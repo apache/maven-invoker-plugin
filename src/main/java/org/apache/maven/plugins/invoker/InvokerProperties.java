@@ -53,7 +53,7 @@ class InvokerProperties
 
         private final String key;
 
-        private InvocationProperty( final String s )
+        InvocationProperty( final String s )
         {
             this.key = s;
         }
@@ -73,7 +73,7 @@ class InvokerProperties
         
         private final String suffix;
         
-        private SelectorProperty( String suffix )
+        SelectorProperty( String suffix )
         {
             this.suffix = suffix;
         }
@@ -96,7 +96,7 @@ class InvokerProperties
      *
      * @param properties The invoker properties to wrap, may be <code>null</code> if none.
      */
-    public InvokerProperties( Properties properties )
+    InvokerProperties( Properties properties )
     {
         this.properties = ( properties != null ) ? properties : new Properties();
     }

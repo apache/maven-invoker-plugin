@@ -50,7 +50,7 @@ class InvokerSession
     /**
      * Creates a new empty session.
      */
-    public InvokerSession()
+    InvokerSession()
     {
         buildJobs = new ArrayList<BuildJob>();
     }
@@ -60,7 +60,7 @@ class InvokerSession
      *
      * @param buildJobs The build jobs to set, must not be <code>null</code>.
      */
-    public InvokerSession( BuildJob[] buildJobs )
+    InvokerSession( BuildJob[] buildJobs )
     {
         this.buildJobs = new ArrayList<BuildJob>( Arrays.asList( buildJobs ) );
     }

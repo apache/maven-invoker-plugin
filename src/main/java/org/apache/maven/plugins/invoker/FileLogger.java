@@ -40,7 +40,7 @@ class FileLogger
      * @param outputFile The path to the output file, must not be <code>null</code>.
      * @throws IOException If the output file could not be created.
      */
-    public FileLogger( File outputFile )
+    FileLogger( File outputFile )
         throws IOException
     {
         super( outputFile, null );
@@ -53,7 +53,7 @@ class FileLogger
      * @param log The mojo logger to additionally output messages to, may be <code>null</code> if not used.
      * @throws IOException If the output file could not be created.
      */
-    public FileLogger( File outputFile, Log log )
+    FileLogger( File outputFile, Log log )
         throws IOException
     {
         super( outputFile, log );

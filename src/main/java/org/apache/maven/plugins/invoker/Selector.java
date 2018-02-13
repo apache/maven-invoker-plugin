@@ -38,7 +38,7 @@ class Selector
     
     private final String actualJavaVersion;
     
-    public Selector( String actualMavenVersion, String actualJavaVersion )
+    Selector( String actualMavenVersion, String actualJavaVersion )
     {
         this.actualMavenVersion = actualMavenVersion;
         this.actualJavaVersion = actualJavaVersion;
