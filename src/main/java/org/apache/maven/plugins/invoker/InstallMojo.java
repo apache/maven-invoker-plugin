@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -427,9 +428,8 @@ public class InstallMojo
 
             projects.put( projectId, reactorProject );
 
-            // only add projects of reactor build previous to this mvnProject
-            foundCurrent |= ( mvnProject.equals( reactorProject ) );
-            if ( !foundCurrent )
+            // only add projects used by the current project
+            if ( isInProjectReferences( project.getProjectReferences().values(), reactorProject ) )
             {
                 dependencyProjects.add( projectId );
             }
@@ -475,6 +475,22 @@ public class InstallMojo
         {
             throw new MojoExecutionException( "Failed to install project dependencies: " + mvnProject, e );
         }
+    }
+
+    protected boolean isInProjectReferences( Collection<MavenProject> references, MavenProject project )
+    {
+        if ( references == null || references.isEmpty() )
+        {
+            return false;
+        }
+        for ( MavenProject mavenProject : references )
+        {
+            if ( StringUtils.equals( mavenProject.getId(), project.getId() ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void copyArtifact( Artifact artifact )
