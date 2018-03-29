@@ -25,7 +25,7 @@ under the License.
   <groupId>org.apache.maven.plugins.invoker</groupId>
   <artifactId>selector-conditions</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>maven-plugin</packaging>
 
   <description>Test to check for selection of builds based on OS and/or JRE.</description>
 
@@ -41,6 +41,7 @@ under the License.
         <version>@pom.version@</version>
         <configuration>
           <debug>true</debug>
+
           <pomIncludes>
             <pomInclude>*/pom.xml</pomInclude>
           </pomIncludes>
