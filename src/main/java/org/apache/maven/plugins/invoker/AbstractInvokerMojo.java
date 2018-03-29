@@ -19,37 +19,6 @@ package org.apache.maven.plugins.invoker;
  * under the License.
  */
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -57,10 +26,10 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.invoker.model.BuildJob;
-import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Writer;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.invoker.model.BuildJob;
+import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Writer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
@@ -97,6 +66,39 @@ import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
@@ -175,7 +177,7 @@ public abstract class AbstractInvokerMojo
      *
      * @since 1.1
      */
-    @Parameter( defaultValue = "${project.build.directory}/its" )
+    @Parameter( property = "invoker.cloneProjectsTo" )
     private File cloneProjectsTo;
 
     // CHECKSTYLE_OFF: LineLength
@@ -680,6 +682,12 @@ public abstract class AbstractInvokerMojo
 
         if ( cloneProjectsTo != null )
         {
+            cloneProjects( collectedProjects );
+            projectsDir = cloneProjectsTo;
+        }
+        if ( cloneProjectsTo == null && "maven-plugin".equals( project.getPackaging() ) )
+        {
+            cloneProjectsTo = new File( project.getBuild().getDirectory(), "its" );
             cloneProjects( collectedProjects );
             projectsDir = cloneProjectsTo;
         }
