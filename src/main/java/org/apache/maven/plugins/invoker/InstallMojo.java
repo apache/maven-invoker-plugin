@@ -59,7 +59,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @since 1.2
  * @author Paul Gier
  * @author Benjamin Bentmann
- * @version $Id: InstallMojo.java 1748000 2016-06-12 13:20:59Z rfscholte $
+ *
  */
 // CHECKSTYLE_OFF: LineLength
 @Mojo( name = "install", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST, requiresDependencyResolution = ResolutionScope.RUNTIME, threadSafe = true )

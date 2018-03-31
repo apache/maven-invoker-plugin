@@ -27,7 +27,7 @@ import org.apache.maven.shared.invoker.InvocationOutputHandler;
 import org.apache.maven.shared.scriptinterpreter.ExecutionLogger;
 
 /**
- * @version $Id: FileLogger.java 1671476 2015-04-06 03:53:29Z dantran $
+ *
  */
 class FileLogger
     extends org.apache.maven.shared.scriptinterpreter.FileLogger

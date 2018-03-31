@@ -26,7 +26,6 @@ import java.util.Properties;
 /**
  * @author Olivier Lamy
  * @since 22 nov. 07
- * @version $Id: ExtendedMavenProjectStub.java 1606207 2014-06-27 20:27:03Z khmarbaise $
  */
 public class ExtendedMavenProjectStub
     extends MavenProjectStub

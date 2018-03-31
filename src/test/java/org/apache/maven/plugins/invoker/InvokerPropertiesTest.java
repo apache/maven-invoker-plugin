@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests the invoker properties facade.
  *
  * @author Benjamin Bentmann
- * @version $Id: InvokerPropertiesTest.java 1779250 2017-01-17 20:20:02Z rfscholte $
  */
 public class InvokerPropertiesTest
     extends TestCase

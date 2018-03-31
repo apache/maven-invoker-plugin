@@ -32,7 +32,6 @@ import org.codehaus.plexus.util.StringUtils;
  * Provides a convenient facade around the <code>invoker.properties</code>.
  *
  * @author Benjamin Bentmann
- * @version $Id: InvokerProperties.java 1779250 2017-01-17 20:20:02Z rfscholte $
  */
 class InvokerProperties
 {

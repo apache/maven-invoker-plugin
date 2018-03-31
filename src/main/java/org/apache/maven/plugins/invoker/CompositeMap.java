@@ -32,7 +32,6 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  *
  * @author Olivier Lamy
  * @since 1.1
- * @version $Id: CompositeMap.java 1784076 2017-02-23 00:35:39Z schulte $
  */
 class CompositeMap
     implements Map<String, Object>

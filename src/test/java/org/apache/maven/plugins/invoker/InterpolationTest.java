@@ -38,7 +38,6 @@ import org.codehaus.plexus.util.ReaderFactory;
 /**
  * @author Olivier Lamy
  * @since 22 nov. 07
- * @version $Id: InterpolationTest.java 1783819 2017-02-21 02:30:23Z schulte $
  */
 public class InterpolationTest
     extends AbstractMojoTestCase

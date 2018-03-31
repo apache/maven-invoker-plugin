@@ -29,7 +29,6 @@ import org.apache.maven.plugins.invoker.model.BuildJob;
 /**
  * @author Olivier Lamy
  * @since 18 nov. 07
- * @version $Id: InvokerMojoTest.java 1731726 2016-02-22 19:34:37Z khmarbaise $
  */
 public class InvokerMojoTest
     extends AbstractMojoTestCase

@@ -32,7 +32,6 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * @since 1.0
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
  * @author <a href="mailto:jdcasey@apache.org">John Casey</a>
- * @version $Id: InvokerMojo.java 1637968 2014-11-10 20:02:25Z khmarbaise $
  */
 // CHECKSTYLE_OFF: LineLength
 @Mojo( name = "run", defaultPhase = LifecyclePhase.INTEGRATION_TEST, requiresDependencyResolution = ResolutionScope.TEST, threadSafe = true )
