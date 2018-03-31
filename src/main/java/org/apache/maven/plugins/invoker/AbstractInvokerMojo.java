@@ -685,7 +685,7 @@ public abstract class AbstractInvokerMojo
             cloneProjects( collectedProjects );
             projectsDir = cloneProjectsTo;
         }
-        if ( cloneProjectsTo == null && "maven-plugin".equals( project.getPackaging() ) )
+        else if ( cloneProjectsTo == null && "maven-plugin".equals( project.getPackaging() ) )
         {
             cloneProjectsTo = new File( project.getBuild().getDirectory(), "its" );
             cloneProjects( collectedProjects );
