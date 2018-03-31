@@ -49,7 +49,8 @@ class InvokerProperties
         OFFLINE( "invoker.offline" ),
         SYSTEM_PROPERTIES_FILE( "invoker.systemPropertiesFile" ),
         DEBUG( "invoker.debug" ),
-        SETTINGS_FILE ( "invoker.settingsFile" );
+        SETTINGS_FILE ( "invoker.settingsFile" ),
+        TIMEOUT_IN_SECONDS ( "invoker.timeoutInSeconds" );
 
         private final String key;
 
@@ -345,6 +346,21 @@ class InvokerProperties
         return get( InvocationProperty.SETTINGS_FILE, index );
     }
 
+    /**
+     * Get timeout to execute the project
+     * @param index index The index of the invocation, must not be negative.
+     * @return the value for the timeout or -1
+     */
+    public int getTimeoutInSeconds( int index )
+    {
+        String timeoutInSecondsStr = get( InvocationProperty.TIMEOUT_IN_SECONDS, index );
+        if ( StringUtils.isEmpty( timeoutInSecondsStr ) )
+        {
+            return -1;
+        }
+        // catch NumberFormatException? well we assume users knows what they do :-)
+        return Integer.parseInt( timeoutInSecondsStr );
+    }
     /**
      * Gets a value from the invoker properties. The invoker properties are intended to describe the invocation settings
      * for multiple builds of the same project. For this reason, the properties are indexed. First, a property named

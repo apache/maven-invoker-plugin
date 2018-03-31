@@ -585,6 +585,13 @@ public abstract class AbstractInvokerMojo
     private Map<String, String> scriptVariables;
 
     /**
+     *
+     * @since 3.0.2
+     */
+    @Parameter( defaultValue = "0", property = "invoker.timeoutInSeconds" )
+    private int timeoutInSeconds;
+
+    /**
      * The scripter runner that is responsible to execute hook scripts.
      */
     private ScriptRunner scriptRunner;
@@ -1842,6 +1849,10 @@ public abstract class AbstractInvokerMojo
                 request.setMavenOpts( mavenOpts );
 
                 request.setOffline( false );
+
+                int timeOut = invokerProperties.getTimeoutInSeconds( invocationIndex );
+                // not set so we use the one at the mojo level
+                request.setTimeoutInSeconds( timeOut < 0 ? timeoutInSeconds : timeOut );
 
                 String customSettingsFile = invokerProperties.getSettingsFile( invocationIndex );
                 if ( customSettingsFile != null )
