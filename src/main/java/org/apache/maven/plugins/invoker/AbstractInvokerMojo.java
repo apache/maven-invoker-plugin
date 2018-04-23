@@ -721,8 +721,10 @@ public abstract class AbstractInvokerMojo
             // mode.
             //
             // Some Idea about ordering?
-            getLog().info( "Running Setup Jobs" );
+            getLog().info( "Running " + setupBuildJobs.length + " setup job"
+                + ( ( setupBuildJobs.length < 2 ) ? "" : "s" ) + ":" );
             runBuilds( projectsDir, setupBuildJobs, 1 );
+            getLog().info( "Setup done." );
         }
 
         // Afterwards run all other jobs.
