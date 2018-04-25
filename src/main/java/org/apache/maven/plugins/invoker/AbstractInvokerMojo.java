@@ -715,7 +715,7 @@ public abstract class AbstractInvokerMojo
             // TODO: Check shouldn't we fail in case of problems?
         }
 
-        if ( setupBuildJobs != null )
+        if ( ( setupBuildJobs != null ) && ( setupBuildJobs.length > 0 ) )
         {
             // Run setup jobs in single thread
             // mode.
