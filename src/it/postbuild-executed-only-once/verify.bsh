@@ -28,7 +28,7 @@ try
     System.out.println( "Checking for existence of touch file: " + touchFile );
     if ( !touchFile.exists() )
     {
-        System.out.println( "FAILED!" );
+        System.out.println( "FAILED! no touchFile " + touchFile.toString() );
         return false;
     }
 }
