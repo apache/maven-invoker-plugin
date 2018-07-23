@@ -51,6 +51,10 @@ under the License.
                 </requireProperty>
               </rules>
               <fail>true</fail>
+              <properties>
+                <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
+                <https.protocols>${https.protocols}</https.protocols>
+              </properties>
             </configuration>
           </execution>
         </executions>
