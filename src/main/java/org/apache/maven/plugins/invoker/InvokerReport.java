@@ -41,6 +41,7 @@ import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -136,13 +137,14 @@ public class InvokerReport
             return;
         }
 
+        BuildJobXpp3Reader buildJobReader = new BuildJobXpp3Reader();
+
         List<BuildJob> buildJobs = new ArrayList<BuildJob>( reportFiles.length );
         for ( File reportFile : reportFiles )
         {
-            try
+            try ( XmlStreamReader xmlReader = ReaderFactory.newXmlReader( reportFile ) )
             {
-                BuildJobXpp3Reader reader = new BuildJobXpp3Reader();
-                buildJobs.add( reader.read( ReaderFactory.newXmlReader( reportFile ) ) );
+                buildJobs.add( buildJobReader.read( xmlReader ) );
             }
             catch ( XmlPullParserException e )
             {

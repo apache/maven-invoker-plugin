@@ -1354,17 +1354,10 @@ public abstract class AbstractInvokerMojo
 
         SettingsXpp3Writer settingsWriter = new SettingsXpp3Writer();
 
-        FileWriter fileWriter = null;
-        try
+        
+        try ( FileWriter fileWriter = new FileWriter( mergedSettingsFile ) )
         {
-            fileWriter = new FileWriter( mergedSettingsFile );
             settingsWriter.write( fileWriter, mergedSettings );
-            fileWriter.close();
-            fileWriter = null;
-        }
-        finally
-        {
-            IOUtil.close( fileWriter );
         }
 
         if ( getLog().isDebugEnabled() )
@@ -1704,20 +1697,12 @@ public abstract class AbstractInvokerMojo
         }
 
         File reportFile = new File( reportsDirectory, "BUILD-" + safeFileName + ".xml" );
-        try
+        try ( FileOutputStream fos = new FileOutputStream( reportFile );
+             Writer osw = new OutputStreamWriter( fos, buildJob.getModelEncoding() ) )
         {
-            FileOutputStream fos = new FileOutputStream( reportFile );
-            try
-            {
-                Writer osw = new OutputStreamWriter( fos, buildJob.getModelEncoding() );
-                BuildJobXpp3Writer writer = new BuildJobXpp3Writer();
-                writer.write( osw, buildJob );
-                osw.close();
-            }
-            finally
-            {
-                fos.close();
-            }
+            BuildJobXpp3Writer writer = new BuildJobXpp3Writer();
+            writer.write( osw, buildJob );
+            osw.close();
         }
         catch ( IOException e )
         {
@@ -2020,24 +2005,16 @@ public abstract class AbstractInvokerMojo
 
         if ( propertiesFile != null && propertiesFile.isFile() )
         {
-            InputStream fin = null;
-            try
+            
+            try ( InputStream fin = new FileInputStream( propertiesFile ) )
             {
-                fin = new FileInputStream( propertiesFile );
-
                 Properties loadedProperties = new Properties();
                 loadedProperties.load( fin );
-                fin.close();
-                fin = null;
                 collectedTestProperties.putAll( loadedProperties );
             }
             catch ( IOException e )
             {
                 throw new MojoExecutionException( "Error reading system properties from " + propertiesFile );
-            }
-            finally
-            {
-                IOUtil.close( fin );
             }
         }
 
@@ -2441,24 +2418,16 @@ public abstract class AbstractInvokerMojo
         throws IOException
     {
         List<String> result = new ArrayList<String>();
+        
+        Map<String, Object> composite = getInterpolationValueSource( false );
 
-        BufferedReader reader = null;
-        try
+        try ( BufferedReader reader =
+            new BufferedReader( new InterpolationFilterReader( newReader( tokenFile ), composite ) ) )
         {
-            Map<String, Object> composite = getInterpolationValueSource( false );
-            reader = new BufferedReader( new InterpolationFilterReader( newReader( tokenFile ), composite ) );
-
             for ( String line = reader.readLine(); line != null; line = reader.readLine() )
             {
                 result.addAll( collectListFromCSV( line ) );
             }
-
-            reader.close();
-            reader = null;
-        }
-        finally
-        {
-            IOUtil.close( reader );
         }
 
         return result;
@@ -2509,36 +2478,20 @@ public abstract class AbstractInvokerMojo
         {
             String xml;
 
-            Reader reader = null;
-            try
-            {
-                // interpolation with token @...@
-                Map<String, Object> composite = getInterpolationValueSource( true );
-                reader =
-                    new InterpolationFilterReader( ReaderFactory.newXmlReader( originalFile ), composite, "@", "@" );
+            Map<String, Object> composite = getInterpolationValueSource( true );
 
+            // interpolation with token @...@
+            try ( Reader reader =
+                new InterpolationFilterReader( ReaderFactory.newXmlReader( originalFile ), composite, "@", "@" ) )
+            {
                 xml = IOUtil.toString( reader );
-
-                reader.close();
-                reader = null;
             }
-            finally
-            {
-                IOUtil.close( reader );
-            }
-
-            Writer writer = null;
-            try
+            
+            try ( Writer writer = WriterFactory.newXmlWriter( interpolatedFile ) )
             {
                 interpolatedFile.getParentFile().mkdirs();
-                writer = WriterFactory.newXmlWriter( interpolatedFile );
+                
                 writer.write( xml );
-                writer.close();
-                writer = null;
-            }
-            finally
-            {
-                IOUtil.close( writer );
             }
         }
         catch ( IOException e )

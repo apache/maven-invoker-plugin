@@ -31,6 +31,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 
 /**
  * Checks the results of maven-invoker-plugin based integration tests and fails the build if any tests failed.
@@ -111,13 +112,15 @@ public class VerifyMojo
             return;
         }
 
+        BuildJobXpp3Reader reader = new BuildJobXpp3Reader();
+
         InvokerSession invokerSession = new InvokerSession();
+
         for ( File reportFile : reportFiles )
         {
-            try
+            try ( Reader xmlReader = ReaderFactory.newXmlReader( reportFile ) )
             {
-                BuildJobXpp3Reader reader = new BuildJobXpp3Reader();
-                invokerSession.addJob( reader.read( ReaderFactory.newXmlReader( reportFile ) ) );
+                invokerSession.addJob( reader.read( xmlReader ) );
             }
             catch ( XmlPullParserException e )
             {

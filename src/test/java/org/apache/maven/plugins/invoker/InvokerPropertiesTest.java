@@ -268,6 +268,12 @@ public class InvokerPropertiesTest
         assertFalse( facade.isInvocationDefined( 1 ) );
         assertTrue( facade.isInvocationDefined( 2 ) );
         assertFalse( facade.isInvocationDefined( 3 ) );
+
+        props.setProperty( "invoker.goals.3", "install" );
+        assertFalse( facade.isInvocationDefined( 1 ) );
+        assertTrue( facade.isInvocationDefined( 2 ) );
+        assertTrue( facade.isInvocationDefined( 3 ) );
+        assertFalse( facade.isInvocationDefined( 4 ) );
     }
     
     public void testIsSelectedDefined()

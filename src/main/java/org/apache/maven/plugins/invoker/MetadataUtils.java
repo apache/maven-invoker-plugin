@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.maven.artifact.Artifact;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -144,23 +143,14 @@ class MetadataUtils
         {
             return null;
         }
-
-        Reader reader = null;
-        try
+        
+        try ( Reader reader = ReaderFactory.newXmlReader( metadataFile ) )
         {
-            reader = ReaderFactory.newXmlReader( metadataFile );
-            final Xpp3Dom xpp3Dom = Xpp3DomBuilder.build( reader );
-            reader.close();
-            reader = null;
-            return xpp3Dom;
+            return Xpp3DomBuilder.build( reader );
         }
         catch ( XmlPullParserException e )
         {
             throw (IOException) new IOException( e.getMessage() ).initCause( e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
         }
     }
 
@@ -169,17 +159,9 @@ class MetadataUtils
     {
         metadataFile.getParentFile().mkdirs();
 
-        Writer writer = null;
-        try
+        try ( Writer writer = WriterFactory.newXmlWriter( metadataFile ) )
         {
-            writer = WriterFactory.newXmlWriter( metadataFile );
             Xpp3DomWriter.write( writer, metadata );
-            writer.close();
-            writer = null;
-        }
-        finally
-        {
-            IOUtil.close( writer );
         }
     }
 

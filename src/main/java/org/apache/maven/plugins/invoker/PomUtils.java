@@ -26,7 +26,6 @@ import java.io.Reader;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -48,14 +47,9 @@ class PomUtils
     public static Model loadPom( File pomFile )
         throws MojoExecutionException
     {
-        Reader reader = null;
-        try
+        try ( Reader reader = ReaderFactory.newXmlReader( pomFile ) )
         {
-            reader = ReaderFactory.newXmlReader( pomFile );
-            final Model model = new MavenXpp3Reader().read( reader, false );
-            reader.close();
-            reader = null;
-            return model;
+            return new MavenXpp3Reader().read( reader, false );
         }
         catch ( XmlPullParserException e )
         {
@@ -64,10 +58,6 @@ class PomUtils
         catch ( IOException e )
         {
             throw new MojoExecutionException( "Failed to read POM: " + pomFile, e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
         }
     }
 
