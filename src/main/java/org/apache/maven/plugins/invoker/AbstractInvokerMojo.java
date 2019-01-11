@@ -335,6 +335,15 @@ public abstract class AbstractInvokerMojo
      */
     @Parameter( property = "invoker.noLog", defaultValue = "false" )
     private boolean noLog;
+    
+    /**
+     * By default a {@code build.log} is created in the root of the project. By setting this folder 
+     * files are written to a different folder, respecting the structure of the projectsDirectory. 
+     * 
+     * @since 3.2.0
+     */
+    @Parameter
+    private File logDirectory;
 
     /**
      * List of profile identifiers to explicitly trigger in the build.
@@ -2072,23 +2081,38 @@ public abstract class AbstractInvokerMojo
 
         if ( !noLog )
         {
-            File outputLog = new File( basedir, "build.log" );
+            Path projectLogDirectory;
+            if ( logDirectory == null )
+            {
+                projectLogDirectory = basedir.toPath();
+            }
+            else if ( cloneProjectsTo != null )
+            {
+                projectLogDirectory =
+                    logDirectory.toPath().resolve( cloneProjectsTo.toPath().relativize( basedir.toPath() ) );
+            }
+            else
+            {
+                projectLogDirectory =
+                    logDirectory.toPath().resolve( projectsDirectory.toPath().relativize( basedir.toPath() ) );
+            }            
+            
             try
             {
                 if ( streamLogs )
                 {
-                    logger = new FileLogger( outputLog, getLog() );
+                    logger = new FileLogger( projectLogDirectory.resolve( "build.log" ).toFile(), getLog() );
                 }
                 else
                 {
-                    logger = new FileLogger( outputLog );
+                    logger = new FileLogger( projectLogDirectory.resolve( "build.log" ).toFile() );
                 }
 
-                getLog().debug( "Build log initialized in: " + outputLog );
+                getLog().debug( "Build log initialized in: " + projectLogDirectory );
             }
             catch ( IOException e )
             {
-                throw new MojoExecutionException( "Error initializing build logfile in: " + outputLog, e );
+                throw new MojoExecutionException( "Error initializing build logfile in: " + projectLogDirectory, e );
             }
         }
 
