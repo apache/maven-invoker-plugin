@@ -413,11 +413,9 @@ public class InstallMojo
     private void installProjectDependencies( MavenProject mvnProject, Collection<MavenProject> reactorProjects )
         throws MojoExecutionException
     {
-        // keep track if we have passed mvnProject in reactorProjects
-        boolean foundCurrent = false;
-
         // ... into dependencies that were resolved from reactor projects ...
         Collection<String> dependencyProjects = new LinkedHashSet<String>();
+        collectAllProjectReferences( mvnProject, dependencyProjects );
 
         // index available reactor projects
         Map<String, MavenProject> projects = new HashMap<String, MavenProject>( reactorProjects.size() );
@@ -427,12 +425,6 @@ public class InstallMojo
                 reactorProject.getGroupId() + ':' + reactorProject.getArtifactId() + ':' + reactorProject.getVersion();
 
             projects.put( projectId, reactorProject );
-
-            // only add projects used by the current project
-            if ( isInProjectReferences( project.getProjectReferences().values(), reactorProject ) )
-            {
-                dependencyProjects.add( projectId );
-            }
         }
 
         // group transitive dependencies (even those that don't contribute to the class path like POMs) ...
@@ -474,6 +466,19 @@ public class InstallMojo
         catch ( Exception e )
         {
             throw new MojoExecutionException( "Failed to install project dependencies: " + mvnProject, e );
+        }
+    }
+    
+    protected void collectAllProjectReferences( MavenProject project, Collection<String> dependencyProjects )
+    {
+        for ( MavenProject reactorProject : project.getProjectReferences().values() )
+        {
+            String projectId =
+                reactorProject.getGroupId() + ':' + reactorProject.getArtifactId() + ':' + reactorProject.getVersion();
+            if ( dependencyProjects.add( projectId ) )
+            {
+                collectAllProjectReferences( reactorProject, dependencyProjects );
+            }
         }
     }
 
