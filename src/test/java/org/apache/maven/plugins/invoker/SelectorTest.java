@@ -31,7 +31,7 @@ public class SelectorTest
     @Test
     public void testGlobalMatch()
     {
-        Selector selector = new Selector( "3.2.5", "1.7" );
+        Selector selector = new Selector( "3.2.5", "1.7", null );
 
         Properties props = new Properties();
         props.setProperty( "invoker.maven.version", "3.0+" );
@@ -42,7 +42,7 @@ public class SelectorTest
     @Test
     public void testSelectorMatch()
     {
-        Selector selector = new Selector( "3.2.5", "1.7" );
+        Selector selector = new Selector( "3.2.5", "1.7", null );
 
         Properties props = new Properties();
         props.setProperty( "selector.1.maven.version", "3.0+" );
@@ -56,7 +56,7 @@ public class SelectorTest
     @Test
     public void testSelectorWithGlobalMatch()
     {
-        Selector selector = new Selector( "3.2.5", "1.7" );
+        Selector selector = new Selector( "3.2.5", "1.7", null );
 
         Properties props = new Properties();
         // invoker.maven.version is used by all selectors

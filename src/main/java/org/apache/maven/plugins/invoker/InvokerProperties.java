@@ -22,7 +22,12 @@ package org.apache.maven.plugins.invoker;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationRequest.ReactorFailureBehavior;
@@ -196,8 +201,41 @@ class InvokerProperties
     {
         return this.properties.getProperty( SELECTOR_PREFIX + index + SelectorProperty.OS_FAMLY.suffix,
                                             getOsFamily() );
-    }   
+    }
     
+    public Collection<InvokerToolchain> getToolchains()
+    {
+        return getToolchains( Pattern.compile( "invoker\\.toolchain\\.([^\\.]+)\\.(.+)" ) );
+    }
+
+    public Collection<InvokerToolchain> getToolchains( int index )
+    {
+        return getToolchains( Pattern.compile( "selector\\." + index + "\\.invoker\\.toolchain\\.([^\\.]+)\\.(.+)" ) );
+    }
+
+    private Collection<InvokerToolchain> getToolchains( Pattern p )
+    {
+        Map<String, InvokerToolchain> toolchains = new HashMap<>();
+        for ( Map.Entry<Object, Object> entry : this.properties.entrySet() )
+        {
+            Matcher m = p.matcher( entry.getKey().toString() );
+            if ( m.matches() )
+            {
+                String type = m.group( 1 );
+                String providesKey = m.group( 2 );
+                String providesValue = entry.getValue().toString();
+
+                InvokerToolchain tc = toolchains.get( type );
+                if ( tc == null )
+                {
+                    tc = new InvokerToolchain( type );
+                    toolchains.put( type, tc );
+                }
+                tc.addProvides( providesKey, providesValue );
+            }
+        }
+        return toolchains.values();
+    }
 
     /**
      * Determines whether these invoker properties contain a build definition for the specified invocation index.

@@ -19,6 +19,8 @@ package org.apache.maven.plugins.invoker;
  * under the License.
  */
 
+import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
+
 /**
  * 
  * @author Robert Scholte
@@ -32,16 +34,21 @@ class Selector
 
     static final int SELECTOR_OSFAMILY = 4;
     
-    static final int SELECTOR_MULTI = 8;
+    static final int SELECTOR_TOOLCHAIN = 8;
+
+    static final int SELECTOR_MULTI = 16;
     
     private final String actualMavenVersion;
     
     private final String actualJavaVersion;
     
-    Selector( String actualMavenVersion, String actualJavaVersion )
+    private final ToolchainPrivateManager toolchainPrivateManager; 
+    
+    Selector( String actualMavenVersion, String actualJavaVersion, ToolchainPrivateManager toolchainPrivateManager )
     {
         this.actualMavenVersion = actualMavenVersion;
         this.actualJavaVersion = actualJavaVersion;
+        this.toolchainPrivateManager = toolchainPrivateManager;
     }
     
     public int getSelection( InvokerProperties invokerProperties ) 
@@ -75,6 +82,12 @@ class Selector
                 selection |= SELECTOR_OSFAMILY;
             }
 
+            if ( !SelectorUtils.isToolchain( toolchainPrivateManager,
+                                             invokerProperties.getToolchains( selectorIndex ) ) )
+            {
+                selection |= SELECTOR_TOOLCHAIN;
+            }
+
             if ( selection == 0 )
             {
                 return 0;
@@ -106,6 +119,11 @@ class Selector
         if ( !SelectorUtils.isOsFamily( invokerProperties.getOsFamily() ) )
         {
             selection |= SELECTOR_OSFAMILY;
+        }
+
+        if ( !SelectorUtils.isToolchain( toolchainPrivateManager, invokerProperties.getToolchains() ) )
+        {
+            selection |= SELECTOR_TOOLCHAIN;
         }
 
         return selection;

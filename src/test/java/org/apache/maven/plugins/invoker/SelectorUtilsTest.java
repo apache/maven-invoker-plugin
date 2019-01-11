@@ -19,13 +19,22 @@ package org.apache.maven.plugins.invoker;
  * under the License.
  */
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.isA;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.maven.plugins.invoker.SelectorUtils;
-
-import junit.framework.TestCase;
+import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
+import org.apache.maven.toolchain.ToolchainPrivate;
+import org.junit.Test;
 
 /**
  * Tests {@link SelectorUtils}.
@@ -33,9 +42,9 @@ import junit.framework.TestCase;
  * @author Benjamin Bentmann
  */
 public class SelectorUtilsTest
-    extends TestCase
 {
 
+    @Test
     public void testParseList()
     {
         List<String> includes = new ArrayList<String>();
@@ -48,6 +57,7 @@ public class SelectorUtilsTest
         assertEquals( Arrays.asList( "1.4" ), excludes );
     }
 
+    @Test
     public void testParseVersion()
     {
         assertEquals( Arrays.asList( 1, 6, 0, 12 ), SelectorUtils.parseVersion( "1.6.0_12" ) );
@@ -56,6 +66,7 @@ public class SelectorUtilsTest
         assertEquals( Arrays.asList( 1, 6, 0, 12 ), SelectorUtils.parseVersion( "1.6.0_12-" ) );
     }
 
+    @Test
     public void testCompareVersions()
     {
         assertTrue( SelectorUtils.compareVersions( Arrays.asList( 1, 6 ), Arrays.asList( 1, 6 ) ) == 0 );
@@ -67,6 +78,7 @@ public class SelectorUtilsTest
         assertTrue( SelectorUtils.compareVersions( Arrays.asList( 1, 6 ), Arrays.asList( 1 ) ) > 0 );
     }
 
+    @Test
     public void testIsMatchingJre()
     {
 
@@ -87,6 +99,41 @@ public class SelectorUtilsTest
 
         assertTrue( SelectorUtils.isJreVersion( (String) null, "1.5" ) );
         assertTrue( SelectorUtils.isJreVersion( "", "1.5" ) );
+    }
+    
+    @Test
+    public void testIsMatchingToolchain() throws Exception
+    {
+        InvokerToolchain openJdk9 = new InvokerToolchain( "jdk" );
+        openJdk9.addProvides( "version", "9" );
+        openJdk9.addProvides( "vendor", "openJDK" );
+
+        InvokerToolchain maven360 = new InvokerToolchain( "maven" );
+        openJdk9.addProvides( "version", "3.6.0" );
+
+        ToolchainPrivateManager toolchainPrivateManager = mock( ToolchainPrivateManager.class );
+        ToolchainPrivate jdkMatching = mock( ToolchainPrivate.class );
+        when( jdkMatching.matchesRequirements( isA( Map.class ) ) ).thenReturn( true );
+        when( jdkMatching.getType() ).thenReturn( "jdk");
+
+        ToolchainPrivate jdkMismatch = mock( ToolchainPrivate.class );
+        when( jdkMismatch.getType() ).thenReturn( "jdk");
+
+        when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) ).thenReturn( new ToolchainPrivate[] { jdkMatching } );
+        assertTrue( SelectorUtils.isToolchain( toolchainPrivateManager, Collections.singleton( openJdk9 ) ) );
+
+        when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) ).thenReturn( new ToolchainPrivate[] { jdkMismatch } );
+        assertFalse( SelectorUtils.isToolchain( toolchainPrivateManager, Collections.singleton( openJdk9 ) ) );
+
+        when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) ).thenReturn( new ToolchainPrivate[] { jdkMatching, jdkMismatch, jdkMatching } );
+        assertTrue( SelectorUtils.isToolchain( toolchainPrivateManager, Collections.singleton( openJdk9 ) ) );
+
+        when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) ).thenReturn( new ToolchainPrivate[0] );
+        assertFalse( SelectorUtils.isToolchain( toolchainPrivateManager, Collections.singleton( openJdk9 ) ) );
+        
+        when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) ).thenReturn( new ToolchainPrivate[] { jdkMatching } );
+        when( toolchainPrivateManager.getToolchainPrivates( "maven" ) ).thenReturn( new ToolchainPrivate[0] );
+        assertFalse( SelectorUtils.isToolchain( toolchainPrivateManager, Arrays.asList( openJdk9, maven360 ) ) );
     }
 
 }

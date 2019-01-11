@@ -1,3 +1,5 @@
+package org.apache.maven.plugins.invoker;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -6,9 +8,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,13 +19,37 @@
  * under the License.
  */
 
-import java.io.File
-import org.apache.commons.io.FileUtils
+import java.util.HashMap;
+import java.util.Map;
 
-// Previous potential target 'content' has impact on IT execution
-// (Some new file should be created by verify.sh) 
-FileUtils.deleteQuietly( new File( basedir, "target/invoker-reports" ) );
-FileUtils.deleteQuietly( new File( basedir, "src/it/jre-version-match/target" ) );
-FileUtils.deleteQuietly( new File( basedir, "src/it/maven-version-match/target" ) );
-FileUtils.deleteQuietly( new File( basedir, "src/it/os-family-match/target" ) );
-return true;
+/**
+ * 
+ * @author Robert Scholte
+ * @since 3.2.0
+ */
+public class InvokerToolchain
+{
+    private final String type;
+    
+    private Map<String, String> provides = new HashMap<>();
+    
+    public InvokerToolchain( String type )
+    {
+        this.type = type;
+    }
+    
+    public String getType()
+    {
+        return type;
+    }
+    
+    public void addProvides( String key, String value )
+    {
+        provides.put( key, value );
+    }
+    
+    public Map<String, String> getProvides()
+    {
+        return provides;
+    }
+}

@@ -20,6 +20,7 @@ package org.apache.maven.plugins.invoker;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.AbstractMojo;
@@ -50,6 +51,9 @@ import org.apache.maven.shared.scriptinterpreter.RunErrorException;
 import org.apache.maven.shared.scriptinterpreter.RunFailureException;
 import org.apache.maven.shared.scriptinterpreter.ScriptRunner;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
+import org.apache.maven.toolchain.MisconfiguredToolchainException;
+import org.apache.maven.toolchain.ToolchainManagerPrivate;
+import org.apache.maven.toolchain.ToolchainPrivate;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -255,6 +259,9 @@ public abstract class AbstractInvokerMojo
 
     @Component
     private SettingsBuilder settingsBuilder;
+    
+    @Component
+    private ToolchainManagerPrivate toolchainManagerPrivate;
 
     /**
      * Relative path of a selector script to run prior in order to decide if the build should be executed. This script
@@ -347,6 +354,9 @@ public abstract class AbstractInvokerMojo
      */
     @Parameter( defaultValue = "${project}", readonly = true, required = true )
     private MavenProject project;
+
+    @Parameter( defaultValue = "${session}", readonly = true, required = true )
+    private MavenSession session;
 
     @Parameter( defaultValue = "${mojoExecution}", readonly = true, required = true )
     private MojoExecution mojoExecution;
@@ -514,7 +524,12 @@ public abstract class AbstractInvokerMojo
      * # Since plugin version 1.5
      * invoker.maven.version = 2.0.10+, !2.1.0, !2.2.0
      * 
-     * # For java.version, maven.version and os.family it is possible to define multiple selectors.
+     * # A mapping for toolchain to ensure it exists
+     * # Since plugin version 3.2.0
+     * invoker.toolchain.&lt;type&gt;.&lt;provides&gt; = value
+     * invoker.toolchain.jdk.version = 11
+     * 
+     * # For java.version, maven.version, os.family and toolchain it is possible to define multiple selectors.
      * # If one of the indexed selectors matches, the test is executed.
      * # With the invoker.x.y equivalents you can specify global matchers.  
      * selector.1.java.version = 1.8+
@@ -1584,6 +1599,14 @@ public abstract class AbstractInvokerMojo
                         }
                         message.append( "OS" );
                     }
+                    if ( ( selection & Selector.SELECTOR_TOOLCHAIN ) != 0 )
+                    {
+                        if ( message.length() > 0 )
+                        {
+                            message.append( ", " );
+                        }
+                        message.append( "Toolchain" );
+                    }
                 }
 
                 if ( !suppressSummaries )
@@ -1673,7 +1696,13 @@ public abstract class AbstractInvokerMojo
      */
     private int getSelection( InvokerProperties invokerProperties, CharSequence actualJreVersion )
     {
-        return new Selector( actualMavenVersion, actualJreVersion.toString() ).getSelection( invokerProperties );
+        return new Selector( actualMavenVersion, actualJreVersion.toString(),
+                             getToolchainPrivateManager() ).getSelection( invokerProperties );
+    }
+
+    private ToolchainPrivateManager getToolchainPrivateManager()
+    {
+        return new ToolchainPrivateManager( toolchainManagerPrivate, session );
     }
 
     /**
@@ -2561,4 +2590,21 @@ public abstract class AbstractInvokerMojo
         return parallelThreads > 1;
     }
 
+    static class ToolchainPrivateManager
+    {
+        private ToolchainManagerPrivate manager;
+        
+        private MavenSession session;
+
+        ToolchainPrivateManager( ToolchainManagerPrivate manager, MavenSession session )
+        {
+            this.manager = manager;
+            this.session = session;
+        }
+
+        ToolchainPrivate[] getToolchainPrivates( String type ) throws MisconfiguredToolchainException
+        {
+            return manager.getToolchainsForType( type, session );
+        }
+    }
 }
