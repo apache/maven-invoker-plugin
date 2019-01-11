@@ -82,6 +82,9 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -89,6 +92,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -97,6 +101,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
@@ -460,9 +465,14 @@ public abstract class AbstractInvokerMojo
      * Maven invocation. Any property present in the file will override the corresponding setting from the plugin
      * configuration. The values of the properties are filtered and may use expressions like
      * <code>${project.version}</code> to reference project properties or values from the parameter
-     * {@link #filterProperties}. The snippet below describes the supported properties:
-     * <p/>
+     * {@link #filterProperties}.<p/>
+     * 
+     * <p>
+     * As of 3.2.0 it is possible to put this folder in any of the ancestor folders, where properties will be inherited.
+     * This way you can provide a single properties file for a group of projects
+     * </p>
      *
+     * The snippet below describes the supported properties:
      * <pre>
      * # A comma or space separated list of goals/phases to execute, may
      * # specify an empty list to execute the default goal of the IT project.
@@ -829,10 +839,8 @@ public abstract class AbstractInvokerMojo
 
         File summaryReportFile = new File( reportsDirectory, "invoker-summary.txt" );
 
-        try
+        try ( Writer writer = new BufferedWriter( new FileWriter( summaryReportFile ) ) )
         {
-            Writer writer = new BufferedWriter( new FileWriter( summaryReportFile ) );
-
             for ( int i = 0; i < buildJobs.length; i++ )
             {
                 BuildJob buildJob = buildJobs[i];
@@ -850,8 +858,6 @@ public abstract class AbstractInvokerMojo
                     writer.append( "\n" );
                 }
             }
-
-            writer.close();
         }
         catch ( IOException e )
         {
@@ -1009,7 +1015,7 @@ public abstract class AbstractInvokerMojo
         }
 
         // determine project directories to clone
-        Collection<String> dirs = new LinkedHashSet<String>();
+        Collection<String> dirs = new LinkedHashSet<>();
         for ( String projectPath : projectPaths )
         {
             if ( !new File( projectsDirectory, projectPath ).isDirectory() )
@@ -1222,6 +1228,78 @@ public abstract class AbstractInvokerMojo
         {
             actualJreVersion = SelectorUtils.getJreVersion();
         }
+        
+        final Path projectsPath = this.projectsDirectory.toPath();
+        
+        Set<Path> folderGroupSet = new HashSet<>();
+        folderGroupSet.add( Paths.get( "." ) );
+        for ( BuildJob buildJob : buildJobs )
+        {
+            Path p = Paths.get( buildJob.getProject() );
+            
+            if ( Files.isRegularFile( projectsPath.resolve( p ) ) )
+            {
+                p = p.getParent();
+            }
+            
+            if ( p != null )
+            {
+                p = p.getParent();
+            }
+            
+            while ( p != null && folderGroupSet.add( p ) )
+            {
+                p = p.getParent();
+            }
+        }
+        
+        List<Path> folderGroup = new ArrayList<>( folderGroupSet );
+        Collections.sort( folderGroup );
+
+        final Map<Path, Properties> globalInvokerProperties = new HashMap<>();
+        
+        for ( Path path : folderGroup )
+        {
+            Properties ancestorProperties = globalInvokerProperties.get( projectsPath.resolve( path ).getParent() );
+
+            Path currentInvokerProperties = projectsPath.resolve( path ).resolve( invokerPropertiesFile );
+
+            Properties currentProperties;
+            if ( Files.isRegularFile( currentInvokerProperties ) )
+            {
+                if ( ancestorProperties != null )
+                {
+                    currentProperties = new Properties( ancestorProperties );
+                    
+                }
+                else
+                {
+                    currentProperties = new Properties();
+                }
+            }
+            else
+            {
+                currentProperties = ancestorProperties;
+            }
+
+            if ( Files.isRegularFile( currentInvokerProperties ) )
+            {
+                try ( InputStream in = new FileInputStream( currentInvokerProperties.toFile() ) )
+                {
+                    currentProperties.load( in );
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( "Failed to read invoker properties: "
+                        + currentInvokerProperties );
+                }
+            }
+            
+            if ( currentProperties != null )
+            {
+                globalInvokerProperties.put( projectsPath.resolve( path ).normalize(), currentProperties );
+            }
+        }
 
         try
         {
@@ -1238,7 +1316,10 @@ public abstract class AbstractInvokerMojo
                         {
                             try
                             {
-                                runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion );
+                                Path ancestorFolder = getAncestorFolder( projectsPath.resolve( job.getProject() ) );
+
+                                runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion,
+                                          globalInvokerProperties.get( ancestorFolder ) );
                             }
                             catch ( MojoExecutionException e )
                             {
@@ -1263,7 +1344,10 @@ public abstract class AbstractInvokerMojo
             {
                 for ( BuildJob job : buildJobs )
                 {
-                    runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion );
+                    Path ancestorFolder = getAncestorFolder( projectsPath.resolve( job.getProject() ) );
+                    
+                    runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion,
+                              globalInvokerProperties.get( ancestorFolder ) );
                 }
             }
         }
@@ -1278,6 +1362,20 @@ public abstract class AbstractInvokerMojo
                 mergedSettingsFile.delete();
             }
         }
+    }
+    
+    private Path getAncestorFolder( Path p )
+    {
+        Path ancestor = p;
+        if ( Files.isRegularFile( ancestor ) )
+        {
+            ancestor = ancestor.getParent();
+        }
+        if ( ancestor != null )
+        {
+            ancestor = ancestor.getParent();
+        }
+        return ancestor;
     }
 
     /**
@@ -1489,10 +1587,11 @@ public abstract class AbstractInvokerMojo
      * @param buildJob The build job to run, must not be <code>null</code>.
      * @param settingsFile The (already interpolated) user settings file for the build, may be <code>null</code> to use
      *            the current user settings.
+     * @param globalInvokerProperties 
      * @throws org.apache.maven.plugin.MojoExecutionException If the project could not be launched.
      */
     private void runBuild( File projectsDir, BuildJob buildJob, File settingsFile, File actualJavaHome,
-                           CharSequence actualJreVersion )
+                           CharSequence actualJreVersion, Properties globalInvokerProperties )
         throws MojoExecutionException
     {
         // FIXME: Think about the following code part -- START
@@ -1521,7 +1620,7 @@ public abstract class AbstractInvokerMojo
 
         getLog().info( buffer().a( "Building: " ).strong( buildJob.getProject() ).toString() );
 
-        InvokerProperties invokerProperties = getInvokerProperties( basedir );
+        InvokerProperties invokerProperties = getInvokerProperties( basedir, globalInvokerProperties );
 
         // let's set what details we can
         buildJob.setName( invokerProperties.getJobName() );
@@ -1727,11 +1826,11 @@ public abstract class AbstractInvokerMojo
 
         File reportFile = new File( reportsDirectory, "BUILD-" + safeFileName + ".xml" );
         try ( FileOutputStream fos = new FileOutputStream( reportFile );
-             Writer osw = new OutputStreamWriter( fos, buildJob.getModelEncoding() ) )
+              Writer osw = new OutputStreamWriter( fos, buildJob.getModelEncoding() ) )
         {
             BuildJobXpp3Writer writer = new BuildJobXpp3Writer();
+
             writer.write( osw, buildJob );
-            osw.close();
         }
         catch ( IOException e )
         {
@@ -2536,51 +2635,89 @@ public abstract class AbstractInvokerMojo
      * @return The invoker properties, may be empty but never <code>null</code>.
      * @throws org.apache.maven.plugin.MojoExecutionException If an I/O error occurred during reading the properties.
      */
-    private InvokerProperties getInvokerProperties( final File projectDirectory )
+    private InvokerProperties getInvokerProperties( final File projectDirectory, Properties globalInvokerProperties )
         throws MojoExecutionException
     {
-        Properties props = new Properties();
-        if ( invokerPropertiesFile != null )
+        Properties props;
+        if ( globalInvokerProperties != null )
         {
-            File propertiesFile = new File( projectDirectory, invokerPropertiesFile );
-            if ( propertiesFile.isFile() )
+            props = new Properties( globalInvokerProperties );
+        }
+        else
+        {
+            props = new Properties();
+        }
+        
+//        Path projectsSourceFolder = this.projectsDirectory.toPath();
+//        Path projectsTargetFolder;
+//        if ( cloneProjectsTo != null )
+//        {
+//            projectsTargetFolder = cloneProjectsTo.toPath();
+//        }
+//        else
+//        {
+//            projectsTargetFolder = projectsSourceFolder;
+//        }
+//        
+//        Path projectDir = projectsTargetFolder.relativize( projectDirectory.toPath() );
+//        
+//        for ( int i = 0; i < projectDir.getNameCount(); i++ )
+//        {
+//            Path subInvokerProperties;
+//            if ( i == 0 )
+//            {
+//                subInvokerProperties = projectsSourceFolder.resolve( invokerPropertiesFile );
+//            }
+//            else
+//            {
+//                subInvokerProperties =
+//                    projectsSourceFolder.resolve( projectDir.subpath( 0, i ) ).resolve( invokerPropertiesFile );
+//            }
+//            
+//            getLog().debug( "Looking for " + subInvokerProperties );
+//                
+//            if ( Files.isRegularFile( subInvokerProperties ) )
+//            {
+//                try ( InputStream in = new FileInputStream( subInvokerProperties.toFile() ) )
+//                {
+//                    props.load( in );
+//                }
+//                catch ( IOException e )
+//                {
+//                    throw new MojoExecutionException( "Failed to read invoker properties: " + subInvokerProperties );
+//                }
+//            }
+//        }
+        
+        File propertiesFile = new File( projectDirectory, invokerPropertiesFile );
+        if ( propertiesFile.isFile() )
+        {
+            try ( InputStream in = new FileInputStream( propertiesFile ) )
             {
-                InputStream in = null;
-                try
-                {
-                    in = new FileInputStream( propertiesFile );
-                    props.load( in );
-                    in.close();
-                    in = null;
-                }
-                catch ( IOException e )
-                {
-                    throw new MojoExecutionException( "Failed to read invoker properties: " + propertiesFile, e );
-                }
-                finally
-                {
-                    IOUtil.close( in );
-                }
+                props.load( in );
             }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Failed to read invoker properties: " + propertiesFile, e );
+            }
+        }
 
-            Interpolator interpolator = new RegexBasedInterpolator();
-            interpolator.addValueSource( new MapBasedValueSource( getInterpolationValueSource( false ) ) );
-            // CHECKSTYLE_OFF: LineLength
-            for ( String key : props.stringPropertyNames() )
+        Interpolator interpolator = new RegexBasedInterpolator();
+        interpolator.addValueSource( new MapBasedValueSource( getInterpolationValueSource( false ) ) );
+        // CHECKSTYLE_OFF: LineLength
+        for ( String key : props.stringPropertyNames() )
+        {
+            String value = props.getProperty( key );
+            try
             {
-                String value = props.getProperty( key );
-                try
-                {
-                    value = interpolator.interpolate( value, "" );
-                }
-                catch ( InterpolationException e )
-                {
-                    throw new MojoExecutionException( "Failed to interpolate invoker properties: " + propertiesFile,
-                                                      e );
-                }
-                props.setProperty( key, value );
+                value = interpolator.interpolate( value, "" );
             }
-            // CHECKSTYLE_ON: LineLength
+            catch ( InterpolationException e )
+            {
+                throw new MojoExecutionException( "Failed to interpolate invoker properties: " + propertiesFile,
+                                                  e );
+            }
+            props.setProperty( key, value );
         }
         return new InvokerProperties( props );
     }
