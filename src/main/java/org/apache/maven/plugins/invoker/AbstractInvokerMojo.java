@@ -1734,8 +1734,8 @@ public abstract class AbstractInvokerMojo
 
             if ( !suppressSummaries )
             {
-                getLog().info( pad( buildJob ).failure( "ERROR" ).a( ' ' ) + formatTime( buildJob.getTime() ) );
                 getLog().info( "  " + e.getMessage() );
+                getLog().info( pad( buildJob ).failure( "ERROR" ).a( ' ' ) + formatTime( buildJob.getTime() ) );
             }
         }
         catch ( RunFailureException e )
@@ -1745,8 +1745,8 @@ public abstract class AbstractInvokerMojo
 
             if ( !suppressSummaries )
             {
-                getLog().info( pad( buildJob ).failure( "FAILED" ).a( ' ' ) + formatTime( buildJob.getTime() ) );
                 getLog().info( "  " + e.getMessage() );
+                getLog().info( pad( buildJob ).failure( "FAILED" ).a( ' ' ) + formatTime( buildJob.getTime() ) );
             }
         }
         finally
