@@ -458,7 +458,11 @@ public class InstallMojo
             for ( String projectId : dependencyProjects )
             {
                 MavenProject dependencyProject = projects.get( projectId );
-
+                if ( dependencyProject == null )
+                {
+                    getLog().error( "dependencyProject null for projectId=" + projectId );
+                    continue;
+                }
                 installProjectArtifacts( dependencyProject );
                 installProjectParents( dependencyProject );
             }
