@@ -66,8 +66,8 @@ class SelectorUtils
 
     static boolean isOsFamily( String osSpec )
     {
-        List<String> includes = new ArrayList<String>();
-        List<String> excludes = new ArrayList<String>();
+        List<String> includes = new ArrayList<>();
+        List<String> excludes = new ArrayList<>();
         parseList( osSpec, includes, excludes );
 
         return isOsFamily( includes, true ) && !isOsFamily( excludes, false );
@@ -165,8 +165,8 @@ class SelectorUtils
 
     static boolean isMavenVersion( String mavenSpec, String actualVersion )
     {
-        List<String> includes = new ArrayList<String>();
-        List<String> excludes = new ArrayList<String>();
+        List<String> includes = new ArrayList<>();
+        List<String> excludes = new ArrayList<>();
         parseList( mavenSpec, includes, excludes );
 
         List<Integer> mavenVersionList = parseVersion( actualVersion );

@@ -713,7 +713,7 @@ public abstract class AbstractInvokerMojo
 
         handleScriptRunnerWithScriptClassPath();
 
-        Collection<String> collectedProjects = new LinkedHashSet<String>();
+        Collection<String> collectedProjects = new LinkedHashSet<>();
         for ( BuildJob buildJob : buildJobs )
         {
             collectProjects( projectsDirectory, buildJob.getProject(), collectedProjects, true );
@@ -802,7 +802,7 @@ public abstract class AbstractInvokerMojo
 
     private BuildJob[] getNonSetupJobs( BuildJob[] buildJobs )
     {
-        List<BuildJob> result = new LinkedList<BuildJob>();
+        List<BuildJob> result = new LinkedList<>();
         for ( int i = 0; i < buildJobs.length; i++ )
         {
             if ( !buildJobs[i].getType().equals( BuildJob.Type.SETUP ) )
@@ -819,7 +819,7 @@ public abstract class AbstractInvokerMojo
         final List<String> scriptClassPath;
         if ( addTestClassPath )
         {
-            scriptClassPath = new ArrayList<String>( testClassPath );
+            scriptClassPath = new ArrayList<>( testClassPath );
             for ( Artifact pluginArtifact : pluginArtifacts )
             {
                 scriptClassPath.remove( pluginArtifact.getFile().getAbsolutePath() );
@@ -1041,7 +1041,7 @@ public abstract class AbstractInvokerMojo
         {
             filter = !cloneProjectsTo.getCanonicalFile().equals( projectsDirectory.getCanonicalFile() );
 
-            List<String> clonedSubpaths = new ArrayList<String>();
+            List<String> clonedSubpaths = new ArrayList<>();
 
             for ( String subpath : dirs )
             {
@@ -1891,7 +1891,7 @@ public abstract class AbstractInvokerMojo
 
         List<String> profiles = getProfiles( basedir );
 
-        Map<String, Object> context = new LinkedHashMap<String, Object>();
+        Map<String, Object> context = new LinkedHashMap<>();
 
         FileLogger logger = setupBuildLogFile( basedir );
         boolean selectorResult = true;
@@ -2256,7 +2256,7 @@ public abstract class AbstractInvokerMojo
         throws IOException
     {
         List<String> excludes =
-            ( pomExcludes != null ) ? new ArrayList<String>( pomExcludes ) : new ArrayList<String>();
+            ( pomExcludes != null ) ? new ArrayList<>( pomExcludes ) : new ArrayList<String>();
         if ( this.settingsFile != null )
         {
             String exclude = relativizePath( this.settingsFile, projectsDirectory.getCanonicalPath() );
@@ -2312,7 +2312,7 @@ public abstract class AbstractInvokerMojo
 
             BuildJob[] normalPoms = scanProjectsDirectory( pomIncludes, excludes, BuildJob.Type.NORMAL );
 
-            Map<String, BuildJob> uniquePoms = new LinkedHashMap<String, BuildJob>();
+            Map<String, BuildJob> uniquePoms = new LinkedHashMap<>();
             for ( BuildJob setupPom : setupPoms )
             {
                 uniquePoms.put( setupPom.getProject(), setupPom );
@@ -2330,8 +2330,8 @@ public abstract class AbstractInvokerMojo
         else
         {
             String[] testRegexes = StringUtils.split( invokerTest, "," );
-            List<String> includes = new ArrayList<String>( testRegexes.length );
-            List<String> excludes = new ArrayList<String>();
+            List<String> includes = new ArrayList<>( testRegexes.length );
+            List<String> excludes = new ArrayList<>();
 
             for ( String regex : testRegexes )
             {
@@ -2390,7 +2390,7 @@ public abstract class AbstractInvokerMojo
         scanner.addDefaultExcludes();
         scanner.scan();
 
-        Map<String, BuildJob> matches = new LinkedHashMap<String, BuildJob>();
+        Map<String, BuildJob> matches = new LinkedHashMap<>();
 
         for ( String includedFile : scanner.getIncludedFiles() )
         {
@@ -2569,7 +2569,7 @@ public abstract class AbstractInvokerMojo
     private List<String> readTokens( final File tokenFile )
         throws IOException
     {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         
         Map<String, Object> composite = getInterpolationValueSource( false );
 
@@ -2593,7 +2593,7 @@ public abstract class AbstractInvokerMojo
      */
     private List<String> collectListFromCSV( final String csv )
     {
-        final List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<>();
 
         if ( ( csv != null ) && ( csv.trim().length() > 0 ) )
         {

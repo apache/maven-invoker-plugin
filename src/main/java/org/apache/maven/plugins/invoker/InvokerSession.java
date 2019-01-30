@@ -52,7 +52,7 @@ class InvokerSession
      */
     InvokerSession()
     {
-        buildJobs = new ArrayList<BuildJob>();
+        buildJobs = new ArrayList<>();
     }
 
     /**
@@ -62,7 +62,7 @@ class InvokerSession
      */
     InvokerSession( BuildJob[] buildJobs )
     {
-        this.buildJobs = new ArrayList<BuildJob>( Arrays.asList( buildJobs ) );
+        this.buildJobs = new ArrayList<>( Arrays.asList( buildJobs ) );
     }
 
     /**
@@ -84,7 +84,7 @@ class InvokerSession
      */
     public void setJobs( List<? extends BuildJob> buildJobs )
     {
-        this.buildJobs = new ArrayList<BuildJob>( buildJobs );
+        this.buildJobs = new ArrayList<>( buildJobs );
 
         resetStats();
     }
@@ -162,10 +162,10 @@ class InvokerSession
             return;
         }
 
-        successfulJobs = new ArrayList<BuildJob>();
-        failedJobs = new ArrayList<BuildJob>();
-        skippedJobs = new ArrayList<BuildJob>();
-        errorJobs = new ArrayList<BuildJob>();
+        successfulJobs = new ArrayList<>();
+        failedJobs = new ArrayList<>();
+        skippedJobs = new ArrayList<>();
+        errorJobs = new ArrayList<>();
 
         for ( BuildJob buildJob : buildJobs )
         {

@@ -178,8 +178,8 @@ public class InstallMojo
 
         createTestRepository();
 
-        installedArtifacts = new HashSet<String>();
-        copiedArtifacts = new HashSet<String>();
+        installedArtifacts = new HashSet<>();
+        copiedArtifacts = new HashSet<>();
 
         installProjectDependencies( project, reactorProjects );
         installProjectParents( project );
@@ -332,7 +332,7 @@ public class InstallMojo
             }
 
             // Install any attached project artifacts
-            Collection<Artifact> attachedArtifacts = (Collection<Artifact>) mvnProject.getAttachedArtifacts();
+            Collection<Artifact> attachedArtifacts = mvnProject.getAttachedArtifacts();
             for ( Artifact attachedArtifact : attachedArtifacts )
             {
                 installArtifact( attachedArtifact.getFile(), attachedArtifact );
@@ -414,11 +414,11 @@ public class InstallMojo
         throws MojoExecutionException
     {
         // ... into dependencies that were resolved from reactor projects ...
-        Collection<String> dependencyProjects = new LinkedHashSet<String>();
+        Collection<String> dependencyProjects = new LinkedHashSet<>();
         collectAllProjectReferences( mvnProject, dependencyProjects );
 
         // index available reactor projects
-        Map<String, MavenProject> projects = new HashMap<String, MavenProject>( reactorProjects.size() );
+        Map<String, MavenProject> projects = new HashMap<>( reactorProjects.size() );
         for ( MavenProject reactorProject : reactorProjects )
         {
             String projectId =
@@ -428,9 +428,9 @@ public class InstallMojo
         }
 
         // group transitive dependencies (even those that don't contribute to the class path like POMs) ...
-        Collection<Artifact> artifacts = (Collection<Artifact>) mvnProject.getArtifacts();
+        Collection<Artifact> artifacts = mvnProject.getArtifacts();
         // ... and those that were resolved from the (local) repo
-        Collection<Artifact> dependencyArtifacts = new LinkedHashSet<Artifact>();
+        Collection<Artifact> dependencyArtifacts = new LinkedHashSet<>();
 
         for ( Artifact artifact : artifacts )
         {

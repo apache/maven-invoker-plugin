@@ -139,7 +139,7 @@ public class InvokerReport
 
         BuildJobXpp3Reader buildJobReader = new BuildJobXpp3Reader();
 
-        List<BuildJob> buildJobs = new ArrayList<BuildJob>( reportFiles.length );
+        List<BuildJob> buildJobs = new ArrayList<>( reportFiles.length );
         for ( File reportFile : reportFiles )
         {
             try ( XmlStreamReader xmlReader = ReaderFactory.newXmlReader( reportFile ) )
