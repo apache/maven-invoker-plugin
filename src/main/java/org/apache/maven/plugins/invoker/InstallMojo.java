@@ -460,7 +460,7 @@ public class InstallMojo
                 MavenProject dependencyProject = projects.get( projectId );
                 if ( dependencyProject == null )
                 {
-                    getLog().error( "dependencyProject null for projectId=" + projectId );
+                    getLog().warn( "skip dependencyProject null for projectId=" + projectId );
                     continue;
                 }
                 installProjectArtifacts( dependencyProject );
