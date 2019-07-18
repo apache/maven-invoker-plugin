@@ -23,12 +23,12 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.plugins.invoker</groupId>
-  <artifactId>local-repo-url</artifactId>
+  <artifactId>junit-report-file</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <description>
-    Test to check for proper filtering of "localRepositoryUrl" token.
+    Test to check for proper generation of junit report files
   </description>
 
   <properties>
