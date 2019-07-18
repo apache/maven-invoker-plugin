@@ -43,6 +43,7 @@ under the License.
         <artifactId>maven-invoker-plugin</artifactId>
         <version>@project.version@</version>
         <configuration>
+          <writeJunitReport>true</writeJunitReport>
           <cloneProjectsTo>${project.build.directory}/its</cloneProjectsTo>
           <pomIncludes>
             <pomInclude>*/pom.xml</pomInclude>
