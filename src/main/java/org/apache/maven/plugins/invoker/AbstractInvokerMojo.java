@@ -1901,6 +1901,7 @@ public abstract class AbstractInvokerMojo
         }
         testcase.setAttribute( "classname", junitPackageName + "." + safeFileName );
         testcase.setAttribute( "name", safeFileName );
+        testcase.setAttribute( "time", Double.toString( buildJob.getTime() ) );
         Xpp3Dom systemOut = new Xpp3Dom( "system-out" );
         testcase.addChild( systemOut );
 
