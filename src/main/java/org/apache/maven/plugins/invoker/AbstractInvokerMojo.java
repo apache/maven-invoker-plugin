@@ -1874,8 +1874,15 @@ public abstract class AbstractInvokerMojo
     {
         File reportFile = new File( reportsDirectory, "TEST-" + safeFileName + ".xml" );
         Xpp3Dom testsuite = new Xpp3Dom( "testsuite" );
-        testsuite.setAttribute( "tests", "1" );
+        testsuite.setAttribute("name", junitPackageName + "." + safeFileName);
         testsuite.setAttribute( "time", Double.toString( buildJob.getTime() ) );
+
+        // set default value for required attributes
+        testsuite.setAttribute( "tests", "1" );
+        testsuite.setAttribute( "errors", "0" );
+        testsuite.setAttribute( "skipped", "0" );
+        testsuite.setAttribute( "failures", "0" );
+
         Xpp3Dom testcase = new Xpp3Dom( "testcase" );
         testsuite.addChild( testcase );
         switch ( buildJob.getResult() )

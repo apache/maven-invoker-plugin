@@ -20,12 +20,17 @@ File buildLog = new File( basedir, 'build.log' )
 assert buildLog.text.contains( '[INFO] run post-build script verify.groovy' )
 
 File invokerReports = new File( new File(basedir, "target"), 'invoker-reports' )
-assert buildLog.exists()
+assert invokerReports.exists()
 
 // test on first project
 def testsuite = new XmlSlurper().parse( new File( invokerReports, "TEST-project.xml" ) )
 
+assert testsuite.@name.text() != null
+assert testsuite.@time.text() != null
 assert testsuite.@tests.text() == "1"
+assert testsuite.@errors.text() == "0"
+assert testsuite.@skipped.text() == "0"
+assert testsuite.@failures.text() == "0"
 
 assert testsuite.testcase.@name.text() == "project"
 def systemOut = testsuite.testcase.'**'.findAll { node -> node.name() == 'system-out' }.get(0)
@@ -35,7 +40,11 @@ assert !systemOut.text().isEmpty()
 // test on second project
 testsuite = new XmlSlurper().parse( new File( invokerReports, "TEST-project_2.xml" ) )
 
+assert testsuite.@name.text() != null
+assert testsuite.@time.text() != null
 assert testsuite.@tests.text() == "1"
+assert testsuite.@errors.text() == "0"
+assert testsuite.@skipped.text() == "0"
 assert testsuite.@failures.text() == "1"
 
 assert testsuite.testcase.@name.text() == "project_2"
