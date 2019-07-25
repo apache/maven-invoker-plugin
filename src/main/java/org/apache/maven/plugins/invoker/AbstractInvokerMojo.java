@@ -2596,7 +2596,7 @@ public abstract class AbstractInvokerMojo
      */
     private Map<String, Object> getInterpolationValueSource( final boolean escapeXml )
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
 
         if ( filterProperties != null )
         {

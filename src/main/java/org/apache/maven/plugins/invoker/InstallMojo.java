@@ -44,11 +44,12 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.artifact.install.ArtifactInstaller;
-import org.apache.maven.shared.dependencies.DefaultDependableCoordinate;
-import org.apache.maven.shared.dependencies.resolve.DependencyResolver;
-import org.apache.maven.shared.dependencies.resolve.DependencyResolverException;
-import org.apache.maven.shared.repository.RepositoryManager;
+import org.apache.maven.shared.artifact.filter.resolve.PatternExclusionsFilter;
+import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
+import org.apache.maven.shared.transfer.dependencies.DefaultDependableCoordinate;
+import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
+import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
+import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
@@ -194,7 +195,6 @@ public class InstallMojo
      * apart from the location, the custom repository will be indistinguishable from the real repository such that its
      * usage is transparent to the integration tests.
      *
-     * @return The local repository for the integration tests, never <code>null</code>.
      * @throws MojoExecutionException If the repository could not be created.
      */
     private void createTestRepository()
@@ -618,7 +618,8 @@ public class InstallMojo
                 coordinate.setType( type );
                 coordinate.setClassifier( classifier );
 
-                resolver.resolveDependencies( projectBuildingRequest, coordinate, null );
+                resolver.resolveDependencies( projectBuildingRequest, coordinate,
+                                              new PatternExclusionsFilter( Collections.<String>emptyList() ) );
             }
             catch ( DependencyResolverException e )
             {
