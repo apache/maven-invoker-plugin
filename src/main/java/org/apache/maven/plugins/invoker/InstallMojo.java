@@ -19,15 +19,6 @@ package org.apache.maven.plugins.invoker;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -46,11 +37,24 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.artifact.filter.resolve.PatternExclusionsFilter;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
+import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.apache.maven.shared.transfer.dependencies.DefaultDependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.codehaus.plexus.util.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Installs the project artifacts of the main build into the local repository as a preparation to run the sub projects.
@@ -161,6 +165,14 @@ public class InstallMojo
     @Component
     private DependencyResolver resolver;
 
+    /**
+     * if the local repository is not used as test repo, the parameter can force get artifacts from local repo
+     * if available instead of download the artifacts again.
+     * @since 3.2.1
+     */
+    @Parameter( property = "invoker.useLocalRepository", defaultValue = "false" )
+    private boolean useLocalRepository;
+
     private ProjectBuildingRequest projectBuildingRequest;
 
     /**
@@ -205,8 +217,19 @@ public class InstallMojo
         {
             throw new MojoExecutionException( "Failed to create directory: " + localRepositoryPath );
         }
-        projectBuildingRequest =
-            repositoryManager.setLocalRepositoryBasedir( session.getProjectBuildingRequest(), localRepositoryPath );
+
+        // we just don't want to download everything again..
+        if ( !localRepository.getBasedir().equals( localRepositoryPath.getPath() ) && useLocalRepository )
+        {
+            projectBuildingRequest =
+                repositoryManager.setLocalRepositoryBasedir( session.getProjectBuildingRequest(),
+                                                             new File( localRepository.getBasedir() ) );
+        }
+        else
+        {
+            projectBuildingRequest =
+                repositoryManager.setLocalRepositoryBasedir( session.getProjectBuildingRequest(), localRepositoryPath );
+        }
     }
 
     /**
@@ -618,14 +641,37 @@ public class InstallMojo
                 coordinate.setType( type );
                 coordinate.setClassifier( classifier );
 
-                resolver.resolveDependencies( projectBuildingRequest, coordinate,
-                                              new PatternExclusionsFilter( Collections.<String>emptyList() ) );
+                Iterable<ArtifactResult> artifactResults =
+                    resolver.resolveDependencies( projectBuildingRequest, coordinate,
+                                                  new PatternExclusionsFilter( Collections.<String>emptyList() ) );
+                if ( !localRepository.getBasedir().equals( localRepositoryPath.getPath() ) && useLocalRepository )
+                {
+                    // using another request with the correct target repo
+                    installer.install( repositoryManager.setLocalRepositoryBasedir( session.getProjectBuildingRequest(),
+                                                                                    localRepositoryPath ),
+                                       toArtifactsList( artifactResults ) );
+                }
             }
             catch ( DependencyResolverException e )
             {
                 throw new MojoExecutionException( "Unable to resolve dependencies for: " + coordinate, e );
             }
+            catch ( ArtifactInstallerException e )
+            {
+                throw new MojoExecutionException( "Fail to install artifacts: " + coordinate, e );
+            }
         }
+    }
+
+    // FIXME could be simplify with using lambda... maybe in the next century... :P
+    private List<Artifact> toArtifactsList( Iterable<ArtifactResult> artifactResults )
+    {
+        List<Artifact> artifacts = new ArrayList<>( );
+        for ( ArtifactResult artifactResult : artifactResults )
+        {
+            artifacts.add( artifactResult.getArtifact() );
+        }
+        return artifacts;
     }
 
 }
