@@ -333,12 +333,6 @@ under the License.
                   <goal>clean</goal>
                   <goal>initialize</goal>
                 </goals>
-                <extraArtifacts>
-                  <extraArtifact>junit:junit:3.8.2</extraArtifact>
-                  <extraArtifact>org.apache.maven.plugins:maven-clean-plugin:2.4:maven-plugin</extraArtifact>
-                  <extraArtifact>org.apache.maven.plugins:maven-clean-plugin:2.4:jar:javadoc</extraArtifact>
-                  <extraArtifact>jdom:jdom:1.1</extraArtifact>
-                </extraArtifacts>
               </configuration>
             </plugin>
           </plugins>
