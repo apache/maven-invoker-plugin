@@ -337,7 +337,6 @@ under the License.
                   <extraArtifact>junit:junit:3.8.2</extraArtifact>
                   <extraArtifact>org.apache.maven.plugins:maven-clean-plugin:2.4:maven-plugin</extraArtifact>
                   <extraArtifact>org.apache.maven.plugins:maven-clean-plugin:2.4:jar:javadoc</extraArtifact>
-                  <extraArtifact>org.apache.maven.plugins:maven-clean-plugin:2.4:pom</extraArtifact>
                   <extraArtifact>jdom:jdom:1.1</extraArtifact>
                 </extraArtifacts>
               </configuration>
