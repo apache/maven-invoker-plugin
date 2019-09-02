@@ -19,16 +19,16 @@ package org.apache.maven.plugins.invoker;
  * under the License.
  */
 
+
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -46,6 +46,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.artifact.filter.resolve.PatternExclusionsFilter;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.apache.maven.shared.transfer.dependencies.DefaultDependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
@@ -160,6 +161,15 @@ public class InstallMojo
      */
     @Component
     private DependencyResolver resolver;
+
+
+    /**
+     * if the local repository is not used as test repo, the parameter can force get artifacts from local repo
+     * if available instead of download the artifacts again.
+     * @since 3.2.1
+     */
+    @Parameter( property = "invoker.useLocalRepository", defaultValue = "false" )
+    private boolean useLocalRepository;
 
     private ProjectBuildingRequest projectBuildingRequest;
 
@@ -486,22 +496,6 @@ public class InstallMojo
         }
     }
 
-    protected boolean isInProjectReferences( Collection<MavenProject> references, MavenProject project )
-    {
-        if ( references == null || references.isEmpty() )
-        {
-            return false;
-        }
-        for ( MavenProject mavenProject : references )
-        {
-            if ( StringUtils.equals( mavenProject.getId(), project.getId() ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void copyArtifact( Artifact artifact )
         throws MojoExecutionException
     {
@@ -618,14 +612,47 @@ public class InstallMojo
                 coordinate.setType( type );
                 coordinate.setClassifier( classifier );
 
-                resolver.resolveDependencies( projectBuildingRequest, coordinate,
-                                              new PatternExclusionsFilter( Collections.<String>emptyList() ) );
+
+                if ( !localRepository.getBasedir().equals( localRepositoryPath.getPath() ) && useLocalRepository )
+                {
+                    String previousId = localRepository.getId();
+                    try
+                    {
+                        // using another request with the correct target repo
+                        ProjectBuildingRequest projectBuildingRequest = repositoryManager
+                                .setLocalRepositoryBasedir( session.getProjectBuildingRequest(),
+                                        localRepositoryPath );
+                        projectBuildingRequest.setRemoteRepositories( Arrays.asList( localRepository ) );
+                        resolver.resolveDependencies( projectBuildingRequest, coordinate,
+                                new PatternExclusionsFilter( Collections.<String>emptyList() ) );
+                    }
+                    finally
+                    {
+                        localRepository.setId( previousId );
+                    }
+                }
+                else
+                {
+                    resolver.resolveDependencies( projectBuildingRequest, coordinate,
+                            new PatternExclusionsFilter( Collections.<String>emptyList() ) );
+                }
             }
             catch ( DependencyResolverException e )
             {
                 throw new MojoExecutionException( "Unable to resolve dependencies for: " + coordinate, e );
             }
         }
+    }
+
+    // FIXME could be simplify with using lambda... maybe in the next century... :P
+    private List<Artifact> toArtifactsList( Iterable<ArtifactResult> artifactResults )
+    {
+        List<Artifact> artifacts = new ArrayList<>( );
+        for ( ArtifactResult artifactResult : artifactResults )
+        {
+            artifacts.add( artifactResult.getArtifact() );
+        }
+        return artifacts;
     }
 
 }
