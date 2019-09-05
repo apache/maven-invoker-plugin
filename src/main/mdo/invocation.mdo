@@ -96,6 +96,13 @@ under the License.
           <type>String</type>
           <description>The type of the build job.</description>
         </field>
+        <field xml.attribute="true">
+          <name>ordinal</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <type>int</type>
+          <description>BuildJobs will be sorted in the ascending order of the ordinal. In other words, the BuildJobs with the slowest numbers will be executed first</description>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

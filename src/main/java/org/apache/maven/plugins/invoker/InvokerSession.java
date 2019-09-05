@@ -22,7 +22,6 @@ package org.apache.maven.plugins.invoker;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoFailureException;
@@ -60,9 +59,9 @@ class InvokerSession
      *
      * @param buildJobs The build jobs to set, must not be <code>null</code>.
      */
-    InvokerSession( BuildJob[] buildJobs )
+    InvokerSession( List<BuildJob> buildJobs )
     {
-        this.buildJobs = new ArrayList<>( Arrays.asList( buildJobs ) );
+        this.buildJobs = new ArrayList<>( buildJobs );
     }
 
     /**

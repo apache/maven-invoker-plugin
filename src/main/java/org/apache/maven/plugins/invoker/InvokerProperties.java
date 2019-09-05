@@ -54,7 +54,8 @@ class InvokerProperties
         SYSTEM_PROPERTIES_FILE( "invoker.systemPropertiesFile" ),
         DEBUG( "invoker.debug" ),
         SETTINGS_FILE ( "invoker.settingsFile" ),
-        TIMEOUT_IN_SECONDS ( "invoker.timeoutInSeconds" );
+        TIMEOUT_IN_SECONDS ( "invoker.timeoutInSeconds" ),
+        ORDINAL ( "invoker.ordinal" );
 
         private final String key;
 
@@ -134,6 +135,15 @@ class InvokerProperties
     public String getJobDescription()
     {
         return this.properties.getProperty( "invoker.description", "" );
+    }
+
+    /**
+     * Get the corresponding ordinal value
+     * @return The ordinal value
+     */
+    public int getOrdinal()
+    {
+        return Integer.parseInt( this.properties.getProperty( "invoker.ordinal", "0" ) );
     }
 
     /**
@@ -302,14 +312,14 @@ class InvokerProperties
         String goals = get( InvocationProperty.GOALS, index );
         if ( goals != null )
         {
-            request.setGoals( new ArrayList<String>( Arrays.asList( StringUtils.split( goals, ", \t\n\r\f" ) ) ) );
+            request.setGoals( new ArrayList<>( Arrays.asList( StringUtils.split( goals, ", \t\n\r\f" ) ) ) );
         }
 
         String profiles = get( InvocationProperty.PROFILES, index );
         if ( profiles != null )
         {
             // CHECKSTYLE_OFF: LineLength
-            request.setProfiles( new ArrayList<String>( Arrays.asList( StringUtils.split( profiles,
+            request.setProfiles( new ArrayList<>( Arrays.asList( StringUtils.split( profiles,
                                                                                           ", \t\n\r\f" ) ) ) );
             // CHECKSTYLE_ON: LineLength
         }

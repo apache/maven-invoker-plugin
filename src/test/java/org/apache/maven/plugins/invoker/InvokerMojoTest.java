@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.plugins.invoker.model.BuildJob;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Settings;
 
 /**
  * @author Olivier Lamy
@@ -34,6 +36,13 @@ public class InvokerMojoTest
     extends AbstractMojoTestCase
 {
 
+    private MavenProject getMavenProject()
+    {
+        MavenProject mavenProject = new MavenProject();
+        mavenProject.setFile(new File("target/foo.txt"));
+        return mavenProject;
+    }
+
     public void testSingleInvokerTest()
         throws Exception
     {
@@ -42,9 +51,12 @@ public class InvokerMojoTest
         List<String> goals = invokerMojo.getGoals( new File( dirPath ) );
         assertEquals( 1, goals.size() );
         setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
+        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties");
+        setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "invokerTest", "*dummy*" );
-        BuildJob[] poms = invokerMojo.getBuildJobs();
-        assertEquals( 1, poms.length );
+        setVariableValueToObject( invokerMojo, "settings", new Settings() );
+        List<BuildJob> poms = invokerMojo.getBuildJobs();
+        assertEquals( 1, poms.size() );
     }
 
     public void testMultiInvokerTest()
@@ -55,9 +67,12 @@ public class InvokerMojoTest
         List<String> goals = invokerMojo.getGoals( new File( dirPath ) );
         assertEquals( 1, goals.size() );
         setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
+        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties");
+        setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "invokerTest", "*dummy*,*terpolatio*" );
-        BuildJob[] poms = invokerMojo.getBuildJobs();
-        assertEquals( 2, poms.length );
+        setVariableValueToObject( invokerMojo, "settings", new Settings() );
+        List<BuildJob> poms = invokerMojo.getBuildJobs();
+        assertEquals( 2, poms.size() );
     }
 
     public void testFullPatternInvokerTest()
@@ -68,9 +83,12 @@ public class InvokerMojoTest
         List<String> goals = invokerMojo.getGoals( new File( dirPath ) );
         assertEquals( 1, goals.size() );
         setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
+        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties");
+        setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "invokerTest", "*" );
-        BuildJob[] poms = invokerMojo.getBuildJobs();
-        assertEquals( 4, poms.length );
+        setVariableValueToObject( invokerMojo, "settings", new Settings() );
+        List<BuildJob> poms = invokerMojo.getBuildJobs();
+        assertEquals( 4, poms.size() );
     }
 
     public void testAlreadyCloned()
