@@ -51,6 +51,14 @@ try
         return false;
     }
 
+    int indexProject3 = log.indexOf( "Building: project3" );
+    int indexProject6 = log.indexOf( "Building: project6" );
+    if(indexProject3 > indexProject6)
+    {
+        System.out.println( "FAILED! project3 should be build before project6" );
+        return false;
+    }
+
     File reportFile = new File( basedir, "target/invoker-reports/BUILD-project1.xml" );
     if ( !reportFile.exists() )
     {

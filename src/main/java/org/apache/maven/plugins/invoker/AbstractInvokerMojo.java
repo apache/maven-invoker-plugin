@@ -93,6 +93,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -566,6 +567,12 @@ public abstract class AbstractInvokerMojo
      * # Path to an alternate <code>settings.xml</code> to use for Maven invocation with this IT.
      * # Since plugin version 3.0.1
      * invoker.settingsFile = ../
+     *
+     * # An integer value to control run order of projects. sorted in the ascending order of the ordinal.
+     * In other words, the BuildJobs with the slowest numbers will be executed first
+     * # Since plugin version 3.2.1
+     * invoker.ordinal = 3
+     * invoker.ordinal = 1
      * </pre>
      *
      * @since 1.2
@@ -691,7 +698,7 @@ public abstract class AbstractInvokerMojo
             setupReportsFolder();
         }
 
-        BuildJob[] buildJobs;
+        List<BuildJob> buildJobs;
         if ( pom == null )
         {
             try
@@ -716,10 +723,10 @@ public abstract class AbstractInvokerMojo
                     + "pom File parameter. Reason: " + e.getMessage(), e );
             }
 
-            buildJobs = new BuildJob[] { new BuildJob( pom.getName(), BuildJob.Type.NORMAL ) };
+            buildJobs = Collections.singletonList( new BuildJob( pom.getName(), BuildJob.Type.NORMAL ) );
         }
 
-        if ( ( buildJobs == null ) || ( buildJobs.length < 1 ) )
+        if ( buildJobs.isEmpty() )
         {
             doFailIfNoProjects();
 
@@ -754,7 +761,7 @@ public abstract class AbstractInvokerMojo
         }
 
         // First run setup jobs.
-        BuildJob[] setupBuildJobs = null;
+        List<BuildJob> setupBuildJobs = null;
         try
         {
             setupBuildJobs = getSetupBuildJobsFromFolders();
@@ -765,20 +772,20 @@ public abstract class AbstractInvokerMojo
             // TODO: Check shouldn't we fail in case of problems?
         }
 
-        if ( ( setupBuildJobs != null ) && ( setupBuildJobs.length > 0 ) )
+        if ( !setupBuildJobs.isEmpty() )
         {
             // Run setup jobs in single thread
             // mode.
             //
             // Some Idea about ordering?
-            getLog().info( "Running " + setupBuildJobs.length + " setup job"
-                + ( ( setupBuildJobs.length < 2 ) ? "" : "s" ) + ":" );
+            getLog().info( "Running " + setupBuildJobs.size() + " setup job"
+                + ( ( setupBuildJobs.size() < 2 ) ? "" : "s" ) + ":" );
             runBuilds( projectsDir, setupBuildJobs, 1 );
             getLog().info( "Setup done." );
         }
 
         // Afterwards run all other jobs.
-        BuildJob[] nonSetupBuildJobs = getNonSetupJobs( buildJobs );
+        List<BuildJob> nonSetupBuildJobs = getNonSetupJobs( buildJobs );
         // We will run the non setup jobs with the configured
         // parallelThreads number.
         runBuilds( projectsDir, nonSetupBuildJobs, parallelThreads );
@@ -816,7 +823,7 @@ public abstract class AbstractInvokerMojo
         }
     }
 
-    private BuildJob[] getNonSetupJobs( BuildJob[] buildJobs )
+    private List<BuildJob> getNonSetupJobs( List<BuildJob> buildJobs )
     {
         List<BuildJob> result = new LinkedList<>();
         for ( BuildJob buildJob : buildJobs )
@@ -826,8 +833,7 @@ public abstract class AbstractInvokerMojo
                 result.add( buildJob );
             }
         }
-        BuildJob[] buildNonSetupJobs = result.toArray( new BuildJob[result.size()] );
-        return buildNonSetupJobs;
+        return result;
     }
 
     private void handleScriptRunnerWithScriptClassPath()
@@ -858,7 +864,7 @@ public abstract class AbstractInvokerMojo
         scriptRunner.setClassPath( scriptClassPath );
     }
 
-    private void writeSummaryFile( BuildJob[] buildJobs )
+    private void writeSummaryFile( List<BuildJob> buildJobs )
         throws MojoExecutionException
     {
 
@@ -1216,7 +1222,7 @@ public abstract class AbstractInvokerMojo
      * @param buildJobs The build jobs to run must not be <code>null</code> nor contain <code>null</code> elements.
      * @throws org.apache.maven.plugin.MojoExecutionException If any build could not be launched.
      */
-    private void runBuilds( final File projectsDir, BuildJob[] buildJobs, int runWithParallelThreads )
+    private void runBuilds( final File projectsDir, List<BuildJob> buildJobs, int runWithParallelThreads )
         throws MojoExecutionException
     {
         if ( !localRepositoryPath.exists() )
@@ -2381,18 +2387,29 @@ public abstract class AbstractInvokerMojo
      * @throws IOException
      * @see {@link #setupIncludes}
      */
-    private BuildJob[] getSetupBuildJobsFromFolders()
-        throws IOException
+    private List<BuildJob> getSetupBuildJobsFromFolders()
+        throws IOException, MojoExecutionException
     {
         List<String> excludes = calculateExcludes();
 
-        BuildJob[] setupPoms = scanProjectsDirectory( setupIncludes, excludes, BuildJob.Type.SETUP );
+        List<BuildJob> setupPoms = scanProjectsDirectory( setupIncludes, excludes, BuildJob.Type.SETUP );
         if ( getLog().isDebugEnabled() )
         {
-            getLog().debug( "Setup projects: " + Arrays.asList( setupPoms ) );
+            getLog().debug( "Setup projects: " + setupPoms );
         }
 
         return setupPoms;
+    }
+
+    private static class OrdinalComparator implements Comparator
+    {
+        private static final OrdinalComparator INSTANCE = new OrdinalComparator();
+
+        @Override
+        public int compare( Object o1, Object o2 )
+        {
+            return Integer.compare( ( ( BuildJob ) o1 ).getOrdinal(), ( ( BuildJob ) o2 ).getOrdinal() );
+        }
     }
 
     /**
@@ -2401,22 +2418,22 @@ public abstract class AbstractInvokerMojo
      * @return The build jobs to process, may be empty but never <code>null</code>.
      * @throws java.io.IOException If the projects directory could not be scanned.
      */
-    BuildJob[] getBuildJobs()
-        throws IOException
+    List<BuildJob> getBuildJobs()
+        throws IOException, MojoExecutionException
     {
-        BuildJob[] buildJobs;
+        List<BuildJob> buildJobs;
 
         if ( invokerTest == null )
         {
             List<String> excludes = calculateExcludes();
 
-            BuildJob[] setupPoms = scanProjectsDirectory( setupIncludes, excludes, BuildJob.Type.SETUP );
+            List<BuildJob> setupPoms = scanProjectsDirectory( setupIncludes, excludes, BuildJob.Type.SETUP );
             if ( getLog().isDebugEnabled() )
             {
                 getLog().debug( "Setup projects: " + Arrays.asList( setupPoms ) );
             }
 
-            BuildJob[] normalPoms = scanProjectsDirectory( pomIncludes, excludes, BuildJob.Type.NORMAL );
+            List<BuildJob> normalPoms = scanProjectsDirectory( pomIncludes, excludes, BuildJob.Type.NORMAL );
 
             Map<String, BuildJob> uniquePoms = new LinkedHashMap<>();
             for ( BuildJob setupPom : setupPoms )
@@ -2431,7 +2448,7 @@ public abstract class AbstractInvokerMojo
                 }
             }
 
-            buildJobs = uniquePoms.values().toArray( new BuildJob[uniquePoms.size()] );
+            buildJobs = new ArrayList<>( uniquePoms.values() );
         }
         else
         {
@@ -2474,12 +2491,12 @@ public abstract class AbstractInvokerMojo
      * @return The build jobs matching the patterns, never <code>null</code>.
      * @throws java.io.IOException If the project directory could not be scanned.
      */
-    private BuildJob[] scanProjectsDirectory( List<String> includes, List<String> excludes, String type )
-        throws IOException
+    private List<BuildJob> scanProjectsDirectory( List<String> includes, List<String> excludes, String type )
+        throws IOException, MojoExecutionException
     {
         if ( !projectsDirectory.isDirectory() )
         {
-            return new BuildJob[0];
+            return Collections.emptyList();
         }
 
         DirectoryScanner scanner = new DirectoryScanner();
@@ -2516,7 +2533,19 @@ public abstract class AbstractInvokerMojo
             }
         }
 
-        return matches.values().toArray( new BuildJob[matches.size()] );
+        List<BuildJob> projects = new ArrayList<>( matches.size() );
+
+        // setup ordinal values to have an order here
+        for ( BuildJob buildJob : matches.values() )
+        {
+            InvokerProperties invokerProperties =
+                    getInvokerProperties( new File( projectsDirectory, buildJob.getProject() ).getParentFile(),
+                            null );
+            buildJob.setOrdinal( invokerProperties.getOrdinal() );
+            projects.add( buildJob );
+        }
+        Collections.sort( projects, OrdinalComparator.INSTANCE );
+        return projects;
     }
 
     /**
@@ -2528,7 +2557,7 @@ public abstract class AbstractInvokerMojo
      *            contain <code>null</code> elements.
      * @throws java.io.IOException If any path could not be relativized.
      */
-    private void relativizeProjectPaths( BuildJob[] buildJobs )
+    private void relativizeProjectPaths( List<BuildJob> buildJobs )
         throws IOException
     {
         String projectsDirPath = projectsDirectory.getCanonicalPath();
@@ -2777,47 +2806,6 @@ public abstract class AbstractInvokerMojo
         {
             props = new Properties();
         }
-        
-//        Path projectsSourceFolder = this.projectsDirectory.toPath();
-//        Path projectsTargetFolder;
-//        if ( cloneProjectsTo != null )
-//        {
-//            projectsTargetFolder = cloneProjectsTo.toPath();
-//        }
-//        else
-//        {
-//            projectsTargetFolder = projectsSourceFolder;
-//        }
-//        
-//        Path projectDir = projectsTargetFolder.relativize( projectDirectory.toPath() );
-//        
-//        for ( int i = 0; i < projectDir.getNameCount(); i++ )
-//        {
-//            Path subInvokerProperties;
-//            if ( i == 0 )
-//            {
-//                subInvokerProperties = projectsSourceFolder.resolve( invokerPropertiesFile );
-//            }
-//            else
-//            {
-//                subInvokerProperties =
-//                    projectsSourceFolder.resolve( projectDir.subpath( 0, i ) ).resolve( invokerPropertiesFile );
-//            }
-//            
-//            getLog().debug( "Looking for " + subInvokerProperties );
-//                
-//            if ( Files.isRegularFile( subInvokerProperties ) )
-//            {
-//                try ( InputStream in = new FileInputStream( subInvokerProperties.toFile() ) )
-//                {
-//                    props.load( in );
-//                }
-//                catch ( IOException e )
-//                {
-//                    throw new MojoExecutionException( "Failed to read invoker properties: " + subInvokerProperties );
-//                }
-//            }
-//        }
         
         File propertiesFile = new File( projectDirectory, invokerPropertiesFile );
         if ( propertiesFile.isFile() )
