@@ -568,8 +568,8 @@ public abstract class AbstractInvokerMojo
      * # Since plugin version 3.0.1
      * invoker.settingsFile = ../
      *
-     * # An integer value to control run order of projects. sorted in the ascending order of the ordinal.
-     * In other words, the BuildJobs with the slowest numbers will be executed first
+     * # An integer value to control run order of projects. sorted in the descending order of the ordinal.
+     * In other words, the BuildJobs with the highest numbers will be executed first
      * # Since plugin version 3.2.1
      * invoker.ordinal = 3
      * invoker.ordinal = 1
@@ -2408,7 +2408,7 @@ public abstract class AbstractInvokerMojo
         @Override
         public int compare( Object o1, Object o2 )
         {
-            return Integer.compare( ( ( BuildJob ) o1 ).getOrdinal(), ( ( BuildJob ) o2 ).getOrdinal() );
+            return Integer.compare( ( ( BuildJob ) o2 ).getOrdinal(), ( ( BuildJob ) o1 ).getOrdinal() );
         }
     }
 
