@@ -101,4 +101,26 @@ public class InvokerMojoTest
         assertFalse( AbstractInvokerMojo.alreadyCloned( "dirs", Collections.singletonList( "dir" ) ) );
     }
 
+    public void testParallelThreadsSettings()
+            throws IllegalAccessException
+    {
+        Object[][] testValues = {
+                {"4", 4},
+                {"1C", Runtime.getRuntime().availableProcessors()},
+                {"2.5C", (int)(2.5 * Runtime.getRuntime().availableProcessors())}
+        };
+
+        InvokerMojo invokerMojo = new InvokerMojo();
+
+        for (Object[] testValue: testValues)
+        {
+            String parallelThreads = (String) testValue[0];
+            int expectedParallelThreads = (Integer) testValue[1];
+
+            setVariableValueToObject(invokerMojo, "parallelThreads", parallelThreads);
+
+            assertEquals(expectedParallelThreads, invokerMojo.getParallelThreadsCount());
+        }
+    }
+
 }

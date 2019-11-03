@@ -589,12 +589,16 @@ public abstract class AbstractInvokerMojo
     private boolean showVersion;
 
     /**
-     * number of threads for running tests in parallel. This will be the number of maven forked process in parallel.
+     * <p>Number of threads for running tests in parallel. This will be the number of maven forked process in parallel.
+     * When terminated with "C", the number part is multiplied by the number of processors (cores) available
+     * to the Java virtual machine. Floating point value are only accepted together with "C".</p>
+     *
+     * <p>Example values: "1.5C", "4"</p>
      *
      * @since 1.6
      */
     @Parameter( property = "invoker.parallelThreads", defaultValue = "1" )
-    private int parallelThreads;
+    private String parallelThreads;
 
     /**
      * @since 1.6
@@ -788,7 +792,7 @@ public abstract class AbstractInvokerMojo
         List<BuildJob> nonSetupBuildJobs = getNonSetupJobs( buildJobs );
         // We will run the non setup jobs with the configured
         // parallelThreads number.
-        runBuilds( projectsDir, nonSetupBuildJobs, parallelThreads );
+        runBuilds( projectsDir, nonSetupBuildJobs, getParallelThreadsCount() );
 
         writeSummaryFile( nonSetupBuildJobs );
 
@@ -2143,6 +2147,20 @@ public abstract class AbstractInvokerMojo
         return executionResult;
     }
 
+    int getParallelThreadsCount()
+    {
+        if ( parallelThreads.endsWith( "C" ) )
+        {
+            double parallelThreadsMultiple = Double.parseDouble(
+                    parallelThreads.substring( 0, parallelThreads.length() - 1 ) );
+            return (int) ( parallelThreadsMultiple * Runtime.getRuntime().availableProcessors() );
+        }
+        else
+        {
+            return Integer.parseInt( parallelThreads );
+        }
+    }
+
     private static class ExecutionResult
     {
         boolean executed;
@@ -2838,11 +2856,6 @@ public abstract class AbstractInvokerMojo
             props.setProperty( key, value );
         }
         return new InvokerProperties( props );
-    }
-
-    protected boolean isParallelRun()
-    {
-        return parallelThreads > 1;
     }
 
     static class ToolchainPrivateManager
