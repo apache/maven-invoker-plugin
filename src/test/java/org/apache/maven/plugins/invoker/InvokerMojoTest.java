@@ -107,19 +107,19 @@ public class InvokerMojoTest
         Object[][] testValues = {
                 {"4", 4},
                 {"1C", Runtime.getRuntime().availableProcessors()},
-                {"2.5C", (int)(2.5 * Runtime.getRuntime().availableProcessors())}
+                {"2.5C", (int) ( Double.parseDouble( "2.5" ) * Runtime.getRuntime().availableProcessors() )}
         };
 
         InvokerMojo invokerMojo = new InvokerMojo();
 
-        for (Object[] testValue: testValues)
+        for ( Object[] testValue: testValues )
         {
             String parallelThreads = (String) testValue[0];
             int expectedParallelThreads = (Integer) testValue[1];
 
-            setVariableValueToObject(invokerMojo, "parallelThreads", parallelThreads);
+            setVariableValueToObject( invokerMojo, "parallelThreads", parallelThreads );
 
-            assertEquals(expectedParallelThreads, invokerMojo.getParallelThreadsCount());
+            assertEquals( expectedParallelThreads, invokerMojo.getParallelThreadsCount() );
         }
     }
 
