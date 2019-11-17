@@ -1924,7 +1924,7 @@ public abstract class AbstractInvokerMojo
 
         if ( executionResult != null && executionResult.fileLogger != null )
         {
-            getLog().info( "fileLogger:" + executionResult.fileLogger.getOutputFile() );
+            getLog().debug( "fileLogger:" + executionResult.fileLogger.getOutputFile() );
             try
             {
                 systemOut.setValue( FileUtils.fileRead( executionResult.fileLogger.getOutputFile() ) );
@@ -1937,7 +1937,7 @@ public abstract class AbstractInvokerMojo
         }
         else
         {
-            getLog().info( safeFileName + ", executionResult:" + executionResult );
+            getLog().debug( safeFileName + ", executionResult:" + executionResult );
         }
         try ( FileOutputStream fos = new FileOutputStream( reportFile );
               Writer osw = new OutputStreamWriter( fos, buildJob.getModelEncoding() ) )
