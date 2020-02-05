@@ -564,7 +564,7 @@ public abstract class AbstractInvokerMojo
      * # Since plugin version 1.8
      * invoker.debug = true
      * 
-     * # Path to an alternate <code>settings.xml</code> to use for Maven invocation with this IT.
+     * # Path to an alternate settings.xml to use for Maven invocation with this IT.
      * # Since plugin version 3.0.1
      * invoker.settingsFile = ../
      *
