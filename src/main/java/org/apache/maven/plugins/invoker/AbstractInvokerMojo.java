@@ -564,12 +564,12 @@ public abstract class AbstractInvokerMojo
      * # Since plugin version 1.8
      * invoker.debug = true
      * 
-     * # Path to an alternate <code>settings.xml</code> to use for Maven invocation with this IT.
+     * # Path to an alternate settings.xml to use for Maven invocation with this IT.
      * # Since plugin version 3.0.1
      * invoker.settingsFile = ../
      *
      * # An integer value to control run order of projects. sorted in the descending order of the ordinal.
-     * In other words, the BuildJobs with the highest numbers will be executed first
+     * # In other words, the BuildJobs with the highest numbers will be executed first
      * # Since plugin version 3.2.1
      * invoker.ordinal = 3
      * invoker.ordinal = 1
