@@ -569,7 +569,7 @@ public abstract class AbstractInvokerMojo
      * invoker.settingsFile = ../
      *
      * # An integer value to control run order of projects. sorted in the descending order of the ordinal.
-     * In other words, the BuildJobs with the highest numbers will be executed first
+     * # In other words, the BuildJobs with the highest numbers will be executed first
      * # Since plugin version 3.2.1
      * invoker.ordinal = 3
      * invoker.ordinal = 1
