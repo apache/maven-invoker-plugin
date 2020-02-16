@@ -29,8 +29,6 @@ import java.util.Properties;
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
-import org.apache.maven.plugins.invoker.CompositeMap;
-import org.apache.maven.plugins.invoker.InvokerMojo;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;

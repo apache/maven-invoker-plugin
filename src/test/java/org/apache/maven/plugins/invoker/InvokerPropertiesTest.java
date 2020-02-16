@@ -1,13 +1,22 @@
 package org.apache.maven.plugins.invoker;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
- * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by
- * applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 import java.io.File;
@@ -15,9 +24,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
-import org.apache.maven.plugins.invoker.InvokerProperties;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationRequest.ReactorFailureBehavior;
 
 import junit.framework.TestCase;
 
@@ -196,11 +205,11 @@ public class InvokerPropertiesTest
 
         InvocationRequest request = new DefaultInvocationRequest();
 
-        request.setReactorFailureBehavior( InvocationRequest.ReactorFailureBehavior.FailAtEnd );
+        request.setReactorFailureBehavior( ReactorFailureBehavior.FailAtEnd );
         facade.configureInvocation( request, 0 );
-        assertEquals( InvocationRequest.ReactorFailureBehavior.FailAtEnd, request.getReactorFailureBehavior() );
+        assertEquals( ReactorFailureBehavior.FailAtEnd, request.getReactorFailureBehavior() );
 
-        props.setProperty( "invoker.failureBehavior", InvocationRequest.ReactorFailureBehavior.FailNever.getLongOption() );
+        props.setProperty( "invoker.failureBehavior", ReactorFailureBehavior.FailNever.getLongOption() );
         facade.configureInvocation( request, 0 );
         assertEquals( "fail-never", request.getReactorFailureBehavior().getLongOption() );
     }

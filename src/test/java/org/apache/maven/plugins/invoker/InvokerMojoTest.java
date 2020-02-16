@@ -32,26 +32,24 @@ import org.apache.maven.settings.Settings;
  * @author Olivier Lamy
  * @since 18 nov. 07
  */
-public class InvokerMojoTest
-    extends AbstractMojoTestCase
+public class InvokerMojoTest extends AbstractMojoTestCase
 {
 
     private MavenProject getMavenProject()
     {
         MavenProject mavenProject = new MavenProject();
-        mavenProject.setFile(new File("target/foo.txt"));
+        mavenProject.setFile( new File( "target/foo.txt" ) );
         return mavenProject;
     }
 
-    public void testSingleInvokerTest()
-        throws Exception
+    public void testSingleInvokerTest() throws Exception
     {
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         List<String> goals = invokerMojo.getGoals( new File( dirPath ) );
         assertEquals( 1, goals.size() );
         setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
-        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties");
+        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties" );
         setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "invokerTest", "*dummy*" );
         setVariableValueToObject( invokerMojo, "settings", new Settings() );
@@ -59,15 +57,14 @@ public class InvokerMojoTest
         assertEquals( 1, poms.size() );
     }
 
-    public void testMultiInvokerTest()
-        throws Exception
+    public void testMultiInvokerTest() throws Exception
     {
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         List<String> goals = invokerMojo.getGoals( new File( dirPath ) );
         assertEquals( 1, goals.size() );
         setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
-        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties");
+        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties" );
         setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "invokerTest", "*dummy*,*terpolatio*" );
         setVariableValueToObject( invokerMojo, "settings", new Settings() );
@@ -75,15 +72,14 @@ public class InvokerMojoTest
         assertEquals( 2, poms.size() );
     }
 
-    public void testFullPatternInvokerTest()
-        throws Exception
+    public void testFullPatternInvokerTest() throws Exception
     {
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         List<String> goals = invokerMojo.getGoals( new File( dirPath ) );
         assertEquals( 1, goals.size() );
         setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
-        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties");
+        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties" );
         setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "invokerTest", "*" );
         setVariableValueToObject( invokerMojo, "settings", new Settings() );
@@ -92,17 +88,15 @@ public class InvokerMojoTest
     }
 
     public void testAlreadyCloned()
-        throws Exception
     {
         assertFalse( AbstractInvokerMojo.alreadyCloned( "dir", Collections.<String>emptyList() ) );
         assertTrue( AbstractInvokerMojo.alreadyCloned( "dir", Collections.singletonList( "dir" ) ) );
         assertTrue( AbstractInvokerMojo.alreadyCloned( "dir" + File.separator + "sub",
-                                                       Collections.singletonList( "dir" ) ) );
+                Collections.singletonList( "dir" ) ) );
         assertFalse( AbstractInvokerMojo.alreadyCloned( "dirs", Collections.singletonList( "dir" ) ) );
     }
 
-    public void testParallelThreadsSettings()
-            throws IllegalAccessException
+    public void testParallelThreadsSettings() throws IllegalAccessException
     {
         Object[][] testValues = {
                 {"4", 4},
@@ -112,7 +106,7 @@ public class InvokerMojoTest
 
         InvokerMojo invokerMojo = new InvokerMojo();
 
-        for ( Object[] testValue: testValues )
+        for ( Object[] testValue : testValues )
         {
             String parallelThreads = (String) testValue[0];
             int expectedParallelThreads = (Integer) testValue[1];
