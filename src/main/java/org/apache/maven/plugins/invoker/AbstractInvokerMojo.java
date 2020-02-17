@@ -573,6 +573,12 @@ public abstract class AbstractInvokerMojo
      * # Since plugin version 3.2.1
      * invoker.ordinal = 3
      * invoker.ordinal = 1
+     *
+     * # The additional value for the environment variable.
+     * # Since plugin version 3.2.2
+     * invoker.environmentVariables.&lt;variableName&gt; = variableValue
+     * invoker.environmentVariables.MY_ENV_NAME = myEnvValue
+     *
      * </pre>
      *
      * @since 1.2

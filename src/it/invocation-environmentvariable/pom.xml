@@ -41,11 +41,13 @@ under the License.
         <version>@project.version@</version>
         <configuration>
           <debug>true</debug>
+          <postBuildHookScript>verify</postBuildHookScript>
           <goals>
             <goal>validate</goal>
           </goals>
           <environmentVariables>
             <MINVOKER145>foobar</MINVOKER145>
+            <MINVOKER255_POM>minvoker255_pom</MINVOKER255_POM>
           </environmentVariables>
         </configuration>
         <executions>

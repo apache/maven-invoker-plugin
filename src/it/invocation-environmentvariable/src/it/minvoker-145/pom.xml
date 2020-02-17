@@ -25,6 +25,7 @@
 
   <profiles>
     <profile>
+      <id>envTest</id>
       <activation>
         <property>
           <name>env.MINVOKER145</name>

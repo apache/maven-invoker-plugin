@@ -42,6 +42,9 @@ class InvokerProperties
 {
     private static final String SELECTOR_PREFIX = "selector.";
 
+    private static final Pattern ENVIRONMENT_VARIABLES_PATTERN =
+            Pattern.compile( "invoker\\.environmentVariables\\.([A-Za-z][^.]+)(\\.([0-9]+))?" );
+
     private enum InvocationProperty
     {
         PROJECT( "invoker.project" ),
@@ -53,9 +56,9 @@ class InvokerProperties
         OFFLINE( "invoker.offline" ),
         SYSTEM_PROPERTIES_FILE( "invoker.systemPropertiesFile" ),
         DEBUG( "invoker.debug" ),
-        SETTINGS_FILE ( "invoker.settingsFile" ),
-        TIMEOUT_IN_SECONDS ( "invoker.timeoutInSeconds" ),
-        ORDINAL ( "invoker.ordinal" );
+        SETTINGS_FILE( "invoker.settingsFile" ),
+        TIMEOUT_IN_SECONDS( "invoker.timeoutInSeconds" ),
+        ORDINAL( "invoker.ordinal" );
 
         private final String key;
 
@@ -70,20 +73,20 @@ class InvokerProperties
             return key;
         }
     }
-    
+
     private enum SelectorProperty
     {
         JAVA_VERSION( ".java.version" ),
         MAVEN_VERSION( ".maven.version" ),
         OS_FAMLY( ".os.family" );
-        
+
         private final String suffix;
-        
+
         SelectorProperty( String suffix )
         {
             this.suffix = suffix;
         }
-        
+
         @Override
         public String toString()
         {
@@ -139,6 +142,7 @@ class InvokerProperties
 
     /**
      * Get the corresponding ordinal value
+     *
      * @return The ordinal value
      */
     public int getOrdinal()
@@ -163,8 +167,8 @@ class InvokerProperties
      */
     public String getJreVersion( int index )
     {
-        return this.properties.getProperty( SELECTOR_PREFIX + index + SelectorProperty.JAVA_VERSION.suffix,
-                                            getJreVersion() );
+        return this.properties.getProperty( SELECTOR_PREFIX + index + SelectorProperty.JAVA_VERSION,
+                getJreVersion() );
     }
 
     /**
@@ -177,17 +181,16 @@ class InvokerProperties
     {
         return this.properties.getProperty( "invoker.maven.version", "" );
     }
-    
+
     /**
-     * 
      * @param index the selector index
      * @return The specification of Maven versions on which this build job should be run.
      * @since 3.0.0
      */
     public String getMavenVersion( int index )
     {
-        return this.properties.getProperty( SELECTOR_PREFIX + index + SelectorProperty.MAVEN_VERSION.suffix,
-                                            getMavenVersion() );
+        return this.properties.getProperty( SELECTOR_PREFIX + index + SelectorProperty.MAVEN_VERSION,
+                getMavenVersion() );
     }
 
     /**
@@ -199,7 +202,7 @@ class InvokerProperties
     {
         return this.properties.getProperty( "invoker.os.family", "" );
     }
-    
+
     /**
      * Gets the specification of OS families on which this build job should be run.
      *
@@ -209,18 +212,17 @@ class InvokerProperties
      */
     public String getOsFamily( int index )
     {
-        return this.properties.getProperty( SELECTOR_PREFIX + index + SelectorProperty.OS_FAMLY.suffix,
-                                            getOsFamily() );
+        return this.properties.getProperty( SELECTOR_PREFIX + index + SelectorProperty.OS_FAMLY, getOsFamily() );
     }
-    
+
     public Collection<InvokerToolchain> getToolchains()
     {
-        return getToolchains( Pattern.compile( "invoker\\.toolchain\\.([^\\.]+)\\.(.+)" ) );
+        return getToolchains( Pattern.compile( "invoker\\.toolchain\\.([^.]+)\\.(.+)" ) );
     }
 
     public Collection<InvokerToolchain> getToolchains( int index )
     {
-        return getToolchains( Pattern.compile( "selector\\." + index + "\\.invoker\\.toolchain\\.([^\\.]+)\\.(.+)" ) );
+        return getToolchains( Pattern.compile( "selector\\." + index + "\\.invoker\\.toolchain\\.([^.]+)\\.(.+)" ) );
     }
 
     private Collection<InvokerToolchain> getToolchains( Pattern p )
@@ -248,6 +250,43 @@ class InvokerProperties
     }
 
     /**
+     * Extract environment variable from properties for given index.
+     * Every environment variable without index is also returned.
+     *
+     * @param index index to lookup
+     * @return map of environment name and value
+     */
+
+    private Map<String, String> getEnvironmentVariables( int index )
+    {
+
+        Map<String, String> envItems = new HashMap<>();
+
+        for ( Map.Entry<Object, Object> entry : properties.entrySet() )
+        {
+            Matcher matcher = ENVIRONMENT_VARIABLES_PATTERN.matcher( entry.getKey().toString() );
+            if ( matcher.matches() )
+            {
+
+                if ( String.valueOf( index ).equals( matcher.group( 3 ) ) )
+                {
+                    // variables with index has higher priority, so override
+                    envItems.put( matcher.group( 1 ), entry.getValue().toString() );
+                }
+                else if ( matcher.group( 3 ) == null )
+                {
+                    // variables without index has lower priority, so check if exist
+                    if ( !envItems.containsKey( matcher.group( 1 ) ) )
+                    {
+                        envItems.put( matcher.group( 1 ), entry.getValue().toString() );
+                    }
+                }
+            }
+        }
+        return envItems;
+    }
+
+    /**
      * Determines whether these invoker properties contain a build definition for the specified invocation index.
      *
      * @param index The one-based index of the invocation to check for, must not be negative.
@@ -264,10 +303,10 @@ class InvokerProperties
         }
         return false;
     }
-    
+
     /**
      * Determines whether these invoker properties contain a build definition for the specified selector index.
-     * 
+     *
      * @param index the index
      * @return <code>true</code> if the selector with the specified index is defined, <code>false</code> otherwise.
      * @since 3.0.0
@@ -341,19 +380,24 @@ class InvokerProperties
         String nonRecursive = get( InvocationProperty.NON_RECURSIVE, index );
         if ( nonRecursive != null )
         {
-            request.setRecursive( !Boolean.valueOf( nonRecursive ) );
+            request.setRecursive( !Boolean.parseBoolean( nonRecursive ) );
         }
 
         String offline = get( InvocationProperty.OFFLINE, index );
         if ( offline != null )
         {
-            request.setOffline( Boolean.valueOf( offline ) );
+            request.setOffline( Boolean.parseBoolean( offline ) );
         }
 
         String debug = get( InvocationProperty.DEBUG, index );
         if ( debug != null )
         {
-            request.setDebug( Boolean.valueOf( debug ) );
+            request.setDebug( Boolean.parseBoolean( debug ) );
+        }
+
+        for ( Map.Entry<String, String> envItem : getEnvironmentVariables( index ).entrySet() )
+        {
+            request.addShellEnvironment( envItem.getKey(), envItem.getValue() );
         }
     }
 
