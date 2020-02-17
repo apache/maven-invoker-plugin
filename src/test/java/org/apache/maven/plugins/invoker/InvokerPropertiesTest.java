@@ -21,33 +21,50 @@ package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 
-import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationRequest.ReactorFailureBehavior;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the invoker properties facade.
  *
  * @author Benjamin Bentmann
  */
+@RunWith( MockitoJUnitRunner.class )
 public class InvokerPropertiesTest
-    extends TestCase
 {
 
+    @Mock
+    private InvocationRequest request;
+
+    @Test
     public void testConstructorNullSafe()
-        throws Exception
     {
         InvokerProperties facade = new InvokerProperties( null );
         assertNotNull( facade.getProperties() );
     }
 
+    @Test
     public void testGetInvokerProperty()
-        throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -62,8 +79,8 @@ public class InvokerPropertiesTest
         assertEquals( "value", facade.get( "key", 2 ) );
     }
 
+    @Test
     public void testGetJobName()
-        throws Exception
     {
         Properties props = new Properties();
         final String jobName = "Build Job name";
@@ -73,8 +90,8 @@ public class InvokerPropertiesTest
         assertEquals( jobName, facade.getJobName() );
     }
 
-    public void testIsExpectedResult()
-        throws Exception
+    @Test
+    public void testIsExpectedResult() throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -91,179 +108,208 @@ public class InvokerPropertiesTest
         assertTrue( facade.isExpectedResult( 1, 0 ) );
     }
 
-    public void testConfigureRequestGoals()
-        throws Exception
+    @Test
+    public void testConfigureRequestEmptyProperties()
+    {
+
+        InvokerProperties facade = new InvokerProperties( null );
+
+        facade.configureInvocation( request, 0 );
+        verifyZeroInteractions( request );
+    }
+
+    @Test
+    public void testConfigureRequestGoals() throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
-
-        InvocationRequest request = new DefaultInvocationRequest();
-
-        request.setGoals( Collections.singletonList( "test" ) );
-        facade.configureInvocation( request, 0 );
-        assertEquals( Collections.singletonList( "test" ), request.getGoals() );
 
         props.setProperty( "invoker.goals", "verify" );
         facade.configureInvocation( request, 0 );
-        assertEquals( Collections.singletonList( "verify" ), request.getGoals() );
+        verify( request ).setGoals( eq( Collections.singletonList( "verify" ) ) );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
 
         props.setProperty( "invoker.goals", "   " );
         facade.configureInvocation( request, 0 );
-        assertEquals( Arrays.asList( new String[0] ), request.getGoals() );
-
-        props.setProperty( "invoker.goals", "  clean , test   verify  " );
-        facade.configureInvocation( request, 0 );
-        assertEquals( Arrays.asList( new String[] { "clean", "test", "verify" } ), request.getGoals() );
+        verify( request ).setGoals( eq( Collections.<String>emptyList() ) );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
 
         props.setProperty( "invoker.goals", "" );
         facade.configureInvocation( request, 0 );
-        assertEquals( Arrays.asList( new String[0] ), request.getGoals() );
+        verify( request ).setGoals( eq( Collections.<String>emptyList() ) );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
+
+        props.setProperty( "invoker.goals", "  clean , test   verify " );
+        facade.configureInvocation( request, 0 );
+        verify( request ).setGoals( eq( Arrays.asList( "clean", "test", "verify" ) ) );
+        verifyNoMoreInteractions( request );
     }
 
-    public void testConfigureRequestProfiles()
-        throws Exception
+    @Test
+    public void testConfigureRequestProfiles() throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
-
-        InvocationRequest request = new DefaultInvocationRequest();
-
-        request.setProfiles( Collections.singletonList( "test" ) );
-        facade.configureInvocation( request, 0 );
-        assertEquals( Collections.singletonList( "test" ), request.getProfiles() );
 
         props.setProperty( "invoker.profiles", "verify" );
         facade.configureInvocation( request, 0 );
-        assertEquals( Collections.singletonList( "verify" ), request.getProfiles() );
+        verify( request ).setProfiles( eq( Collections.singletonList( "verify" ) ) );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
 
         props.setProperty( "invoker.profiles", "   " );
         facade.configureInvocation( request, 0 );
-        assertEquals( Arrays.asList( new String[0] ), request.getProfiles() );
-
-        props.setProperty( "invoker.profiles", "  clean , test   verify  ," );
-        facade.configureInvocation( request, 0 );
-        assertEquals( Arrays.asList( new String[] { "clean", "test", "verify" } ), request.getProfiles() );
+        verify( request ).setProfiles( eq( Collections.<String>emptyList() ) );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
 
         props.setProperty( "invoker.profiles", "" );
         facade.configureInvocation( request, 0 );
-        assertEquals( Arrays.asList( new String[0] ), request.getProfiles() );
+        verify( request ).setProfiles( eq( Collections.<String>emptyList() ) );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
+
+        props.setProperty( "invoker.profiles", "  clean , test   verify  ," );
+        facade.configureInvocation( request, 0 );
+        verify( request ).setProfiles( eq( Arrays.asList( "clean", "test", "verify" ) ) );
+        verifyNoMoreInteractions( request );
     }
 
-    public void testConfigureRequestProject()
-        throws Exception
+    @Test
+    public void testConfigureRequestProject() throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
-
-        InvocationRequest request = new DefaultInvocationRequest();
 
         File tempPom = File.createTempFile( "maven-invoker-plugin-test", ".pom" );
-        File tempDir = tempPom.getParentFile();
+        try
+        {
+            File tempDir = tempPom.getParentFile();
+            when( request.getBaseDirectory() ).thenReturn( tempDir );
 
-        request.setBaseDirectory( tempDir );
-        facade.configureInvocation( request, 0 );
-        assertEquals( tempDir, request.getBaseDirectory() );
-        assertEquals( null, request.getPomFile() );
+            props.setProperty( "invoker.project", tempPom.getName() );
+            facade.configureInvocation( request, 0 );
+            verify( request ).getBaseDirectory();
+            verify( request ).setBaseDirectory( eq( tempDir ) );
+            verify( request ).setPomFile( eq( tempPom ) );
+            verifyNoMoreInteractions( request );
+            clearInvocations( request );
 
-        props.setProperty( "invoker.project", tempPom.getName() );
-        request.setBaseDirectory( tempDir );
-        facade.configureInvocation( request, 0 );
-        assertEquals( tempDir, request.getBaseDirectory() );
-        assertEquals( tempPom, request.getPomFile() );
-
-        props.setProperty( "invoker.project", "" );
-        request.setBaseDirectory( tempDir );
-        facade.configureInvocation( request, 0 );
-        assertEquals( tempDir, request.getBaseDirectory() );
-        assertEquals( null, request.getPomFile() );
-
-        tempPom.delete();
+            props.setProperty( "invoker.project", "" );
+            facade.configureInvocation( request, 0 );
+            verify( request ).getBaseDirectory();
+            verify( request ).setBaseDirectory( eq( tempDir ) );
+            verify( request ).setPomFile( null );
+            verifyNoMoreInteractions( request );
+        }
+        finally
+        {
+            tempPom.delete();
+        }
     }
 
+    @Test
     public void testConfigureRequestMavenOpts()
-        throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
-
-        InvocationRequest request = new DefaultInvocationRequest();
-
-        request.setMavenOpts( "default" );
-        facade.configureInvocation( request, 0 );
-        assertEquals( "default", request.getMavenOpts() );
 
         props.setProperty( "invoker.mavenOpts", "-Xmx512m" );
         facade.configureInvocation( request, 0 );
-        assertEquals( "-Xmx512m", request.getMavenOpts() );
+        verify( request ).setMavenOpts( "-Xmx512m" );
+        verifyNoMoreInteractions( request );
     }
 
-    public void testConfigureRequestFailureBehavior()
-        throws Exception
+    @Test
+    public void testConfigureRequestFailureBehavior() throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
-
-        InvocationRequest request = new DefaultInvocationRequest();
-
-        request.setReactorFailureBehavior( ReactorFailureBehavior.FailAtEnd );
-        facade.configureInvocation( request, 0 );
-        assertEquals( ReactorFailureBehavior.FailAtEnd, request.getReactorFailureBehavior() );
 
         props.setProperty( "invoker.failureBehavior", ReactorFailureBehavior.FailNever.getLongOption() );
         facade.configureInvocation( request, 0 );
-        assertEquals( "fail-never", request.getReactorFailureBehavior().getLongOption() );
+        verify( request ).setReactorFailureBehavior( eq( ReactorFailureBehavior.FailNever ) );
+        verifyNoMoreInteractions( request );
     }
 
-    public void testConfigureRequestRecursion()
-        throws Exception
+    @Test
+    public void testConfigureRequestFailureBehaviorUnKnownName() throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
 
-        InvocationRequest request = new DefaultInvocationRequest();
+        props.setProperty( "invoker.failureBehavior", "xxxUnKnown" );
+        try
+        {
+            facade.configureInvocation( request, 0 );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            assertEquals( "The string 'xxxUnKnown' can not be converted to enumeration.", e.getMessage() );
+        }
+        verifyZeroInteractions( request );
+    }
 
-        request.setRecursive( true );
-        facade.configureInvocation( request, 0 );
-        assertTrue( request.isRecursive() );
-        request.setRecursive( false );
-        facade.configureInvocation( request, 0 );
-        assertFalse( request.isRecursive() );
+
+    @Test
+    public void testConfigureRequestRecursion() throws Exception
+    {
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties( props );
 
         props.setProperty( "invoker.nonRecursive", "true" );
         facade.configureInvocation( request, 0 );
-        assertFalse( request.isRecursive() );
+        verify( request ).setRecursive( false );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
 
         props.setProperty( "invoker.nonRecursive", "false" );
         facade.configureInvocation( request, 0 );
-        assertTrue( request.isRecursive() );
+        verify( request ).setRecursive( true );
+        verifyNoMoreInteractions( request );
     }
 
-    public void testConfigureRequestOffline()
-        throws Exception
+    @Test
+    public void testConfigureRequestOffline() throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
 
-        InvocationRequest request = new DefaultInvocationRequest();
-
-        request.setOffline( true );
-        facade.configureInvocation( request, 0 );
-        assertTrue( request.isOffline() );
-        request.setOffline( false );
-        facade.configureInvocation( request, 0 );
-        assertFalse( request.isOffline() );
-
         props.setProperty( "invoker.offline", "true" );
         facade.configureInvocation( request, 0 );
-        assertTrue( request.isOffline() );
+        verify( request ).setOffline( true );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
 
         props.setProperty( "invoker.offline", "false" );
         facade.configureInvocation( request, 0 );
-        assertFalse( request.isOffline() );
+        verify( request ).setOffline( false );
+        verifyNoMoreInteractions( request );
     }
 
-    public void testIsInvocationDefined()
-        throws Exception
+    @Test
+    public void testConfigureRequestDebug() throws Exception
+    {
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties( props );
+
+        props.setProperty( "invoker.debug", "true" );
+        facade.configureInvocation( request, 0 );
+        verify( request ).setDebug( true );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
+
+        props.setProperty( "invoker.debug", "false" );
+        facade.configureInvocation( request, 0 );
+        verify( request ).setDebug( false );
+        verifyNoMoreInteractions( request );
+    }
+
+    @Test
+    public void testIsInvocationDefined() throws Exception
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -284,7 +330,8 @@ public class InvokerPropertiesTest
         assertTrue( facade.isInvocationDefined( 3 ) );
         assertFalse( facade.isInvocationDefined( 4 ) );
     }
-    
+
+    @Test
     public void testIsSelectedDefined()
     {
         Properties props = new Properties();
@@ -306,4 +353,51 @@ public class InvokerPropertiesTest
         assertTrue( facade.isSelectorDefined( 4 ) );
         assertFalse( facade.isSelectorDefined( 5 ) );
     }
+
+    @Test
+    public void testGetToolchainsForEmptyProperties()
+    {
+
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties( props );
+
+        Collection<InvokerToolchain> toolchains = facade.getToolchains();
+        assertNotNull( toolchains );
+        assertEquals( 0, toolchains.size() );
+
+        toolchains = facade.getToolchains( 1 );
+        assertNotNull( toolchains );
+        assertEquals( 0, toolchains.size() );
+    }
+
+    @Test
+    public void testGetToolchains()
+    {
+        Properties props = new Properties();
+        props.put( "invoker.toolchain.jdk.version", "11" );
+        InvokerProperties facade = new InvokerProperties( props );
+
+        Collection<InvokerToolchain> toolchains = facade.getToolchains();
+        assertNotNull( toolchains );
+        assertEquals( 1, toolchains.size() );
+        InvokerToolchain toolchain = toolchains.iterator().next();
+        assertEquals( "jdk", toolchain.getType() );
+        assertEquals( Collections.singletonMap( "version", "11" ), toolchain.getProvides() );
+    }
+
+    @Test
+    public void testGetToolchainsWithIndex()
+    {
+        Properties props = new Properties();
+        props.put( "selector.1.invoker.toolchain.jdk.version", "11" );
+        InvokerProperties facade = new InvokerProperties( props );
+
+        Collection<InvokerToolchain> toolchains = facade.getToolchains( 1 );
+        assertNotNull( toolchains );
+        assertEquals( 1, toolchains.size() );
+        InvokerToolchain toolchain = toolchains.iterator().next();
+        assertEquals( "jdk", toolchain.getType() );
+        assertEquals( Collections.singletonMap( "version", "11" ), toolchain.getProvides() );
+    }
+
 }
