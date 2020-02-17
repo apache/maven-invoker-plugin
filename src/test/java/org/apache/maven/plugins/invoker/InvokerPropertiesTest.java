@@ -91,7 +91,7 @@ public class InvokerPropertiesTest
     }
 
     @Test
-    public void testIsExpectedResult() throws Exception
+    public void testIsExpectedResult()
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -119,7 +119,7 @@ public class InvokerPropertiesTest
     }
 
     @Test
-    public void testConfigureRequestGoals() throws Exception
+    public void testConfigureRequestGoals()
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -149,7 +149,7 @@ public class InvokerPropertiesTest
     }
 
     @Test
-    public void testConfigureRequestProfiles() throws Exception
+    public void testConfigureRequestProfiles()
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -224,7 +224,7 @@ public class InvokerPropertiesTest
     }
 
     @Test
-    public void testConfigureRequestFailureBehavior() throws Exception
+    public void testConfigureRequestFailureBehavior()
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -236,7 +236,7 @@ public class InvokerPropertiesTest
     }
 
     @Test
-    public void testConfigureRequestFailureBehaviorUnKnownName() throws Exception
+    public void testConfigureRequestFailureBehaviorUnKnownName()
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -255,7 +255,7 @@ public class InvokerPropertiesTest
 
 
     @Test
-    public void testConfigureRequestRecursion() throws Exception
+    public void testConfigureRequestRecursion()
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -273,7 +273,7 @@ public class InvokerPropertiesTest
     }
 
     @Test
-    public void testConfigureRequestOffline() throws Exception
+    public void testConfigureRequestOffline()
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -291,7 +291,7 @@ public class InvokerPropertiesTest
     }
 
     @Test
-    public void testConfigureRequestDebug() throws Exception
+    public void testConfigureRequestDebug()
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
@@ -309,7 +309,45 @@ public class InvokerPropertiesTest
     }
 
     @Test
-    public void testIsInvocationDefined() throws Exception
+    public void testConfigureEnvironmentVariables()
+    {
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties( props );
+
+        props.setProperty( "invoker.abcdef", "abcdf" );
+        props.setProperty( "invoker.environmentVariables.KEY1.1", "value1.1" );
+        props.setProperty( "invoker.environmentVariables.KEY1", "value1" );
+        props.setProperty( "invoker.environmentVariables.KEY2", "value2" );
+        props.setProperty( "invoker.environmentVariables.KEY2.1", "value2.1" );
+        props.setProperty( "invoker.environmentVariables.KEY3", "value3" );
+        facade.configureInvocation( request, 0 );
+        verify( request ).addShellEnvironment( "KEY1", "value1" );
+        verify( request ).addShellEnvironment( "KEY2", "value2" );
+        verify( request ).addShellEnvironment( "KEY3", "value3" );
+        verifyNoMoreInteractions( request );
+    }
+
+    @Test
+    public void testConfigureEnvironmentVariablesWithIndex()
+    {
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties( props );
+
+        props.setProperty( "invoker.abcdef", "abcdf" );
+        props.setProperty( "invoker.environmentVariables.KEY1.1", "value1.1" );
+        props.setProperty( "invoker.environmentVariables.KEY1", "value1" );
+        props.setProperty( "invoker.environmentVariables.KEY2", "value2" );
+        props.setProperty( "invoker.environmentVariables.KEY2.1", "value2.1" );
+        props.setProperty( "invoker.environmentVariables.KEY3", "value3" );
+        facade.configureInvocation( request, 1 );
+        verify( request ).addShellEnvironment( "KEY1", "value1.1" );
+        verify( request ).addShellEnvironment( "KEY2", "value2.1" );
+        verify( request ).addShellEnvironment( "KEY3", "value3" );
+        verifyNoMoreInteractions( request );
+    }
+
+    @Test
+    public void testIsInvocationDefined()
     {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
