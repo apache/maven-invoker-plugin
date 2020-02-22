@@ -75,6 +75,7 @@ under the License.
     <groovy-groupId>org.codehaus.groovy</groovy-groupId>
     <groovy-artifactId>groovy-all</groovy-artifactId>
     <groovy-version>2.2.2</groovy-version> <!-- latest 1.6 compatible -->
+    <project.build.outputTimestamp>2020-02-22T16:40:59Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
