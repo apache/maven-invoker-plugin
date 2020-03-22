@@ -67,8 +67,8 @@ under the License.
   <properties>
     <javaVersion>7</javaVersion>
     <mavenVersion>3.0</mavenVersion>
-    <doxiaVersion>1.7</doxiaVersion>
-    <doxia-sitetoolsVersion>1.7.4</doxia-sitetoolsVersion>
+    <doxiaVersion>1.9.1</doxiaVersion>
+    <doxia-sitetoolsVersion>1.9.2</doxia-sitetoolsVersion>
     <beanshell-groupId>org.beanshell</beanshell-groupId>
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b4</beanshell-version>
