@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Java CI
+name: GitHub CI
 
 on: [push, pull_request]
 
@@ -25,18 +25,28 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
+        java: [7, 8, 11, 14]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
-      - name: Set up JDK 1.8
+      - name: Set up cache for ~./m2/repository
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ matrix.os }}-java${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ matrix.os }}-java${{ matrix.java }}-
+            maven-${{ matrix.os }}-
+
+      - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: ${{ matrix.java }}
 
       - name: Build with Maven
-        run: mvn install -e -B -V --no-transfer-progress -P run-its
+        run: mvn verify -e -B -V -P run-its
