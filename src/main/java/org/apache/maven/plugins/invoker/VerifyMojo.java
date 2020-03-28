@@ -86,6 +86,14 @@ public class VerifyMojo
     private Boolean failIfNoProjects;
 
     /**
+     * Set to <code>true</code> to output build.log to mojo log in case of failed jobs.
+     *
+     * @since 3.2.2
+     */
+    @Parameter( property = "invoker.streamLogsOnFailures", defaultValue = "false" )
+    private boolean streamLogsOnFailures;
+
+    /**
      * Invokes Maven on the configured test projects.
      *
      * @throws org.apache.maven.plugin.MojoExecutionException If the goal encountered severe errors.
@@ -135,6 +143,11 @@ public class VerifyMojo
         if ( !suppressSummaries )
         {
             invokerSession.logSummary( getLog(), ignoreFailures );
+        }
+
+        if ( streamLogsOnFailures )
+        {
+            invokerSession.logFailedBuildLog( getLog(), ignoreFailures );
         }
 
         invokerSession.handleFailures( getLog(), ignoreFailures );

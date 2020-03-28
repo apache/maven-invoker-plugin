@@ -1659,7 +1659,6 @@ public abstract class AbstractInvokerMojo
         // let's set what details we can
         buildJob.setName( invokerProperties.getJobName() );
         buildJob.setDescription( invokerProperties.getJobDescription() );
-        ExecutionResult executionResult = null;
 
         try
         {
@@ -1668,18 +1667,27 @@ public abstract class AbstractInvokerMojo
             {
                 long milliseconds = System.currentTimeMillis();
                 boolean executed;
+
+                FileLogger buildLogger = setupBuildLogFile( basedir );
+                if ( buildLogger != null )
+                {
+                    buildJob.setBuildlog( buildLogger.getOutputFile().getAbsolutePath() );
+                }
+
                 try
                 {
-                    // CHECKSTYLE_OFF: LineLength
-                    executionResult =
-                        runBuild( basedir, interpolatedPomFile, settingsFile, actualJavaHome, invokerProperties );
-                    // CHECKSTYLE_ON: LineLength
-                    executed = executionResult.executed;
+                    executed = runBuild( basedir, interpolatedPomFile, settingsFile, actualJavaHome,
+                            invokerProperties, buildLogger );
                 }
                 finally
                 {
                     milliseconds = System.currentTimeMillis() - milliseconds;
                     buildJob.setTime( milliseconds / 1000.0 );
+
+                    if ( buildLogger != null )
+                    {
+                        buildLogger.close();
+                    }
                 }
 
                 if ( executed )
@@ -1779,7 +1787,7 @@ public abstract class AbstractInvokerMojo
         finally
         {
             deleteInterpolatedPomFile( interpolatedPomFile );
-            writeBuildReport( buildJob, executionResult );
+            writeBuildReport( buildJob );
         }
     }
 
@@ -1846,7 +1854,7 @@ public abstract class AbstractInvokerMojo
      * @param buildJob The build job whose report should be written, must not be <code>null</code>.
      * @throws org.apache.maven.plugin.MojoExecutionException If the report could not be written.
      */
-    private void writeBuildReport( BuildJob buildJob, ExecutionResult executionResult )
+    private void writeBuildReport( BuildJob buildJob )
         throws MojoExecutionException
     {
         if ( disableReports )
@@ -1875,11 +1883,11 @@ public abstract class AbstractInvokerMojo
 
         if ( writeJunitReport )
         {
-            writeJunitReport( buildJob, safeFileName, executionResult );
+            writeJunitReport( buildJob, safeFileName );
         }
     }
 
-    private void writeJunitReport( BuildJob buildJob, String safeFileName, ExecutionResult executionResult )
+    private void writeJunitReport( BuildJob buildJob, String safeFileName )
         throws MojoExecutionException
     {
         File reportFile = new File( reportsDirectory, "TEST-" + safeFileName + ".xml" );
@@ -1922,23 +1930,26 @@ public abstract class AbstractInvokerMojo
         Xpp3Dom systemOut = new Xpp3Dom( "system-out" );
         testcase.addChild( systemOut );
 
-        if ( executionResult != null && executionResult.fileLogger != null )
+
+        File buildLogFile = buildJob.getBuildlog() != null ? new File( buildJob.getBuildlog() ) : null;
+
+        if ( buildLogFile != null && buildLogFile.exists() )
         {
-            getLog().debug( "fileLogger:" + executionResult.fileLogger.getOutputFile() );
+            getLog().debug( "fileLogger:" + buildLogFile );
             try
             {
-                systemOut.setValue( FileUtils.fileRead( executionResult.fileLogger.getOutputFile() ) );
+                systemOut.setValue( FileUtils.fileRead( buildLogFile ) );
             }
             catch ( IOException e )
             {
-                throw new MojoExecutionException( "Failed to read logfile " + executionResult.fileLogger.getOutputFile()
-                    , e );
+                throw new MojoExecutionException( "Failed to read logfile " + buildLogFile, e );
             }
         }
         else
         {
-            getLog().debug( safeFileName + ", executionResult:" + executionResult );
+            getLog().debug( safeFileName + "not exists buildLogFile = " + buildLogFile );
         }
+
         try ( FileOutputStream fos = new FileOutputStream( reportFile );
               Writer osw = new OutputStreamWriter( fos, buildJob.getModelEncoding() ) )
         {
@@ -1968,14 +1979,15 @@ public abstract class AbstractInvokerMojo
      * @param settingsFile The (already interpolated) user settings file for the build, may be <code>null</code>. Will
      *            be merged with the settings file of the invoking Maven process.
      * @param invokerProperties The properties to use.
+     * @param logger file logger to write execution build.log
      * @return <code>true</code> if the project was launched or <code>false</code> if the selector script indicated that
      *         the project should be skipped.
      * @throws org.apache.maven.plugin.MojoExecutionException If the project could not be launched.
      * @throws org.apache.maven.shared.scriptinterpreter.RunFailureException If either a hook script or the build itself
      *             failed.
      */
-    private ExecutionResult runBuild( File basedir, File pomFile, File settingsFile, File actualJavaHome,
-                              InvokerProperties invokerProperties )
+    private boolean runBuild( File basedir, File pomFile, File settingsFile, File actualJavaHome,
+                                      InvokerProperties invokerProperties, FileLogger logger )
         throws MojoExecutionException, RunFailureException
     {
         if ( getLog().isDebugEnabled() && !invokerProperties.getProperties().isEmpty() )
@@ -1995,9 +2007,8 @@ public abstract class AbstractInvokerMojo
 
         Map<String, Object> context = new LinkedHashMap<>();
 
-        FileLogger logger = setupBuildLogFile( basedir );
         boolean selectorResult = true;
-        ExecutionResult executionResult = new ExecutionResult();
+
         try
         {
             try
@@ -2013,8 +2024,7 @@ public abstract class AbstractInvokerMojo
             catch ( RunFailureException e )
             {
                 selectorResult = false;
-                executionResult.executed = false;
-                return executionResult;
+                return false;
             }
 
             scriptRunner.run( "pre-build script", basedir, preBuildHookScript, context, logger,
@@ -2137,14 +2147,8 @@ public abstract class AbstractInvokerMojo
             {
                 runPostBuildHook( basedir, context, logger );
             }
-            if ( logger != null )
-            {
-                logger.close();
-            }
         }
-        executionResult.executed = true;
-        executionResult. fileLogger = logger;
-        return executionResult;
+        return true;
     }
 
     int getParallelThreadsCount()
@@ -2158,18 +2162,6 @@ public abstract class AbstractInvokerMojo
         else
         {
             return Integer.parseInt( parallelThreads );
-        }
-    }
-
-    private static class ExecutionResult
-    {
-        boolean executed;
-        FileLogger fileLogger;
-
-        @Override
-        public String toString()
-        {
-            return "ExecutionResult{" + "executed=" + executed + ", fileLogger=" + fileLogger + '}';
         }
     }
 
