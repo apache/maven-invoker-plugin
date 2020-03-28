@@ -21,12 +21,16 @@ package org.apache.maven.plugins.invoker;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.shared.utils.io.IOUtil;
 
 /**
  * Tracks a set of build jobs and their results.
@@ -35,6 +39,8 @@ import org.apache.maven.plugin.logging.Log;
  */
 class InvokerSession
 {
+    private static final String SEPARATOR = buffer().strong(
+            "-------------------------------------------------" ).toString();
 
     private List<BuildJob> buildJobs;
 
@@ -197,42 +203,57 @@ class InvokerSession
     {
         updateStats();
 
-        String separator = buffer().strong( "-------------------------------------------------" ).toString();
-
-        logger.info( separator );
+        logger.info( SEPARATOR );
         logger.info( "Build Summary:" );
-        logger.info( "  Passed: " + successfulJobs.size() + ", Failed: " + failedJobs.size() + ", Errors: "
-            + errorJobs.size() + ", Skipped: " + skippedJobs.size() );
-        logger.info( separator );
+        logger.info( "  Passed: " + successfulJobs.size()
+                + ", Failed: " + failedJobs.size()
+                + ", Errors: " + errorJobs.size()
+                + ", Skipped: " + skippedJobs.size() );
+        logger.info( SEPARATOR );
 
-        if ( !failedJobs.isEmpty() )
+        logBuildJobList( logger, ignoreFailures, "The following builds failed:", failedJobs );
+        logBuildJobList( logger, ignoreFailures, "The following builds finished with error:", errorJobs );
+        logBuildJobList( logger, ignoreFailures, "The following builds was skipped:", skippedJobs );
+    }
+
+    public void logFailedBuildLog( Log logger, boolean ignoreFailures )
+            throws MojoFailureException
+    {
+        List<BuildJob> jobToLogs = new ArrayList<>( failedJobs );
+        jobToLogs.addAll( errorJobs );
+
+        for ( BuildJob buildJob: jobToLogs )
         {
-            String heading = "The following builds failed:";
-            if ( ignoreFailures )
+            File buildLogFile = buildJob.getBuildlog() != null ? new File( buildJob.getBuildlog() ) : null;
+            if ( buildLogFile != null && buildLogFile.exists() )
             {
-                logger.warn( heading );
-            }
-            else
-            {
-                logger.error( heading );
-            }
-
-            for ( BuildJob buildJob : failedJobs )
-            {
-                String item = "*  " + buildJob.getProject();
-                if ( ignoreFailures )
+                try
                 {
-                    logger.warn( item );
+                    // prepare message with build.log in one string to omit begin [ERROR], [WARN]
+                    // so whole log will be displayed without decoration
+                    StringBuilder buildLogMessage = new StringBuilder( );
+                    buildLogMessage.append( System.lineSeparator() );
+                    buildLogMessage.append( System.lineSeparator() );
+                    buildLogMessage.append( "*** begin build.log for: " + buildJob.getProject() + " ***" );
+                    buildLogMessage.append( System.lineSeparator() );
+                    buildLogMessage.append( IOUtil.toString( new FileReader( buildLogFile ) ) );
+                    buildLogMessage.append( "*** end build.log for: " + buildJob.getProject() + " ***" );
+                    buildLogMessage.append( System.lineSeparator() );
+
+                    logWithLevel( logger, ignoreFailures, SEPARATOR );
+                    logWithLevel( logger, ignoreFailures,  buildLogMessage.toString() );
+                    logWithLevel( logger, ignoreFailures, SEPARATOR );
+                    logWithLevel( logger, ignoreFailures, "" );
+
                 }
-                else
+                catch ( IOException e )
                 {
-                    logger.error( item );
+                    throw new MojoFailureException( e.getMessage(), e );
                 }
             }
-
-            logger.info( separator );
         }
     }
+
 
     /**
      * Handles the build failures in this session.
@@ -275,4 +296,47 @@ class InvokerSession
         }
     }
 
+    /**
+     * Log list of jobs.
+     *
+     * @param logger logger to write
+     * @param warn flag indicate log level
+     * @param buildJobs jobs to list
+     */
+    private void logBuildJobList( Log logger, boolean warn, String header, List<BuildJob> buildJobs )
+    {
+        if ( buildJobs.isEmpty() )
+        {
+            return;
+        }
+
+        logWithLevel( logger, warn, header );
+
+        for ( BuildJob buildJob : buildJobs )
+        {
+            logWithLevel( logger, warn, "*  " + buildJob.getProject() );
+        }
+
+        logger.info( SEPARATOR );
+    }
+
+    /**
+     * Log message in correct level depends on flag.
+     *
+     * @param logger logger to write
+     * @param warn flag indicate log level
+     * @param message message to write
+     */
+    private void logWithLevel( Log logger, boolean warn, String message )
+    {
+
+        if ( warn )
+        {
+            logger.warn( message );
+        }
+        else
+        {
+            logger.error( message );
+        }
+    }
 }

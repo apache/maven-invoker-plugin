@@ -57,12 +57,25 @@ public class InvokerMojo
     @Parameter( property = "invoker.failIfNoProjects" )
     private Boolean failIfNoProjects;
 
+    /**
+     * Set to <code>true</code> to output build.log to mojo log in case of failed jobs.
+     *
+     * @since 3.2.2
+     */
+    @Parameter( property = "invoker.streamLogsOnFailures", defaultValue = "false" )
+    private boolean streamLogsOnFailures;
+
     void processResults( InvokerSession invokerSession )
         throws MojoFailureException
     {
         if ( !suppressSummaries )
         {
             invokerSession.logSummary( getLog(), ignoreFailures );
+        }
+
+        if ( streamLogsOnFailures )
+        {
+            invokerSession.logFailedBuildLog( getLog(), ignoreFailures );
         }
 
         invokerSession.handleFailures( getLog(), ignoreFailures );

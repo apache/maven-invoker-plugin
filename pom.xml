@@ -336,6 +336,9 @@ under the License.
                   <maven.compiler.source>${maven.compiler.source}</maven.compiler.source>
                   <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
                 </properties>
+                <scriptVariables>
+                  <projectVersion>${project.version}</projectVersion>
+                </scriptVariables>
                 <goals>
                   <goal>clean</goal>
                   <goal>initialize</goal>

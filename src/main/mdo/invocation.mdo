@@ -103,6 +103,13 @@ under the License.
           <type>int</type>
           <description>BuildJobs will be sorted in the descending order of the ordinal. In other words, the BuildJobs with the highest numbers will be executed first</description>
         </field>
+        <field xml.attribute="true">
+          <name>buildlog</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <type>String</type>
+          <description>The build log filename</description>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
