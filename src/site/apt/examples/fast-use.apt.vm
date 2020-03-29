@@ -104,3 +104,40 @@ Fast Build Configuration
 
   The token <<<@localRepositoryUrl@>>> will be automatically replaced by the Invoker Plugin with the URL to the local
   repository used for the Maven invocation.
+
+Fast Build Configuration - mergeUserSettings and mirrors
+
+  When you want to use Fast Build Configuration with options <<<mergeUserSettings>>>
+  you should take care for your mirror setting.
+
+  If you have in <<<~/.m2/settings.xml>>> something like:
+
++------------------
+<mirrors>
+    <mirror>
+        <id>mirrorId</id>
+        <name>Public Mirrors</name>
+        <url>url_to_my_mirror</url>
+        <mirrorOf>*,!repo1,!repo2</mirrorOf>
+    </mirror>
+</mirrors>
++------------------
+
+  Please look at <<<mirrorOf>>> tag, single <<<*>>> means match all repositories for mirroring
+  - also repository with id <<<local.central>>> will be mirrored.
+  In effective Fast Build Configuration will not work as expected.
+
+  You should change this to similar:
+
++------------------
+<mirrors>
+    <mirror>
+        <id>mirrorId</id>
+        <name>Public Mirrors</name>
+        <url>url_to_my_mirror</url>
+        <mirrorOf>external:*,!repo1,!repo2</mirrorOf>
+    </mirror>
+</mirrors>
++------------------
+
+  Where <<<external:*>>> - matches all repositories except those using localhost or file based repositories.
