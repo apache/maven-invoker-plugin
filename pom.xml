@@ -75,6 +75,7 @@ under the License.
     <groovy-groupId>org.codehaus.groovy</groovy-groupId>
     <groovy-artifactId>groovy-all</groovy-artifactId>
     <groovy-version>2.4.19</groovy-version>
+    <surefire.version>2.22.2</surefire.version>
     <project.build.outputTimestamp>2020-02-22T16:40:59Z</project.build.outputTimestamp>
   </properties>
 
@@ -264,6 +265,10 @@ under the License.
           </configuration>
         </plugin>
         <plugin>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>3.0.0-M3</version>
+        </plugin>
+        <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.1.0</version>
         </plugin>
@@ -313,7 +318,7 @@ under the License.
     <profile>
       <id>run-its</id>
       <properties>
-        <sitePluginVersion>3.3</sitePluginVersion>
+        <sitePluginVersion>3.7.1</sitePluginVersion>
       </properties>
       <build>
         <pluginManagement>
