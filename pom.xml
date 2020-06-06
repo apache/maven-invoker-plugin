@@ -74,7 +74,7 @@ under the License.
     <beanshell-version>2.0b4</beanshell-version>
     <groovy-groupId>org.codehaus.groovy</groovy-groupId>
     <groovy-artifactId>groovy-all</groovy-artifactId>
-    <groovy-version>2.2.2</groovy-version> <!-- latest 1.6 compatible -->
+    <groovy-version>2.4.19</groovy-version>
     <project.build.outputTimestamp>2020-02-22T16:40:59Z</project.build.outputTimestamp>
   </properties>
 
@@ -388,53 +388,11 @@ under the License.
               <version>${project.version}</version>
               <configuration>
                 <writeJunitReport>true</writeJunitReport>
+                <streamLogsOnFailures>true</streamLogsOnFailures>
               </configuration>
             </plugin>
           </plugins>
         </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>bytecode-check</id>
-      <activation>
-        <jdk>[1.7,)</jdk>
-      </activation>
-      <properties>
-        <groovy-version>2.4.19</groovy-version>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <executions>
-              <!-- compile time should be 1.6 compatible -->
-              <!-- groovy-all 2.3.0+ has 2 java7 classes -->
-              <execution>
-                <id>enforce-bytecode-version</id>
-                <configuration>
-                  <rules>
-                    <enforceBytecodeVersion>
-                      <ignoredScopes>
-                        <ignoredScope>runtime</ignoredScope>
-                      </ignoredScopes>
-                    </enforceBytecodeVersion>
-                  </rules>
-                </configuration>
-              </execution>
-              <execution>
-                <id>enforce-bytecode-version-runtime</id>
-                <configuration>
-                  <rules>
-                    <enforceBytecodeVersion>
-                      <maxJdkVersion>1.7</maxJdkVersion>
-                    </enforceBytecodeVersion>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
       </build>
     </profile>
   </profiles>
