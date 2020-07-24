@@ -24,14 +24,14 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.invoker.InvocationOutputHandler;
-import org.apache.maven.shared.scriptinterpreter.ExecutionLogger;
+import org.apache.maven.shared.scriptinterpreter.FileLoggerMirrorHandler;
 
 /**
  *
  */
 class FileLogger
     extends org.apache.maven.shared.scriptinterpreter.FileLogger
-    implements InvocationOutputHandler, ExecutionLogger
+    implements InvocationOutputHandler
 {
 
     /**
@@ -43,7 +43,7 @@ class FileLogger
     FileLogger( File outputFile )
         throws IOException
     {
-        super( outputFile, null );
+        super( outputFile );
     }
 
     /**
@@ -53,10 +53,17 @@ class FileLogger
      * @param log The mojo logger to additionally output messages to, may be <code>null</code> if not used.
      * @throws IOException If the output file could not be created.
      */
-    FileLogger( File outputFile, Log log )
+    FileLogger( File outputFile, final Log log )
         throws IOException
     {
-        super( outputFile, log );
+        super( outputFile, new FileLoggerMirrorHandler()
+        {
+            @Override
+            public void consumeOutput( String message )
+            {
+                log.info( message );
+            }
+        } );
     }
 
 }

@@ -47,8 +47,8 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenCommandLineBuilder;
 import org.apache.maven.shared.invoker.MavenInvocationException;
-import org.apache.maven.shared.scriptinterpreter.RunErrorException;
-import org.apache.maven.shared.scriptinterpreter.RunFailureException;
+import org.apache.maven.shared.scriptinterpreter.ScriptException;
+import org.apache.maven.shared.scriptinterpreter.ScriptReturnException;
 import org.apache.maven.shared.scriptinterpreter.ScriptRunner;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
@@ -912,7 +912,7 @@ public abstract class AbstractInvokerMojo
         {
             scriptClassPath = null;
         }
-        scriptRunner = new ScriptRunner( getLog() );
+        scriptRunner = new ScriptRunner( );
         scriptRunner.setScriptEncoding( encoding );
         scriptRunner.setGlobalVariable( "localRepositoryPath", localRepositoryPath );
         if ( scriptVariables != null )
@@ -1819,17 +1819,6 @@ public abstract class AbstractInvokerMojo
                 buildJob.setFailureMessage( "Skipped due to " + message.toString() );
             }
         }
-        catch ( RunErrorException e )
-        {
-            buildJob.setResult( BuildJob.Result.ERROR );
-            buildJob.setFailureMessage( e.getMessage() );
-
-            if ( !suppressSummaries )
-            {
-                getLog().info( "  " + e.getMessage() );
-                getLog().info( pad( buildJob ).failure( "ERROR" ).a( ' ' ) + formatTime( buildJob.getTime() ) );
-            }
-        }
         catch ( RunFailureException e )
         {
             buildJob.setResult( e.getType() );
@@ -2040,7 +2029,7 @@ public abstract class AbstractInvokerMojo
      * @return <code>true</code> if the project was launched or <code>false</code> if the selector script indicated that
      *         the project should be skipped.
      * @throws org.apache.maven.plugin.MojoExecutionException If the project could not be launched.
-     * @throws org.apache.maven.shared.scriptinterpreter.RunFailureException If either a hook script or the build itself
+     * @throws RunFailureException If either a hook script or the build itself
      *             failed.
      */
     private boolean runBuild( File basedir, File pomFile, File settingsFile, File actualJavaHome,
@@ -2070,22 +2059,26 @@ public abstract class AbstractInvokerMojo
         {
             try
             {
-                scriptRunner.run( "selector script", basedir, selectorScript, context, logger, BuildJob.Result.SKIPPED,
-                                  false );
+                scriptRunner.run( "selector script", basedir, selectorScript, context, logger );
             }
-            catch ( RunErrorException e )
-            {
-                selectorResult = false;
-                throw e;
-            }
-            catch ( RunFailureException e )
+            catch ( ScriptReturnException e )
             {
                 selectorResult = false;
                 return false;
             }
+            catch ( ScriptException e )
+            {
+                throw new RunFailureException( BuildJob.Result.ERROR, e );
+            }
 
-            scriptRunner.run( "pre-build script", basedir, preBuildHookScript, context, logger,
-                              BuildJob.Result.FAILURE_PRE_HOOK, false );
+            try
+            {
+                scriptRunner.run( "pre-build script", basedir, preBuildHookScript, context, logger );
+            }
+            catch ( ScriptException e )
+            {
+                throw new RunFailureException( BuildJob.Result.FAILURE_PRE_HOOK, e );
+            }
 
             final InvocationRequest request = new DefaultInvocationRequest();
 
@@ -2227,15 +2220,18 @@ public abstract class AbstractInvokerMojo
     {
         try
         {
-            scriptRunner.run( "post-build script", basedir, postBuildHookScript, context, logger,
-                              BuildJob.Result.FAILURE_POST_HOOK, true );
+            scriptRunner.run( "post-build script", basedir, postBuildHookScript, context, logger );
         }
         catch ( IOException e )
         {
             throw new MojoExecutionException( e.getMessage(), e );
         }
+        catch ( ScriptException e )
+        {
+            throw new RunFailureException( e.getMessage(), BuildJob.Result.FAILURE_POST_HOOK, e );
+        }
     }
-    private void setupLoggerForBuildJob( FileLogger logger, final InvocationRequest request )
+    private void setupLoggerForBuildJob( final FileLogger logger, final InvocationRequest request )
     {
         if ( logger != null )
         {
@@ -2359,8 +2355,6 @@ public abstract class AbstractInvokerMojo
      * @param invocationIndex The index of the invocation for which to check the exit code, must not be negative.
      * @param invokerProperties The invoker properties used to check the exit code, must not be <code>null</code>.
      * @param logger The build logger, may be <code>null</code> if logging is disabled.
-     * @throws org.apache.maven.shared.scriptinterpreter.RunFailureException If the invocation result indicates a build
-     *             failure.
      */
     private void verify( InvocationResult result, int invocationIndex, InvokerProperties invokerProperties,
                          FileLogger logger )
