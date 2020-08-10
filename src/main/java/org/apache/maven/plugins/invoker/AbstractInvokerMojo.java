@@ -659,6 +659,15 @@ public abstract class AbstractInvokerMojo
     private String junitPackageName = "maven.invoker.it";
 
     /**
+     * Only invoke maven projects if their sources have been modified since
+     * they were last built. Only works in conjunction with <code>cloneProjectsTo</code>.
+
+     * @since 3.2.2
+     */
+    @Parameter( defaultValue = "false", property = "invoker.updateOnly" )
+    private boolean updateOnly = false;
+
+    /**
      * The scripter runner that is responsible to execute hook scripts.
      */
     private ScriptRunner scriptRunner;
@@ -759,6 +768,24 @@ public abstract class AbstractInvokerMojo
             cloneProjectsTo = new File( project.getBuild().getDirectory(), "its" );
         }
 
+        if ( updateOnly )
+        {
+            if ( cloneProjectsTo == null )
+            {
+                getLog().warn( "updateOnly functionality is not supported without cloning the projects" );
+            }
+            else if ( lastModifiedRecursive( projectsDirectory ) <= lastModifiedRecursive( cloneProjectsTo ) )
+            {
+                getLog().debug( "Skipping invocation as cloned projects are up-to-date"
+                        + "and updateOnly parameter is set to true." );
+                return;
+            }
+            else
+            {
+                getLog().debug( "Cloned projects are out of date" );
+            }
+        }
+
         if ( cloneProjectsTo != null )
         {
             cloneProjects( collectedProjects );
@@ -803,6 +830,29 @@ public abstract class AbstractInvokerMojo
 
         processResults( new InvokerSession( nonSetupBuildJobs ) );
 
+    }
+
+    /**
+     * Find the latest lastModified recursively within a directory structure.
+     *
+     * @param file the root file to check.
+     * @return the latest lastModified time found.
+     */
+    private long lastModifiedRecursive( File file )
+    {
+        long lastModified = file.lastModified();
+
+        final File[] entries = file.listFiles();
+
+        if ( entries != null )
+        {
+            for ( File entry : entries )
+            {
+                lastModified = Math.max( lastModified, lastModifiedRecursive( entry ) );
+            }
+        }
+
+        return lastModified;
     }
 
     /**
