@@ -776,7 +776,7 @@ public abstract class AbstractInvokerMojo
             }
             else if ( lastModifiedRecursive( projectsDirectory ) <= lastModifiedRecursive( cloneProjectsTo ) )
             {
-                getLog().debug( "Skipping invocation as cloned projects are up-to-date"
+                getLog().debug( "Skipping invocation as cloned projects are up-to-date "
                         + "and updateOnly parameter is set to true." );
                 return;
             }
