@@ -29,6 +29,8 @@
 Cloning Projects
 
   By default the projects will be executed in the same directory where they are found.
+  (With the exception when project using invoker plugin is of <maven-plugin> packaging.
+  In such case IT projects will be cloned to and executed in <<<target/its>>> by default.)
   This means that build output will be generated with the project files.  It may be
   helpful to copy the projects to another directory before running them, for example
   <<<target/it>>>.  This will allow <<<mvn clean>>> to remove the output generated

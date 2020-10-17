@@ -186,6 +186,8 @@ public abstract class AbstractInvokerMojo
      * Directory to which projects should be cloned prior to execution. If set to {@code null}, each integration test 
      * will be run in the directory in which the corresponding IT POM was found. In this case, you most likely want to
      * configure your SCM to ignore <code>target</code> and <code>build.log</code> in the test's base directory.
+     * (<b>Exception</b> when project using invoker plugin is of <i>maven-plugin</i> packaging:
+     * In such case IT projects will be cloned to and executed in <code>target/its</code> by default.)
      *
      * @since 1.1
      */
