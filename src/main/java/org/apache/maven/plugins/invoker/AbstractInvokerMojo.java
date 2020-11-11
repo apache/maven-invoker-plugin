@@ -1144,9 +1144,7 @@ public abstract class AbstractInvokerMojo
                         // avoid infinite recursion if the cloneTo path is a subdirectory.
                         if ( cloneSubdir != null )
                         {
-                            File temp = File.createTempFile( "pre-invocation-clone.", "" );
-                            temp.delete();
-                            temp.mkdirs();
+                            File temp = Files.createTempDirectory( "pre-invocation-clone." ).toFile();
 
                             copyDirectoryStructure( projectsDirectory, temp );
 
