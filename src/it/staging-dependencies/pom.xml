@@ -35,7 +35,7 @@ under the License.
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.2</version>
+      <version>4.13.1</version>
     </dependency>
     <!-- snapshot version, must be staged using the base version and not the timestamped version -->
     <dependency>

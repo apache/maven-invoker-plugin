@@ -35,8 +35,8 @@ try
     }
 
     String[] files = {
-            "junit/junit/3.8.2/junit-3.8.2.pom",
-            "junit/junit/3.8.2/junit-3.8.2.jar",
+            "junit/junit/4.13.1/junit-4.13.1.pom",
+            "junit/junit/4.13.1/junit-4.13.1.jar",
             "junit/junit/maven-metadata-local.xml",
             "org/apache/maven/its/minvoker-70/1.0-SNAPSHOT/minvoker-70-1.0-SNAPSHOT.pom",
             "org/apache/maven/its/minvoker-70/1.0-SNAPSHOT/minvoker-70-1.0-SNAPSHOT.jar",
