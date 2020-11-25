@@ -69,9 +69,9 @@ under the License.
     <mavenVersion>3.0</mavenVersion>
     <doxiaVersion>1.9.1</doxiaVersion>
     <doxiaSitetoolsVersion>1.9.2</doxiaSitetoolsVersion>
-    <beanshell-groupId>org.beanshell</beanshell-groupId>
+    <beanshell-groupId>org.apache-extras.beanshell</beanshell-groupId>
     <beanshell-artifactId>bsh</beanshell-artifactId>
-    <beanshell-version>2.0b5</beanshell-version>
+    <beanshell-version>2.0b6</beanshell-version>
     <groovy-groupId>org.codehaus.groovy</groovy-groupId>
     <groovy-artifactId>groovy-all</groovy-artifactId>
     <groovy-version>2.4.20</groovy-version>
