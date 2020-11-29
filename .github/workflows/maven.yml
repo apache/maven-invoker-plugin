@@ -24,8 +24,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 11, 14, 15-ea]
+        os: [ubuntu-20.04, windows-latest, macOS-latest]
+        java: [7, 8, 11, 15, 16-ea]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -34,14 +34,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up cache for ~./m2/repository
-        uses: actions/cache@v1
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
         with:
-          path: ~/.m2/repository
-          key: maven-${{ matrix.os }}-java${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ matrix.os }}-java${{ matrix.java }}-
-            maven-${{ matrix.os }}-
+            path: ~/.m2/repository
+            key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+            restore-keys: |
+                ${{ runner.os }}-maven-
 
       - name: Set up JDK
         uses: actions/setup-java@v1
