@@ -282,7 +282,7 @@ class SelectorUtils
             }
         }
     }
-    
+
     /**
      * @param toolchainPrivateManager
      * @param invokerToolchains
@@ -315,9 +315,9 @@ class SelectorUtils
             {
                 return false;
             }
-            
+
             if ( !found )
-            { 
+            {
                 return false;
             }
         }

@@ -22,7 +22,7 @@ package org.apache.maven.plugins.invoker;
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 
 /**
- * 
+ *
  * @author Robert Scholte
  *
  */
@@ -33,38 +33,38 @@ class Selector
     static final int SELECTOR_JREVERSION = 2;
 
     static final int SELECTOR_OSFAMILY = 4;
-    
+
     static final int SELECTOR_TOOLCHAIN = 8;
 
     static final int SELECTOR_MULTI = 16;
-    
+
     private final String actualMavenVersion;
-    
+
     private final String actualJavaVersion;
-    
-    private final ToolchainPrivateManager toolchainPrivateManager; 
-    
+
+    private final ToolchainPrivateManager toolchainPrivateManager;
+
     Selector( String actualMavenVersion, String actualJavaVersion, ToolchainPrivateManager toolchainPrivateManager )
     {
         this.actualMavenVersion = actualMavenVersion;
         this.actualJavaVersion = actualJavaVersion;
         this.toolchainPrivateManager = toolchainPrivateManager;
     }
-    
-    public int getSelection( InvokerProperties invokerProperties ) 
+
+    public int getSelection( InvokerProperties invokerProperties )
     {
         if ( !invokerProperties.isSelectorDefined( 1 ) )
         {
             return getGlobal( invokerProperties );
         }
-        
+
         for ( int selectorIndex = 1;; selectorIndex++ )
         {
             if ( selectorIndex > 1 && !invokerProperties.isSelectorDefined( selectorIndex ) )
             {
                 break;
             }
-            
+
             int selection = 0;
             if ( !SelectorUtils.isMavenVersion( invokerProperties.getMavenVersion( selectorIndex ),
                                                 actualMavenVersion ) )
@@ -95,7 +95,7 @@ class Selector
         }
         return SELECTOR_MULTI;
     }
-    
+
     /**
      * Determines whether selector conditions of the specified invoker properties match the current environment.
      *

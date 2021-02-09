@@ -100,7 +100,7 @@ public class SelectorUtilsTest
         assertTrue( SelectorUtils.isJreVersion( (String) null, "1.5" ) );
         assertTrue( SelectorUtils.isJreVersion( "", "1.5" ) );
     }
-    
+
     @Test
     public void testIsMatchingToolchain() throws Exception
     {
@@ -134,7 +134,7 @@ public class SelectorUtilsTest
         when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) )
                 .thenReturn( new ToolchainPrivate[0] );
         assertFalse( SelectorUtils.isToolchain( toolchainPrivateManager, Collections.singleton( openJdk9 ) ) );
-        
+
         when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) )
                 .thenReturn( new ToolchainPrivate[] { jdkMatching } );
         when( toolchainPrivateManager.getToolchainPrivates( "maven" ) )

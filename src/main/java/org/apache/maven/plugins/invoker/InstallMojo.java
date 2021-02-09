@@ -78,7 +78,7 @@ public class InstallMojo
      */
     @Component
     private ArtifactInstaller installer;
-    
+
     @Component
     private RepositoryManager repositoryManager;
 
@@ -99,7 +99,7 @@ public class InstallMojo
      * possibly broken artifacts, it is strongly recommended to use an isolated repository for the integration tests
      * (e.g. <code>${project.build.directory}/it-repo</code>).
      */
-    @Parameter( property = "invoker.localRepositoryPath", 
+    @Parameter( property = "invoker.localRepositoryPath",
                 defaultValue = "${session.localRepository.basedir}", required = true )
     private File localRepositoryPath;
 
@@ -111,7 +111,7 @@ public class InstallMojo
 
     @Parameter( defaultValue = "${session}", readonly = true, required = true )
     private MavenSession session;
-    
+
     /**
      * The set of Maven projects in the reactor build.
      */
@@ -213,7 +213,7 @@ public class InstallMojo
     private void createTestRepository()
         throws MojoExecutionException
     {
-        
+
         if ( !localRepositoryPath.exists() && !localRepositoryPath.mkdirs() )
         {
             throw new MojoExecutionException( "Failed to create directory: " + localRepositoryPath );
@@ -485,7 +485,7 @@ public class InstallMojo
             throw new MojoExecutionException( "Failed to install project dependencies: " + mvnProject, e );
         }
     }
-    
+
     protected void collectAllProjectReferences( MavenProject project, Collection<String> dependencyProjects )
     {
         for ( MavenProject reactorProject : project.getProjectReferences().values() )

@@ -143,7 +143,7 @@ class MetadataUtils
         {
             return null;
         }
-        
+
         try ( Reader reader = ReaderFactory.newXmlReader( metadataFile ) )
         {
             return Xpp3DomBuilder.build( reader );

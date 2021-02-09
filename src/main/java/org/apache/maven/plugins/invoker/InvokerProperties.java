@@ -428,7 +428,7 @@ class InvokerProperties
 
     /**
      * Gets the settings file used for the specified invocation.
-     * 
+     *
      * @param index The index of the invocation, must not be negative.
      * @return the value for the settings file or <code>null</code> if not set.
      */

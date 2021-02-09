@@ -23,31 +23,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *
  * @author Robert Scholte
  * @since 3.2.0
  */
 public class InvokerToolchain
 {
     private final String type;
-    
+
     private Map<String, String> provides = new HashMap<>();
-    
+
     public InvokerToolchain( String type )
     {
         this.type = type;
     }
-    
+
     public String getType()
     {
         return type;
     }
-    
+
     public void addProvides( String key, String value )
     {
         provides.put( key, value );
     }
-    
+
     public Map<String, String> getProvides()
     {
         return provides;

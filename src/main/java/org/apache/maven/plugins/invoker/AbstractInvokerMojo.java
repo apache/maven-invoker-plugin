@@ -183,7 +183,7 @@ public abstract class AbstractInvokerMojo
     private boolean disableReports;
 
     /**
-     * Directory to which projects should be cloned prior to execution. If set to {@code null}, each integration test 
+     * Directory to which projects should be cloned prior to execution. If set to {@code null}, each integration test
      * will be run in the directory in which the corresponding IT POM was found. In this case, you most likely want to
      * configure your SCM to ignore <code>target</code> and <code>build.log</code> in the test's base directory.
      * (<b>Exception</b> when project using invoker plugin is of <i>maven-plugin</i> packaging:
@@ -269,7 +269,7 @@ public abstract class AbstractInvokerMojo
 
     @Component
     private SettingsBuilder settingsBuilder;
-    
+
     @Component
     private ToolchainManagerPrivate toolchainManagerPrivate;
 
@@ -340,11 +340,11 @@ public abstract class AbstractInvokerMojo
      */
     @Parameter( property = "invoker.noLog", defaultValue = "false" )
     private boolean noLog;
-    
+
     /**
-     * By default a {@code build.log} is created in the root of the project. By setting this folder 
-     * files are written to a different folder, respecting the structure of the projectsDirectory. 
-     * 
+     * By default a {@code build.log} is created in the root of the project. By setting this folder
+     * files are written to a different folder, respecting the structure of the projectsDirectory.
+     *
      * @since 3.2.0
      */
     @Parameter
@@ -480,7 +480,7 @@ public abstract class AbstractInvokerMojo
      * configuration. The values of the properties are filtered and may use expressions like
      * <code>${project.version}</code> to reference project properties or values from the parameter
      * {@link #filterProperties}.<p/>
-     * 
+     *
      * <p>
      * As of 3.2.0 it is possible to put this folder in any of the ancestor folders, where properties will be inherited.
      * This way you can provide a single properties file for a group of projects
@@ -539,7 +539,7 @@ public abstract class AbstractInvokerMojo
      * # A comma separated list of JRE versions on which this build job should be run.
      * # Since plugin version 1.4
      * invoker.java.version = 1.4+, !1.4.1, 1.7-
-     * 
+     *
      * # A comma separated list of OS families on which this build job should be run.
      * # Since plugin version 1.4
      * invoker.os.family = !windows, unix, mac
@@ -547,25 +547,25 @@ public abstract class AbstractInvokerMojo
      * # A comma separated list of Maven versions on which this build should be run.
      * # Since plugin version 1.5
      * invoker.maven.version = 2.0.10+, !2.1.0, !2.2.0
-     * 
+     *
      * # A mapping for toolchain to ensure it exists
      * # Since plugin version 3.2.0
      * invoker.toolchain.&lt;type&gt;.&lt;provides&gt; = value
      * invoker.toolchain.jdk.version = 11
-     * 
+     *
      * # For java.version, maven.version, os.family and toolchain it is possible to define multiple selectors.
      * # If one of the indexed selectors matches, the test is executed.
-     * # With the invoker.x.y equivalents you can specify global matchers.  
+     * # With the invoker.x.y equivalents you can specify global matchers.
      * selector.1.java.version = 1.8+
      * selector.1.maven.version = 3.2.5+
      * selector.1.os.family = !windows
      * selector.2.maven.version = 3.0+
      * selector.3.java.version = 9+
-     * 
+     *
      * # A boolean value controlling the debug logging level of Maven, , defaults to &quot;false&quot;
      * # Since plugin version 1.8
      * invoker.debug = true
-     * 
+     *
      * # Path to an alternate settings.xml to use for Maven invocation with this IT.
      * # Since plugin version 3.0.1
      * invoker.settingsFile = ../
@@ -859,7 +859,7 @@ public abstract class AbstractInvokerMojo
 
     /**
      * This will create the necessary folders for the reports.
-     * 
+     *
      * @throws MojoExecutionException in case of failure during creation of the reports folder.
      */
     private void setupReportsFolder()
@@ -1317,36 +1317,36 @@ public abstract class AbstractInvokerMojo
         {
             actualJreVersion = SelectorUtils.getJreVersion();
         }
-        
+
         final Path projectsPath = this.projectsDirectory.toPath();
-        
+
         Set<Path> folderGroupSet = new HashSet<>();
         folderGroupSet.add( Paths.get( "." ) );
         for ( BuildJob buildJob : buildJobs )
         {
             Path p = Paths.get( buildJob.getProject() );
-            
+
             if ( Files.isRegularFile( projectsPath.resolve( p ) ) )
             {
                 p = p.getParent();
             }
-            
+
             if ( p != null )
             {
                 p = p.getParent();
             }
-            
+
             while ( p != null && folderGroupSet.add( p ) )
             {
                 p = p.getParent();
             }
         }
-        
+
         List<Path> folderGroup = new ArrayList<>( folderGroupSet );
         Collections.sort( folderGroup );
 
         final Map<Path, Properties> globalInvokerProperties = new HashMap<>();
-        
+
         for ( Path path : folderGroup )
         {
             Properties ancestorProperties = globalInvokerProperties.get( projectsPath.resolve( path ).getParent() );
@@ -1359,7 +1359,7 @@ public abstract class AbstractInvokerMojo
                 if ( ancestorProperties != null )
                 {
                     currentProperties = new Properties( ancestorProperties );
-                    
+
                 }
                 else
                 {
@@ -1383,7 +1383,7 @@ public abstract class AbstractInvokerMojo
                         + currentInvokerProperties );
                 }
             }
-            
+
             if ( currentProperties != null )
             {
                 globalInvokerProperties.put( projectsPath.resolve( path ).normalize(), currentProperties );
@@ -1434,7 +1434,7 @@ public abstract class AbstractInvokerMojo
                 for ( BuildJob job : buildJobs )
                 {
                     Path ancestorFolder = getAncestorFolder( projectsPath.resolve( job.getProject() ) );
-                    
+
                     runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion,
                               globalInvokerProperties.get( ancestorFolder ) );
                 }
@@ -1452,7 +1452,7 @@ public abstract class AbstractInvokerMojo
             }
         }
     }
-    
+
     private Path getAncestorFolder( Path p )
     {
         Path ancestor = p;
@@ -1470,7 +1470,7 @@ public abstract class AbstractInvokerMojo
     /**
      * Interpolate settings.xml file.
      * @param settingsFile a settings file
-     * 
+     *
      * @return The interpolated settings.xml file.
      * @throws MojoExecutionException in case of a problem.
      */
@@ -1496,7 +1496,7 @@ public abstract class AbstractInvokerMojo
 
     /**
      * Merge the settings file
-     * 
+     *
      * @param interpolatedSettingsFile The interpolated settings file.
      * @return The merged settings file.
      * @throws MojoExecutionException Fail the build in case the merged settings file can't be created.
@@ -1556,7 +1556,7 @@ public abstract class AbstractInvokerMojo
 
         SettingsXpp3Writer settingsWriter = new SettingsXpp3Writer();
 
-        
+
         try ( FileWriter fileWriter = new FileWriter( mergedSettingsFile ) )
         {
             settingsWriter.write( fileWriter, mergedSettings );
@@ -1643,7 +1643,7 @@ public abstract class AbstractInvokerMojo
 
     /**
      * Interpolate the pom file.
-     * 
+     *
      * @param pomFile The pom file.
      * @param basedir The base directory.
      * @return interpolated pom file location in case we have interpolated the pom file otherwise the original pom file
@@ -1676,7 +1676,7 @@ public abstract class AbstractInvokerMojo
      * @param buildJob The build job to run, must not be <code>null</code>.
      * @param settingsFile The (already interpolated) user settings file for the build, may be <code>null</code> to use
      *            the current user settings.
-     * @param globalInvokerProperties 
+     * @param globalInvokerProperties
      * @throws org.apache.maven.plugin.MojoExecutionException If the project could not be launched.
      */
     private void runBuild( File projectsDir, BuildJob buildJob, File settingsFile, File actualJavaHome,
@@ -1863,7 +1863,7 @@ public abstract class AbstractInvokerMojo
 
     /**
      * Delete the interpolated pom file if it has been created before.
-     * 
+     *
      * @param interpolatedPomFile The interpolated pom file.
      */
     private void deleteInterpolatedPomFile( File interpolatedPomFile )
@@ -2145,7 +2145,7 @@ public abstract class AbstractInvokerMojo
                 {
                     File interpolateSettingsFile = interpolateSettings( new File( customSettingsFile ) );
                     File mergeSettingsFile = mergeSettings( interpolateSettingsFile );
-                    
+
                     request.setUserSettingsFile( mergeSettingsFile );
                 }
                 else
@@ -2268,8 +2268,8 @@ public abstract class AbstractInvokerMojo
             {
                 projectLogDirectory =
                     logDirectory.toPath().resolve( projectsDirectory.toPath().relativize( basedir.toPath() ) );
-            }            
-            
+            }
+
             try
             {
                 if ( streamLogs )
@@ -2330,7 +2330,7 @@ public abstract class AbstractInvokerMojo
 
         if ( propertiesFile != null && propertiesFile.isFile() )
         {
-            
+
             try ( InputStream fin = new FileInputStream( propertiesFile ) )
             {
                 Properties loadedProperties = new Properties();
@@ -2764,7 +2764,7 @@ public abstract class AbstractInvokerMojo
         throws IOException
     {
         List<String> result = new ArrayList<>();
-        
+
         Map<String, Object> composite = getInterpolationValueSource( false );
 
         try ( BufferedReader reader =
@@ -2832,11 +2832,11 @@ public abstract class AbstractInvokerMojo
             {
                 xml = IOUtil.toString( reader );
             }
-            
+
             try ( Writer writer = WriterFactory.newXmlWriter( interpolatedFile ) )
             {
                 interpolatedFile.getParentFile().mkdirs();
-                
+
                 writer.write( xml );
             }
         }
@@ -2865,7 +2865,7 @@ public abstract class AbstractInvokerMojo
         {
             props = new Properties();
         }
-        
+
         File propertiesFile = new File( projectDirectory, invokerPropertiesFile );
         if ( propertiesFile.isFile() )
         {
@@ -2902,7 +2902,7 @@ public abstract class AbstractInvokerMojo
     static class ToolchainPrivateManager
     {
         private ToolchainManagerPrivate manager;
-        
+
         private MavenSession session;
 
         ToolchainPrivateManager( ToolchainManagerPrivate manager, MavenSession session )
