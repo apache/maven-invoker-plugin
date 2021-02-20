@@ -148,14 +148,8 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-common-artifact-filters</artifactId>
-      <version>3.1.1</version>
+      <version>3.2.0</version>
       <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>sisu-inject-plexus</artifactId>
-          <groupId>org.sonatype.sisu</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Doxia -->
     <dependency>
