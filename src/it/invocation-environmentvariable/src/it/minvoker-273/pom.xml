@@ -22,13 +22,10 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>org.apache.maven.plugins.invoker.its</groupId>
-  <artifactId>invocation-environmentvariable</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <artifactId>minvoker-273</artifactId>
+  <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-
-  <description>Test if the environmentvariable is applied</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,32 +35,17 @@ under the License.
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <version>@project.version@</version>
-        <configuration>
-          <debug>true</debug>
-          <postBuildHookScript>verify</postBuildHookScript>
-          <goals>
-            <goal>validate</goal>
-          </goals>
-          <environmentVariables>
-            <MINVOKER145>foobar</MINVOKER145>
-            <MINVOKER255_POM>minvoker255_pom</MINVOKER255_POM>
-            <MINVOKER273_PROPERTIES1/>
-            <MINVOKER273_PROPERTIES3/>
-          </environmentVariables>
-        </configuration>
+        <artifactId>maven-help-plugin</artifactId>
+        <version>3.2.0</version>
         <executions>
           <execution>
-            <id>integration-test</id>
-            <phase>initialize</phase>
+            <phase>validate</phase>
             <goals>
-              <goal>run</goal>
+              <goal>system</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
-
 </project>
