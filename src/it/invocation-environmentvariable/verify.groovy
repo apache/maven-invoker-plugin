@@ -16,6 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-def buildLog = new File( basedir, 'build.log' )
-assert buildLog.text.contains('[INFO] BUILD SUCCESS')
+
+def buildLog = new File( basedir, 'build.log' ).text
+assert buildLog.contains('[INFO] BUILD SUCCESS')
+
+def buildLod273 = new File( basedir, 'src/it/minvoker-273/build.log' ).text
+
+// MINVOKER273_PROPERTIES1 is present in system environment and should be removed
+assert !buildLod273.contains('MINVOKER273_PROPERTIES1')
+
+// MINVOKER273_PROPERTIES2 is present in system environment and should be present in invocation
+assert buildLod273.contains('MINVOKER273_PROPERTIES2=minvoker273_properties2')
+
+// MINVOKER273_PROPERTIES3 is not present in system environment and should not be present in invocation
+assert !buildLod273.contains('MINVOKER273_PROPERTIES3')
 
