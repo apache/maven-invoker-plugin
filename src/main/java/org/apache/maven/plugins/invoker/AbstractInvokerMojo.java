@@ -90,7 +90,6 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1057,9 +1056,7 @@ public abstract class AbstractInvokerMojo
                 collectProjects( projectsDir, parent, projectPaths, false );
             }
 
-            Collection<String> modulePaths = new LinkedHashSet<>();
-
-            modulePaths.addAll( model.getModules() );
+            Collection<String> modulePaths = new LinkedHashSet<>( model.getModules() );
 
             for ( Profile profile : model.getProfiles() )
             {
@@ -2038,7 +2035,7 @@ public abstract class AbstractInvokerMojo
         {
             Properties props = invokerProperties.getProperties();
             getLog().debug( "Using invoker properties:" );
-            for ( String key : new TreeSet<String>( props.stringPropertyNames() ) )
+            for ( String key : new TreeSet<>( props.stringPropertyNames() ) )
             {
                 String value = props.getProperty( key );
                 getLog().debug( "  " + key + " = " + value );
@@ -2489,7 +2486,7 @@ public abstract class AbstractInvokerMojo
             List<BuildJob> setupPoms = scanProjectsDirectory( setupIncludes, excludes, BuildJob.Type.SETUP );
             if ( getLog().isDebugEnabled() )
             {
-                getLog().debug( "Setup projects: " + Arrays.asList( setupPoms ) );
+                getLog().debug( "Setup projects: " + setupPoms );
             }
 
             List<BuildJob> normalPoms = scanProjectsDirectory( pomIncludes, excludes, BuildJob.Type.NORMAL );

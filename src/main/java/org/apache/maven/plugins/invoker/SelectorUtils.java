@@ -22,7 +22,6 @@ package org.apache.maven.plugins.invoker;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -146,10 +145,6 @@ class SelectorUtils
                     return version;
                 }
             }
-            catch ( MalformedURLException e )
-            {
-                // ignore
-            }
             catch ( IOException e )
             {
                 // ignore
@@ -192,8 +187,8 @@ class SelectorUtils
 
     static boolean isJreVersion( String jreSpec, String actualJreVersion )
     {
-        List<String> includes = new ArrayList<String>();
-        List<String> excludes = new ArrayList<String>();
+        List<String> includes = new ArrayList<>();
+        List<String> excludes = new ArrayList<>();
         parseList( jreSpec, includes, excludes );
 
         List<Integer> jreVersion = parseVersion( actualJreVersion );
@@ -249,7 +244,7 @@ class SelectorUtils
 
         String[] tokens = StringUtils.split( version, "." );
 
-        List<Integer> numbers = new ArrayList<Integer>();
+        List<Integer> numbers = new ArrayList<>();
 
         for ( String token : tokens )
         {

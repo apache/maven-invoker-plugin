@@ -47,8 +47,8 @@ public class SelectorUtilsTest
     @Test
     public void testParseList()
     {
-        List<String> includes = new ArrayList<String>();
-        List<String> excludes = new ArrayList<String>();
+        List<String> includes = new ArrayList<>();
+        List<String> excludes = new ArrayList<>();
 
         SelectorUtils.parseList( null, includes, excludes );
 

@@ -27,10 +27,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.shared.utils.io.IOUtil;
 
 /**
  * Tracks a set of build jobs and their results.
@@ -231,17 +231,12 @@ class InvokerSession
                 {
                     // prepare message with build.log in one string to omit begin [ERROR], [WARN]
                     // so whole log will be displayed without decoration
-                    StringBuilder buildLogMessage = new StringBuilder( );
-                    buildLogMessage.append( System.lineSeparator() );
-                    buildLogMessage.append( System.lineSeparator() );
-                    buildLogMessage.append( "*** begin build.log for: " + buildJob.getProject() + " ***" );
-                    buildLogMessage.append( System.lineSeparator() );
-                    buildLogMessage.append( IOUtil.toString( new FileReader( buildLogFile ) ) );
-                    buildLogMessage.append( "*** end build.log for: " + buildJob.getProject() + " ***" );
-                    buildLogMessage.append( System.lineSeparator() );
-
                     logWithLevel( logger, ignoreFailures, SEPARATOR );
-                    logWithLevel( logger, ignoreFailures,  buildLogMessage.toString() );
+                    String buildLogMessage = System.lineSeparator() + System.lineSeparator()
+                            + "*** begin build.log for: " + buildJob.getProject() + " ***" + System.lineSeparator()
+                            + IOUtils.toString( new FileReader( buildLogFile ) )
+                            + "*** end build.log for: " + buildJob.getProject() + " ***" + System.lineSeparator();
+                    logWithLevel( logger, ignoreFailures, buildLogMessage );
                     logWithLevel( logger, ignoreFailures, SEPARATOR );
                     logWithLevel( logger, ignoreFailures, "" );
 
