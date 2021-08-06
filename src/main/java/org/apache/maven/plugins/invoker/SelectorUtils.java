@@ -122,7 +122,7 @@ class SelectorUtils
     static String getMavenVersion( File mavenHome )
     {
         File mavenLib = new File( mavenHome, "lib" );
-        File[] jarFiles = mavenLib.listFiles( (dir, name) -> name.endsWith( ".jar" ) );
+        File[] jarFiles = mavenLib.listFiles( ( dir, name ) -> name.endsWith( ".jar" ) );
 
         for ( File file : jarFiles )
         {

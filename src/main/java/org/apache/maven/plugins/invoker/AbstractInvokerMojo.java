@@ -1384,7 +1384,7 @@ public abstract class AbstractInvokerMojo
                 ExecutorService executorService = Executors.newFixedThreadPool( runWithParallelThreads );
                 for ( final BuildJob job : buildJobs )
                 {
-                    executorService.execute(() ->
+                    executorService.execute( () ->
                     {
                         try
                         {
