@@ -89,7 +89,7 @@ public class InvokerMojoTest extends AbstractMojoTestCase
 
     public void testAlreadyCloned()
     {
-        assertFalse( AbstractInvokerMojo.alreadyCloned( "dir", Collections.<String>emptyList() ) );
+        assertFalse( AbstractInvokerMojo.alreadyCloned( "dir", Collections.emptyList() ) );
         assertTrue( AbstractInvokerMojo.alreadyCloned( "dir", Collections.singletonList( "dir" ) ) );
         assertTrue( AbstractInvokerMojo.alreadyCloned( "dir" + File.separator + "sub",
                 Collections.singletonList( "dir" ) ) );

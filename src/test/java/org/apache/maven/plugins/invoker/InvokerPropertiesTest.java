@@ -132,13 +132,13 @@ public class InvokerPropertiesTest
 
         props.setProperty( "invoker.goals", "   " );
         facade.configureInvocation( request, 0 );
-        verify( request ).setGoals( eq( Collections.<String>emptyList() ) );
+        verify( request ).setGoals( eq( Collections.emptyList() ) );
         verifyNoMoreInteractions( request );
         clearInvocations( request );
 
         props.setProperty( "invoker.goals", "" );
         facade.configureInvocation( request, 0 );
-        verify( request ).setGoals( eq( Collections.<String>emptyList() ) );
+        verify( request ).setGoals( eq( Collections.emptyList() ) );
         verifyNoMoreInteractions( request );
         clearInvocations( request );
 
@@ -162,13 +162,13 @@ public class InvokerPropertiesTest
 
         props.setProperty( "invoker.profiles", "   " );
         facade.configureInvocation( request, 0 );
-        verify( request ).setProfiles( eq( Collections.<String>emptyList() ) );
+        verify( request ).setProfiles( eq( Collections.emptyList() ) );
         verifyNoMoreInteractions( request );
         clearInvocations( request );
 
         props.setProperty( "invoker.profiles", "" );
         facade.configureInvocation( request, 0 );
-        verify( request ).setProfiles( eq( Collections.<String>emptyList() ) );
+        verify( request ).setProfiles( eq( Collections.emptyList() ) );
         verifyNoMoreInteractions( request );
         clearInvocations( request );
 

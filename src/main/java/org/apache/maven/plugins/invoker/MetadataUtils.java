@@ -82,7 +82,7 @@ class MetadataUtils
 
         File metadataFile = new File( file.getParentFile().getParentFile(), "maven-metadata-local.xml" );
 
-        Set<String> allVersions = new LinkedHashSet<String>();
+        Set<String> allVersions = new LinkedHashSet<>();
 
         Xpp3Dom metadata = readMetadata( metadataFile );
 
@@ -150,7 +150,7 @@ class MetadataUtils
         }
         catch ( XmlPullParserException e )
         {
-            throw (IOException) new IOException( e.getMessage() ).initCause( e );
+            throw new IOException( e.getMessage(), e );
         }
     }
 

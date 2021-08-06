@@ -22,7 +22,6 @@ package org.apache.maven.plugins.invoker;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -90,7 +89,6 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -98,11 +96,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -110,6 +106,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -886,15 +883,10 @@ public abstract class AbstractInvokerMojo
 
     private List<BuildJob> getNonSetupJobs( List<BuildJob> buildJobs )
     {
-        List<BuildJob> result = new LinkedList<>();
-        for ( BuildJob buildJob : buildJobs )
-        {
-            if ( !buildJob.getType().equals( BuildJob.Type.SETUP ) )
-            {
-                result.add( buildJob );
-            }
-        }
-        return result;
+        return buildJobs.stream().
+                filter( buildJob -> !buildJob.getType().equals( BuildJob.Type.SETUP ) ).
+                collect( Collectors.toList() );
+
     }
 
     private void handleScriptRunnerWithScriptClassPath()
@@ -917,10 +909,7 @@ public abstract class AbstractInvokerMojo
         scriptRunner.setGlobalVariable( "localRepositoryPath", localRepositoryPath );
         if ( scriptVariables != null )
         {
-            for ( Entry<String, String> entry : scriptVariables.entrySet() )
-            {
-                scriptRunner.setGlobalVariable( entry.getKey(), entry.getValue() );
-            }
+            scriptVariables.forEach( (key, value) -> scriptRunner.setGlobalVariable( key, value ) );
         }
         scriptRunner.setClassPath( scriptClassPath );
     }
@@ -1057,14 +1046,10 @@ public abstract class AbstractInvokerMojo
                 collectProjects( projectsDir, parent, projectPaths, false );
             }
 
-            Collection<String> modulePaths = new LinkedHashSet<>();
+            Collection<String> modulePaths = new LinkedHashSet<>( model.getModules() );
 
-            modulePaths.addAll( model.getModules() );
+            model.getProfiles().forEach( profile -> modulePaths.addAll( profile.getModules() ) );
 
-            for ( Profile profile : model.getProfiles() )
-            {
-                modulePaths.addAll( profile.getModules() );
-            }
 
             for ( String modulePath : modulePaths )
             {
@@ -1399,23 +1384,19 @@ public abstract class AbstractInvokerMojo
                 ExecutorService executorService = Executors.newFixedThreadPool( runWithParallelThreads );
                 for ( final BuildJob job : buildJobs )
                 {
-                    executorService.execute( new Runnable()
-                    {
-                        public void run()
+                    executorService.execute(() -> {
+                        try
                         {
-                            try
-                            {
-                                Path ancestorFolder = getAncestorFolder( projectsPath.resolve( job.getProject() ) );
+                            Path ancestorFolder = getAncestorFolder( projectsPath.resolve( job.getProject() ) );
 
-                                runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion,
-                                          globalInvokerProperties.get( ancestorFolder ) );
-                            }
-                            catch ( MojoExecutionException e )
-                            {
-                                throw new RuntimeException( e.getMessage(), e );
-                            }
+                            runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion,
+                                      globalInvokerProperties.get( ancestorFolder ) );
                         }
-                    } );
+                        catch ( MojoExecutionException e )
+                        {
+                            throw new RuntimeException( e.getMessage(), e );
+                        }
+                    });
                 }
 
                 try
@@ -1623,13 +1604,7 @@ public abstract class AbstractInvokerMojo
         commandLine.createArg().setValue( "java.version" );
 
         final StringBuilder actualJreVersion = new StringBuilder();
-        StreamConsumer consumer = new StreamConsumer()
-        {
-            public void consumeLine( String line )
-            {
-                actualJreVersion.append( line );
-            }
-        };
+        StreamConsumer consumer = actualJreVersion::append;
         try
         {
             CommandLineUtils.executeCommandLine( commandLine, consumer, null );
@@ -1809,12 +1784,12 @@ public abstract class AbstractInvokerMojo
 
                 if ( !suppressSummaries )
                 {
-                    getLog().info( pad( buildJob ).warning( "SKIPPED" ) + " due to " + message.toString() );
+                    getLog().info( pad( buildJob ).warning( "SKIPPED" ) + " due to " + message );
                 }
 
                 // Abuse failureMessage, the field in the report which should contain the reason for skipping
                 // Consider skipCode + I18N
-                buildJob.setFailureMessage( "Skipped due to " + message.toString() );
+                buildJob.setFailureMessage( "Skipped due to " + message );
             }
         }
         catch ( RunFailureException e )
@@ -2038,7 +2013,7 @@ public abstract class AbstractInvokerMojo
         {
             Properties props = invokerProperties.getProperties();
             getLog().debug( "Using invoker properties:" );
-            for ( String key : new TreeSet<String>( props.stringPropertyNames() ) )
+            for ( String key : new TreeSet<>( props.stringPropertyNames() ) )
             {
                 String value = props.getProperty( key );
                 getLog().debug( "  " + key + " = " + value );
@@ -2427,7 +2402,7 @@ public abstract class AbstractInvokerMojo
         throws IOException
     {
         List<String> excludes =
-            ( pomExcludes != null ) ? new ArrayList<>( pomExcludes ) : new ArrayList<String>();
+            ( pomExcludes != null ) ? new ArrayList<>( pomExcludes ) : new ArrayList<>();
         if ( this.settingsFile != null )
         {
             String exclude = relativizePath( this.settingsFile, projectsDirectory.getCanonicalPath() );
@@ -2460,14 +2435,14 @@ public abstract class AbstractInvokerMojo
         return setupPoms;
     }
 
-    private static class OrdinalComparator implements Comparator
+    private static class OrdinalComparator implements Comparator<BuildJob>
     {
         private static final OrdinalComparator INSTANCE = new OrdinalComparator();
 
         @Override
-        public int compare( Object o1, Object o2 )
+        public int compare( BuildJob o1, BuildJob o2 )
         {
-            return Integer.compare( ( ( BuildJob ) o2 ).getOrdinal(), ( ( BuildJob ) o1 ).getOrdinal() );
+            return Integer.compare( o2.getOrdinal(), o1.getOrdinal() );
         }
     }
 
@@ -2489,7 +2464,7 @@ public abstract class AbstractInvokerMojo
             List<BuildJob> setupPoms = scanProjectsDirectory( setupIncludes, excludes, BuildJob.Type.SETUP );
             if ( getLog().isDebugEnabled() )
             {
-                getLog().debug( "Setup projects: " + Arrays.asList( setupPoms ) );
+                getLog().debug( "Setup projects: " + Collections.singletonList(setupPoms));
             }
 
             List<BuildJob> normalPoms = scanProjectsDirectory( pomIncludes, excludes, BuildJob.Type.NORMAL );
@@ -2563,11 +2538,11 @@ public abstract class AbstractInvokerMojo
         scanner.setFollowSymlinks( false );
         if ( includes != null )
         {
-            scanner.setIncludes( includes.toArray( new String[includes.size()] ) );
+            scanner.setIncludes( includes.toArray(new String[0]) );
         }
         if ( excludes != null )
         {
-            scanner.setExcludes( excludes.toArray( new String[excludes.size()] ) );
+            scanner.setExcludes( excludes.toArray(new String[0]) );
         }
         scanner.addDefaultExcludes();
         scanner.scan();
@@ -2603,7 +2578,7 @@ public abstract class AbstractInvokerMojo
             buildJob.setOrdinal( invokerProperties.getOrdinal() );
             projects.add( buildJob );
         }
-        Collections.sort( projects, OrdinalComparator.INSTANCE );
+        projects.sort( OrdinalComparator.INSTANCE );
         return projects;
     }
 

@@ -625,9 +625,9 @@ public class InstallMojo
                         ProjectBuildingRequest projectBuildingRequest = repositoryManager
                                 .setLocalRepositoryBasedir( session.getProjectBuildingRequest(),
                                         localRepositoryPath );
-                        projectBuildingRequest.setRemoteRepositories( Arrays.asList( localRepository ) );
+                        projectBuildingRequest.setRemoteRepositories( Collections.singletonList( localRepository ) );
                         resolver.resolveDependencies( projectBuildingRequest, coordinate,
-                                new PatternExclusionsFilter( Collections.<String>emptyList() ) );
+                                new PatternExclusionsFilter( Collections.emptyList() ) );
                     }
                     finally
                     {
@@ -637,7 +637,7 @@ public class InstallMojo
                 else
                 {
                     resolver.resolveDependencies( projectBuildingRequest, coordinate,
-                            new PatternExclusionsFilter( Collections.<String>emptyList() ) );
+                            new PatternExclusionsFilter( Collections.emptyList() ) );
                 }
             }
             catch ( DependencyResolverException e )

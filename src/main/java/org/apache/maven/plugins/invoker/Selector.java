@@ -111,7 +111,7 @@ class Selector
             selection |= SELECTOR_MAVENVERSION;
         }
 
-        if ( !SelectorUtils.isJreVersion( invokerProperties.getJreVersion(), actualJavaVersion.toString() ) )
+        if ( !SelectorUtils.isJreVersion( invokerProperties.getJreVersion(), actualJavaVersion ) )
         {
             selection |= SELECTOR_JREVERSION;
         }

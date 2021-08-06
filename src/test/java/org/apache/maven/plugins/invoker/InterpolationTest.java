@@ -21,7 +21,7 @@ package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.Reader;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -114,7 +114,7 @@ public class InterpolationTest
     {
 
         InvokerMojo invokerMojo = new InvokerMojo();
-        setVariableValueToObject( invokerMojo, "profiles", Arrays.asList( "zloug" ) );
+        setVariableValueToObject( invokerMojo, "profiles", Collections.singletonList("zloug"));
         setVariableValueToObject( invokerMojo, "settings", new Settings() );
         String dirPath = getBasedir() + File.separatorChar + "src" + File.separatorChar + "test" + File.separatorChar
             + "resources" + File.separatorChar + "unit" + File.separatorChar + "profiles-from-file";

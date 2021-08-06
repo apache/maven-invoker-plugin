@@ -20,15 +20,16 @@ package org.apache.maven.plugins.invoker;
  */
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 import org.apache.maven.project.MavenProject;
@@ -121,13 +122,7 @@ class SelectorUtils
     static String getMavenVersion( File mavenHome )
     {
         File mavenLib = new File( mavenHome, "lib" );
-        File[] jarFiles = mavenLib.listFiles( new FilenameFilter()
-        {
-            public boolean accept( File dir, String name )
-            {
-                return name.endsWith( ".jar" );
-            }
-        } );
+        File[] jarFiles = mavenLib.listFiles((dir, name) -> name.endsWith( ".jar" ));
 
         for ( File file : jarFiles )
         {
@@ -192,8 +187,8 @@ class SelectorUtils
 
     static boolean isJreVersion( String jreSpec, String actualJreVersion )
     {
-        List<String> includes = new ArrayList<String>();
-        List<String> excludes = new ArrayList<String>();
+        List<String> includes = new ArrayList<>();
+        List<String> excludes = new ArrayList<>();
         parseList( jreSpec, includes, excludes );
 
         List<Integer> jreVersion = parseVersion( actualJreVersion );
@@ -249,12 +244,7 @@ class SelectorUtils
 
         String[] tokens = StringUtils.split( version, "." );
 
-        List<Integer> numbers = new ArrayList<Integer>();
-
-        for ( String token : tokens )
-        {
-            numbers.add( Integer.valueOf( token ) );
-        }
+        List<Integer> numbers = Arrays.stream(tokens).map( Integer::valueOf ).collect( Collectors.toList() );
 
         return numbers;
     }
