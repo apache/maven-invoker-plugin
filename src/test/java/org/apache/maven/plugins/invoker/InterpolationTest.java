@@ -114,7 +114,7 @@ public class InterpolationTest
     {
 
         InvokerMojo invokerMojo = new InvokerMojo();
-        setVariableValueToObject( invokerMojo, "profiles", Collections.singletonList("zloug"));
+        setVariableValueToObject( invokerMojo, "profiles", Collections.singletonList( "zloug" ) );
         setVariableValueToObject( invokerMojo, "settings", new Settings() );
         String dirPath = getBasedir() + File.separatorChar + "src" + File.separatorChar + "test" + File.separatorChar
             + "resources" + File.separatorChar + "unit" + File.separatorChar + "profiles-from-file";

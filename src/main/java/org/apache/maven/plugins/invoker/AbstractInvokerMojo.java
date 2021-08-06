@@ -909,7 +909,7 @@ public abstract class AbstractInvokerMojo
         scriptRunner.setGlobalVariable( "localRepositoryPath", localRepositoryPath );
         if ( scriptVariables != null )
         {
-            scriptVariables.forEach( (key, value) -> scriptRunner.setGlobalVariable( key, value ) );
+            scriptVariables.forEach( ( key, value ) -> scriptRunner.setGlobalVariable( key, value ) );
         }
         scriptRunner.setClassPath( scriptClassPath );
     }
@@ -1384,7 +1384,8 @@ public abstract class AbstractInvokerMojo
                 ExecutorService executorService = Executors.newFixedThreadPool( runWithParallelThreads );
                 for ( final BuildJob job : buildJobs )
                 {
-                    executorService.execute(() -> {
+                    executorService.execute(() ->
+                    {
                         try
                         {
                             Path ancestorFolder = getAncestorFolder( projectsPath.resolve( job.getProject() ) );
@@ -1396,7 +1397,7 @@ public abstract class AbstractInvokerMojo
                         {
                             throw new RuntimeException( e.getMessage(), e );
                         }
-                    });
+                    } );
                 }
 
                 try
@@ -2464,7 +2465,7 @@ public abstract class AbstractInvokerMojo
             List<BuildJob> setupPoms = scanProjectsDirectory( setupIncludes, excludes, BuildJob.Type.SETUP );
             if ( getLog().isDebugEnabled() )
             {
-                getLog().debug( "Setup projects: " + Collections.singletonList(setupPoms));
+                getLog().debug( "Setup projects: " + Collections.singletonList( setupPoms ) );
             }
 
             List<BuildJob> normalPoms = scanProjectsDirectory( pomIncludes, excludes, BuildJob.Type.NORMAL );
@@ -2538,11 +2539,11 @@ public abstract class AbstractInvokerMojo
         scanner.setFollowSymlinks( false );
         if ( includes != null )
         {
-            scanner.setIncludes( includes.toArray(new String[0]) );
+            scanner.setIncludes( includes.toArray( new String[0] ) );
         }
         if ( excludes != null )
         {
-            scanner.setExcludes( excludes.toArray(new String[0]) );
+            scanner.setExcludes( excludes.toArray( new String[0] ) );
         }
         scanner.addDefaultExcludes();
         scanner.scan();
