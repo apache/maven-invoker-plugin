@@ -22,14 +22,11 @@ package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
@@ -49,7 +46,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.artifact.filter.resolve.PatternExclusionsFilter;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.apache.maven.shared.transfer.dependencies.DefaultDependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
@@ -625,9 +621,9 @@ public class InstallMojo
                         ProjectBuildingRequest projectBuildingRequest = repositoryManager
                                 .setLocalRepositoryBasedir( session.getProjectBuildingRequest(),
                                         localRepositoryPath );
-                        projectBuildingRequest.setRemoteRepositories( Arrays.asList( localRepository ) );
+                        projectBuildingRequest.setRemoteRepositories( Collections.singletonList( localRepository ) );
                         resolver.resolveDependencies( projectBuildingRequest, coordinate,
-                                new PatternExclusionsFilter( Collections.<String>emptyList() ) );
+                                new PatternExclusionsFilter( Collections.emptyList() ) );
                     }
                     finally
                     {
@@ -637,7 +633,7 @@ public class InstallMojo
                 else
                 {
                     resolver.resolveDependencies( projectBuildingRequest, coordinate,
-                            new PatternExclusionsFilter( Collections.<String>emptyList() ) );
+                            new PatternExclusionsFilter( Collections.emptyList() ) );
                 }
             }
             catch ( DependencyResolverException e )
@@ -645,17 +641,6 @@ public class InstallMojo
                 throw new MojoExecutionException( "Unable to resolve dependencies for: " + coordinate, e );
             }
         }
-    }
-
-    // FIXME could be simplify with using lambda... maybe in the next century... :P
-    private List<Artifact> toArtifactsList( Iterable<ArtifactResult> artifactResults )
-    {
-        List<Artifact> artifacts = new ArrayList<>( );
-        for ( ArtifactResult artifactResult : artifactResults )
-        {
-            artifacts.add( artifactResult.getArtifact() );
-        }
-        return artifacts;
     }
 
 }

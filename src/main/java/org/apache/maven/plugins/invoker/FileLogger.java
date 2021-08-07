@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.invoker.InvocationOutputHandler;
-import org.apache.maven.shared.scriptinterpreter.FileLoggerMirrorHandler;
 
 /**
  *
@@ -56,14 +55,7 @@ class FileLogger
     FileLogger( File outputFile, final Log log )
         throws IOException
     {
-        super( outputFile, new FileLoggerMirrorHandler()
-        {
-            @Override
-            public void consumeOutput( String message )
-            {
-                log.info( message );
-            }
-        } );
+        super( outputFile, log::info );
     }
 
 }

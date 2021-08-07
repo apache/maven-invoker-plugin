@@ -47,14 +47,14 @@ public class SelectorUtilsTest
     @Test
     public void testParseList()
     {
-        List<String> includes = new ArrayList<String>();
-        List<String> excludes = new ArrayList<String>();
+        List<String> includes = new ArrayList<>();
+        List<String> excludes = new ArrayList<>();
 
         SelectorUtils.parseList( null, includes, excludes );
 
         SelectorUtils.parseList( " 1.5, !1.4, 1.6+ ", includes, excludes );
         assertEquals( Arrays.asList( "1.5", "1.6+" ), includes );
-        assertEquals( Arrays.asList( "1.4" ), excludes );
+        assertEquals( Collections.singletonList( "1.4" ), excludes );
     }
 
     @Test
@@ -74,8 +74,8 @@ public class SelectorUtilsTest
         assertTrue( SelectorUtils.compareVersions( Arrays.asList( 1, 5 ), Arrays.asList( 1, 6 ) ) < 0 );
         assertTrue( SelectorUtils.compareVersions( Arrays.asList( 1, 6 ), Arrays.asList( 1, 5 ) ) > 0 );
 
-        assertTrue( SelectorUtils.compareVersions( Arrays.asList( 1 ), Arrays.asList( 1, 6 ) ) < 0 );
-        assertTrue( SelectorUtils.compareVersions( Arrays.asList( 1, 6 ), Arrays.asList( 1 ) ) > 0 );
+        assertTrue( SelectorUtils.compareVersions( Collections.singletonList( 1 ), Arrays.asList( 1, 6 ) ) < 0 );
+        assertTrue( SelectorUtils.compareVersions( Arrays.asList( 1, 6 ), Collections.singletonList( 1 ) ) > 0 );
     }
 
     @Test
