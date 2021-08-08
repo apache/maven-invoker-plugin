@@ -73,23 +73,11 @@ under the License.
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
     <groovy-groupId>org.codehaus.groovy</groovy-groupId>
-    <groovy-artifactId>groovy</groovy-artifactId>
+    <groovy-artifactId>groovy-all</groovy-artifactId>
     <groovy-version>3.0.8</groovy-version>
     <surefire.version>2.22.2</surefire.version>
     <project.build.outputTimestamp>2021-02-14T00:04:14Z</project.build.outputTimestamp>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>${groovy-groupId}</groupId>
-        <artifactId>groovy-bom</artifactId>
-        <version>${groovy-version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -214,77 +202,8 @@ under the License.
     <dependency>
       <groupId>${groovy-groupId}</groupId>
       <artifactId>${groovy-artifactId}</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- groovy-all do not provide anymore a uber jar containing everything so we must add some dependencies -->
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-ant</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-astbuilder</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-console</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-datetime</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-jmx</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-json</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-jsr223</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-macro</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-nio</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-servlet</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-test</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-test-junit5</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-testng</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${groovy-groupId}</groupId>
-      <artifactId>groovy-xml</artifactId>
+      <version>3.0.8</version>
+      <type>pom</type>
       <scope>runtime</scope>
     </dependency>
 
