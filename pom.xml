@@ -202,7 +202,7 @@ under the License.
     <dependency>
       <groupId>${groovy-groupId}</groupId>
       <artifactId>${groovy-artifactId}</artifactId>
-      <version>3.0.8</version>
+      <version>${groovy-version}</version>
       <type>pom</type>
       <scope>runtime</scope>
     </dependency>
