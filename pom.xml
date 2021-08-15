@@ -205,6 +205,12 @@ under the License.
       <version>${groovy-version}</version>
       <type>pom</type>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion> <!-- pulls in jline with shaded org.fusesource.jansi.Ansi, causing invalid output for M3.5.0- -->
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-groovysh</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
