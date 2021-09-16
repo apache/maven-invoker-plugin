@@ -89,6 +89,7 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -741,7 +742,7 @@ public abstract class AbstractInvokerMojo
                     + "pom File parameter. Reason: " + e.getMessage(), e );
             }
 
-            buildJobs = Collections.singletonList( new BuildJob( pom.getName(), BuildJob.Type.NORMAL ) );
+            buildJobs = Collections.singletonList( new BuildJob( pom.getName() ) );
         }
 
         if ( buildJobs.isEmpty() )
@@ -796,23 +797,13 @@ public abstract class AbstractInvokerMojo
         }
 
         // First run setup jobs.
-        List<BuildJob> setupBuildJobs = null;
-        try
-        {
-            setupBuildJobs = getSetupBuildJobsFromFolders();
-        }
-        catch ( IOException e )
-        {
-            getLog().error( "Failure during scanning of folders.", e );
-            // TODO: Check shouldn't we fail in case of problems?
-        }
+        List<BuildJob> setupBuildJobs = getSetupJobs( buildJobs );
 
         if ( !setupBuildJobs.isEmpty() )
         {
-            // Run setup jobs in single thread
-            // mode.
+            // Run setup jobs in single thread mode.
             //
-            // Some Idea about ordering?
+            // Jobs are ordered according to ordinal value from invoker.properties
             getLog().info( "Running " + setupBuildJobs.size() + " setup job"
                 + ( ( setupBuildJobs.size() < 2 ) ? "" : "s" ) + ":" );
             runBuilds( projectsDir, setupBuildJobs, 1 );
@@ -881,12 +872,18 @@ public abstract class AbstractInvokerMojo
         }
     }
 
+    private List<BuildJob> getSetupJobs( List<BuildJob> buildJobs )
+    {
+        return buildJobs.stream().
+                filter( buildJob -> buildJob.getType().equals( BuildJob.Type.SETUP ) ).
+                collect( Collectors.toList() );
+    }
+
     private List<BuildJob> getNonSetupJobs( List<BuildJob> buildJobs )
     {
         return buildJobs.stream().
                 filter( buildJob -> !buildJob.getType().equals( BuildJob.Type.SETUP ) ).
                 collect( Collectors.toList() );
-
     }
 
     private void handleScriptRunnerWithScriptClassPath()
@@ -2399,11 +2396,46 @@ public abstract class AbstractInvokerMojo
         }
     }
 
+    private List<String> calculateIncludes()
+    {
+        if ( invokerTest != null )
+        {
+            String[] testRegexes = StringUtils.split( invokerTest, "," );
+            return Arrays.stream( testRegexes )
+                    .map( String::trim )
+                    .filter( s -> !s.isEmpty() )
+                    .filter( s -> !s.startsWith( "!" ) )
+                    .collect( Collectors.toList() );
+        }
+        else
+        {
+            Set<String> uniqueIncludes = new HashSet<>();
+            uniqueIncludes.addAll( pomIncludes );
+            uniqueIncludes.addAll( setupIncludes );
+            return new ArrayList<>( uniqueIncludes );
+        }
+    }
+
     private List<String> calculateExcludes()
         throws IOException
     {
-        List<String> excludes =
-            ( pomExcludes != null ) ? new ArrayList<>( pomExcludes ) : new ArrayList<>();
+        List<String> excludes;
+
+        if ( invokerTest != null )
+        {
+            String[] testRegexes = StringUtils.split( invokerTest, "," );
+            excludes = Arrays.stream( testRegexes )
+                    .map( String::trim )
+                    .filter( s -> !s.isEmpty() )
+                    .filter( s -> s.startsWith( "!" ) )
+                    .map( s -> s.substring( 1 ) )
+                    .collect( Collectors.toList() );
+        }
+        else
+        {
+            excludes = pomExcludes != null ? new ArrayList<>( pomExcludes ) : new ArrayList<>();
+        }
+
         if ( this.settingsFile != null )
         {
             String exclude = relativizePath( this.settingsFile, projectsDirectory.getCanonicalPath() );
@@ -2415,25 +2447,6 @@ public abstract class AbstractInvokerMojo
         }
         return excludes;
 
-    }
-
-    /**
-     * @return The list of setupUp jobs.
-     * @throws IOException
-     * @see {@link #setupIncludes}
-     */
-    private List<BuildJob> getSetupBuildJobsFromFolders()
-        throws IOException, MojoExecutionException
-    {
-        List<String> excludes = calculateExcludes();
-
-        List<BuildJob> setupPoms = scanProjectsDirectory( setupIncludes, excludes, BuildJob.Type.SETUP );
-        if ( getLog().isDebugEnabled() )
-        {
-            getLog().debug( "Setup projects: " + setupPoms );
-        }
-
-        return setupPoms;
     }
 
     private static class OrdinalComparator implements Comparator<BuildJob>
@@ -2456,62 +2469,35 @@ public abstract class AbstractInvokerMojo
     List<BuildJob> getBuildJobs()
         throws IOException, MojoExecutionException
     {
-        List<BuildJob> buildJobs;
 
-        if ( invokerTest == null )
+        List<String> includes = calculateIncludes();
+        List<String> excludes = calculateExcludes();
+        List<BuildJob> buildJobsAll = scanProjectsDirectory( includes, excludes );
+        List<BuildJob> buildJobsSetup = scanProjectsDirectory( setupIncludes, excludes );
+
+        List<String> setupProjects = buildJobsSetup.stream()
+                .map( BuildJob::getProject )
+                .collect( Collectors.toList() );
+
+
+        for  ( BuildJob job : buildJobsAll )
         {
-            List<String> excludes = calculateExcludes();
-
-            List<BuildJob> setupPoms = scanProjectsDirectory( setupIncludes, excludes, BuildJob.Type.SETUP );
-            if ( getLog().isDebugEnabled() )
+            if ( setupProjects.contains( job.getProject() ) )
             {
-                getLog().debug( "Setup projects: " + Collections.singletonList( setupPoms ) );
+                job.setType( BuildJob.Type.SETUP );
             }
-
-            List<BuildJob> normalPoms = scanProjectsDirectory( pomIncludes, excludes, BuildJob.Type.NORMAL );
-
-            Map<String, BuildJob> uniquePoms = new LinkedHashMap<>();
-            for ( BuildJob setupPom : setupPoms )
-            {
-                uniquePoms.put( setupPom.getProject(), setupPom );
-            }
-            for ( BuildJob normalPom : normalPoms )
-            {
-                if ( !uniquePoms.containsKey( normalPom.getProject() ) )
-                {
-                    uniquePoms.put( normalPom.getProject(), normalPom );
-                }
-            }
-
-            buildJobs = new ArrayList<>( uniquePoms.values() );
-        }
-        else
-        {
-            String[] testRegexes = StringUtils.split( invokerTest, "," );
-            List<String> includes = new ArrayList<>( testRegexes.length );
-            List<String> excludes = new ArrayList<>();
-
-            for ( String regex : testRegexes )
-            {
-                // user just use -Dinvoker.test=MWAR191,MNG111 to use a directory thats the end is not pom.xml
-                if ( regex.startsWith( "!" ) )
-                {
-                    excludes.add( regex.substring( 1 ) );
-                }
-                else
-                {
-                    includes.add( regex );
-                }
-            }
-
-            // it would be nice if we could figure out what types these are... but perhaps
-            // not necessary for the -Dinvoker.test=xxx t
-            buildJobs = scanProjectsDirectory( includes, excludes, BuildJob.Type.DIRECT );
+            InvokerProperties invokerProperties =
+                    getInvokerProperties( new File( projectsDirectory, job.getProject() ).getParentFile(),
+                            null );
+            job.setOrdinal( invokerProperties.getOrdinal() );
         }
 
-        relativizeProjectPaths( buildJobs );
+        // setup ordinal values to have an order here
+        buildJobsAll.sort( OrdinalComparator.INSTANCE );
 
-        return buildJobs;
+        relativizeProjectPaths( buildJobsAll );
+
+        return buildJobsAll;
     }
 
     /**
@@ -2522,12 +2508,11 @@ public abstract class AbstractInvokerMojo
      *
      * @param includes The include patterns for the scanner, may be <code>null</code>.
      * @param excludes The exclude patterns for the scanner, may be <code>null</code> to exclude nothing.
-     * @param type The type to assign to the resulting build jobs, must not be <code>null</code>.
      * @return The build jobs matching the patterns, never <code>null</code>.
      * @throws java.io.IOException If the project directory could not be scanned.
      */
-    private List<BuildJob> scanProjectsDirectory( List<String> includes, List<String> excludes, String type )
-        throws IOException, MojoExecutionException
+    private List<BuildJob> scanProjectsDirectory( List<String> includes, List<String> excludes )
+            throws IOException
     {
         if ( !projectsDirectory.isDirectory() )
         {
@@ -2552,7 +2537,7 @@ public abstract class AbstractInvokerMojo
 
         for ( String includedFile : scanner.getIncludedFiles() )
         {
-            matches.put( includedFile, new BuildJob( includedFile, type ) );
+            matches.put( includedFile, new BuildJob( includedFile ) );
         }
 
         for ( String includedDir : scanner.getIncludedDirectories() )
@@ -2560,27 +2545,15 @@ public abstract class AbstractInvokerMojo
             String includedFile = includedDir + File.separatorChar + "pom.xml";
             if ( new File( scanner.getBasedir(), includedFile ).isFile() )
             {
-                matches.put( includedFile, new BuildJob( includedFile, type ) );
+                matches.put( includedFile, new BuildJob( includedFile ) );
             }
             else
             {
-                matches.put( includedDir, new BuildJob( includedDir, type ) );
+                matches.put( includedDir, new BuildJob( includedDir ) );
             }
         }
 
-        List<BuildJob> projects = new ArrayList<>( matches.size() );
-
-        // setup ordinal values to have an order here
-        for ( BuildJob buildJob : matches.values() )
-        {
-            InvokerProperties invokerProperties =
-                    getInvokerProperties( new File( projectsDirectory, buildJob.getProject() ).getParentFile(),
-                            null );
-            buildJob.setOrdinal( invokerProperties.getOrdinal() );
-            projects.add( buildJob );
-        }
-        projects.sort( OrdinalComparator.INSTANCE );
-        return projects;
+        return new ArrayList<>( matches.values() );
     }
 
     /**

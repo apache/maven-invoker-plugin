@@ -19,14 +19,16 @@ package org.apache.maven.plugins.invoker;
  * under the License.
  */
 
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Olivier Lamy
@@ -34,6 +36,11 @@ import org.apache.maven.settings.Settings;
  */
 public class InvokerMojoTest extends AbstractMojoTestCase
 {
+
+    private static final String DUMMY_PROJECT = "dummy" + File.separator + "pom.xml";
+    private static final String GOALS_FROM_FILE_PROJECT = "goals-from-file" + File.separator + "pom.xml";
+    private static final String INTERPOLATION_PROJECT = "interpolation" + File.separator + "pom.xml";
+    private static final String PROFILES_FROM_FILE_PROJECT = "profiles-from-file";
 
     private MavenProject getMavenProject()
     {
@@ -44,47 +51,123 @@ public class InvokerMojoTest extends AbstractMojoTestCase
 
     public void testSingleInvokerTest() throws Exception
     {
+        // given
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
-        List<String> goals = invokerMojo.getGoals( new File( dirPath ) );
-        assertEquals( 1, goals.size() );
         setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
         setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties" );
         setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "invokerTest", "*dummy*" );
         setVariableValueToObject( invokerMojo, "settings", new Settings() );
-        List<BuildJob> poms = invokerMojo.getBuildJobs();
-        assertEquals( 1, poms.size() );
+
+        // when
+        List<BuildJob> jobs = invokerMojo.getBuildJobs();
+
+        // then
+        assertThat( jobs )
+                .map( BuildJob::getProject )
+                .containsExactlyInAnyOrder( DUMMY_PROJECT );
     }
 
     public void testMultiInvokerTest() throws Exception
     {
+        // given
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
-        List<String> goals = invokerMojo.getGoals( new File( dirPath ) );
-        assertEquals( 1, goals.size() );
         setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
         setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties" );
         setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "invokerTest", "*dummy*,*terpolatio*" );
         setVariableValueToObject( invokerMojo, "settings", new Settings() );
-        List<BuildJob> poms = invokerMojo.getBuildJobs();
-        assertEquals( 2, poms.size() );
+
+        // when
+        List<BuildJob> jobs = invokerMojo.getBuildJobs();
+
+        // then
+        assertThat( jobs )
+                .map( BuildJob::getProject )
+                .containsExactlyInAnyOrder( DUMMY_PROJECT, INTERPOLATION_PROJECT );
     }
 
     public void testFullPatternInvokerTest() throws Exception
     {
+        // given
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
-        List<String> goals = invokerMojo.getGoals( new File( dirPath ) );
-        assertEquals( 1, goals.size() );
         setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
         setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties" );
         setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "invokerTest", "*" );
         setVariableValueToObject( invokerMojo, "settings", new Settings() );
-        List<BuildJob> poms = invokerMojo.getBuildJobs();
-        assertEquals( 4, poms.size() );
+
+        // when
+        List<BuildJob> jobs = invokerMojo.getBuildJobs();
+
+        // then
+        assertThat( jobs )
+                .map( BuildJob::getProject )
+                .containsExactlyInAnyOrder(
+                        DUMMY_PROJECT, GOALS_FROM_FILE_PROJECT,
+                        INTERPOLATION_PROJECT, PROFILES_FROM_FILE_PROJECT );
+    }
+
+    public void testSetupInProjectList() throws Exception
+    {
+        // given
+        InvokerMojo invokerMojo = new InvokerMojo();
+        String dirPath = getBasedir() + "/src/test/resources/unit";
+        setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
+        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties" );
+        setVariableValueToObject( invokerMojo, "project", getMavenProject() );
+        setVariableValueToObject( invokerMojo, "settings", new Settings() );
+        setVariableValueToObject( invokerMojo, "setupIncludes", Collections.singletonList( "dum*/pom.xml" ) );
+
+        // when
+        List<BuildJob> jobs = invokerMojo.getBuildJobs();
+
+        // then
+
+        // we have all projects with pom.xml
+        assertThat( jobs )
+                .map( BuildJob::getProject )
+                .containsExactlyInAnyOrder(
+                        DUMMY_PROJECT, GOALS_FROM_FILE_PROJECT, INTERPOLATION_PROJECT );
+
+        // and we have one setup project
+        assertThat( jobs )
+                .filteredOn( job -> BuildJob.Type.SETUP.equals( job.getType() ) )
+                .map( BuildJob::getProject )
+                .containsExactlyInAnyOrder(  DUMMY_PROJECT );
+    }
+
+    public void testSetupProjectIsFiltered() throws Exception
+    {
+        // given
+        InvokerMojo invokerMojo = new InvokerMojo();
+        String dirPath = getBasedir() + "/src/test/resources/unit";
+        setVariableValueToObject( invokerMojo, "projectsDirectory", new File( dirPath ) );
+        setVariableValueToObject( invokerMojo, "invokerPropertiesFile", "invoker.properties" );
+        setVariableValueToObject( invokerMojo, "project", getMavenProject() );
+        setVariableValueToObject( invokerMojo, "settings", new Settings() );
+        setVariableValueToObject( invokerMojo, "setupIncludes", Collections.singletonList( "dum*/pom.xml" ) );
+        setVariableValueToObject( invokerMojo, "invokerTest", "*from-file*" );
+
+
+        // when
+        List<BuildJob> jobs = invokerMojo.getBuildJobs();
+
+        // then
+
+        // we have filtered projects
+        assertThat( jobs )
+                .map( BuildJob::getProject )
+                .containsExactlyInAnyOrder(
+                        GOALS_FROM_FILE_PROJECT, PROFILES_FROM_FILE_PROJECT );
+
+        // and we don't have a setup project
+        assertThat( jobs )
+                .filteredOn( job -> BuildJob.Type.SETUP.equals( job.getType() ) )
+                .isEmpty();
     }
 
     public void testAlreadyCloned()
@@ -116,5 +199,4 @@ public class InvokerMojoTest extends AbstractMojoTestCase
             assertEquals( expectedParallelThreads, invokerMojo.getParallelThreadsCount() );
         }
     }
-
 }

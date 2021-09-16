@@ -95,6 +95,7 @@ under the License.
           <required>true</required>
           <type>String</type>
           <description>The type of the build job.</description>
+          <defaultValue>normal</defaultValue>
         </field>
         <field xml.attribute="true">
           <name>ordinal</name>
@@ -124,15 +125,13 @@ under the License.
     }
 
     /**
-     * Creates a new build job with the specified project path and type.
+     * Creates a new build job with the specified project path.
      * 
      * @param project The path to the project.
-     * @param type The type of the build job.
      */
-    public BuildJob( String project, String type )
+    public BuildJob( String project )
     {
         this.project = project;
-        this.type = type;
     }
           ]]></code>
         </codeSegment>
@@ -196,11 +195,6 @@ under the License.
          * A normal build job.
          */
         public static final String NORMAL = "normal";
-
-        /**
-         * A build job that was directly selected via the <code>-Dinvoker.test=xxx,yyy</code> parameter.
-         */
-        public static final String DIRECT = "direct";
 
     }
           ]]></code>

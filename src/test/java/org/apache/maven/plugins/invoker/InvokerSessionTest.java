@@ -40,7 +40,7 @@ public class InvokerSessionTest
     public void skipSummary()
     {
         Log logger = mock( Log.class );
-        BuildJob skippedBuildJob = new BuildJob( "minvoker-279", null );
+        BuildJob skippedBuildJob = new BuildJob( "minvoker-279" );
         skippedBuildJob.setResult( BuildJob.Result.SKIPPED );
         InvokerSession session = new InvokerSession( Collections.singletonList( skippedBuildJob ) );
 
