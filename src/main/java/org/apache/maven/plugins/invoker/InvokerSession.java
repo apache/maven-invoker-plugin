@@ -236,8 +236,10 @@ class InvokerSession
                     buildLogMessage.append( System.lineSeparator() );
                     buildLogMessage.append( "*** begin build.log for: " + buildJob.getProject() + " ***" );
                     buildLogMessage.append( System.lineSeparator() );
-                    FileReader buildLogReader = new FileReader( buildLogFile );
-                    buildLogMessage.append( IOUtil.toString( buildLogReader ) );
+                    try ( FileReader buildLogReader = new FileReader( buildLogFile ) )
+                    {
+                        buildLogMessage.append( IOUtil.toString( buildLogReader ) );
+                    }
                     buildLogMessage.append( "*** end build.log for: " + buildJob.getProject() + " ***" );
                     buildLogMessage.append( System.lineSeparator() );
 
