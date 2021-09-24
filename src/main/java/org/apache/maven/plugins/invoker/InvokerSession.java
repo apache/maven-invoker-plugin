@@ -213,7 +213,7 @@ class InvokerSession
 
         logBuildJobList( logger, ignoreFailures, "The following builds failed:", failedJobs );
         logBuildJobList( logger, ignoreFailures, "The following builds finished with error:", errorJobs );
-        logBuildJobList( logger, true, "The following builds was skipped:", skippedJobs );
+        logBuildJobList( logger, true, "The following builds were skipped:", skippedJobs );
     }
 
     public void logFailedBuildLog( Log logger, boolean ignoreFailures )
