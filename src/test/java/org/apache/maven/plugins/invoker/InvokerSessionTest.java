@@ -46,7 +46,7 @@ public class InvokerSessionTest
 
         session.logSummary( logger, false );
 
-        verify( logger ).warn( "The following builds was skipped:" );
+        verify( logger ).warn( "The following builds were skipped:" );
         verify( logger ).warn( "*  minvoker-279" );
         verify( logger, never() ).error( anyString() );
     }
