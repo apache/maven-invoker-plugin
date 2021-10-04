@@ -52,8 +52,6 @@ under the License.
             <goal>install</goal>
           </goals>
           <properties>
-            <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
-            <https.protocols>${https.protocols}</https.protocols>
             <propertyFromCommandLine>value with spaces from cli</propertyFromCommandLine>
           </properties>
           <filterProperties>

@@ -45,10 +45,6 @@ under the License.
           <streamLogs>true</streamLogs>
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
           <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-          <properties>
-            <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
-            <https.protocols>${https.protocols}</https.protocols>
-          </properties>
         </configuration>
         <executions>
           <execution>

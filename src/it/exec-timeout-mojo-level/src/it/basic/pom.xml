@@ -33,12 +33,6 @@ under the License.
         <groupId>org.apache.maven.plugins.invoker</groupId>
         <artifactId>exec-timeout-invoker-level</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <configuration>
-          <properties>
-            <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
-            <https.protocols>${https.protocols}</https.protocols>
-          </properties>
-        </configuration>
         <executions>
           <execution>
             <id>touch</id>
