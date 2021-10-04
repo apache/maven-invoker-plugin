@@ -47,10 +47,6 @@ under the License.
           <filterProperties>
             <latin1Chars>&#169;&#174;&#196;&#214;&#220;&#228;&#246;&#252;&#223;</latin1Chars>
           </filterProperties>
-          <properties>
-            <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
-            <https.protocols>${https.protocols}</https.protocols>
-          </properties>
         </configuration>
         <executions>
           <execution>

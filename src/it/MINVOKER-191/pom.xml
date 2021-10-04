@@ -67,10 +67,6 @@ under the License.
           <version>@project.version@</version>
           <configuration>
             <writeJunitReport>true</writeJunitReport>
-            <properties>
-              <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
-              <https.protocols>${https.protocols}</https.protocols>
-            </properties>
           </configuration>
         </plugin>
       </plugins>

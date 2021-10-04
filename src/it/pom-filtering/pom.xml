@@ -60,10 +60,6 @@ under the License.
             <basedir>FAILED</basedir>
             <baseurl>FAILED</baseurl>
           </filterProperties>
-          <properties>
-            <!-- e.g. ensure that Java7 picks up TLSv1.2 when connecting with Central -->
-            <https.protocols>${https.protocols}</https.protocols>
-          </properties>
         </configuration>
         <executions>
           <execution>
