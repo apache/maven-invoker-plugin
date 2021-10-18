@@ -66,7 +66,7 @@ under the License.
 
   <properties>
     <javaVersion>8</javaVersion>
-    <mavenVersion>3.1.1</mavenVersion>
+    <mavenVersion>3.2.5</mavenVersion>
     <doxiaVersion>1.10</doxiaVersion>
     <doxiaSitetoolsVersion>1.10</doxiaSitetoolsVersion>
     <beanshell-groupId>org.apache-extras.beanshell</beanshell-groupId>
@@ -89,26 +89,31 @@ under the License.
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>${mavenVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>${mavenVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>${mavenVersion}</version>
+      <scope>compile</scope> <!-- set to provided once MPLUGIN-372 fixed -->
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>${mavenVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-settings</artifactId>
       <version>${mavenVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
@@ -260,7 +265,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.plugin-testing</groupId>
       <artifactId>maven-plugin-testing-harness</artifactId>
-      <version>3.1.0</version>
+      <version>3.3.0</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -301,10 +306,6 @@ under the License.
           </configuration>
         </plugin>
         <plugin>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.0.0-M3</version>
-        </plugin>
-        <plugin>
           <artifactId>maven-site-plugin</artifactId>
           <version>3.9.1</version>
         </plugin>
@@ -316,6 +317,17 @@ under the License.
     </pluginManagement>
 
     <plugins>
+      <plugin> <!-- Remove once MPOM-270 fixed -->
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>extra-enforcer-rules</artifactId>
+            <version>1.4</version>
+          </dependency>
+        </dependencies>
+      </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
