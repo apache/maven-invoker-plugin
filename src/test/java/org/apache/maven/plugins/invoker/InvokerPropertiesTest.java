@@ -40,8 +40,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -115,7 +115,7 @@ public class InvokerPropertiesTest
         InvokerProperties facade = new InvokerProperties( null );
 
         facade.configureInvocation( request, 0 );
-        verifyZeroInteractions( request );
+        verifyNoInteractions( request );
     }
 
     @Test
@@ -250,7 +250,7 @@ public class InvokerPropertiesTest
         {
             assertEquals( "The string 'xxxUnKnown' can not be converted to enumeration.", e.getMessage() );
         }
-        verifyZeroInteractions( request );
+        verifyNoInteractions( request );
     }
 
 
