@@ -215,6 +215,20 @@ under the License.
           <groupId>org.codehaus.groovy</groupId>
           <artifactId>groovy-groovysh</artifactId>
         </exclusion>
+        <!-- MINVOKER-285 - exclude additional tests frameworks -->
+        <exclusion>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-test</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-test-junit5</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-testng</artifactId>
+        </exclusion>
+        <!-- /MINVOKER-285 -->
       </exclusions>
     </dependency>
 
