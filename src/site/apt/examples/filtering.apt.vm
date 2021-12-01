@@ -58,8 +58,6 @@ Filtering Files
          |  +- pom.xml                 <- Filtered
          +- pom.xml                    <- Filtered
          +- invoker.properties         <- Filtered
-         +- goals.txt                  <- Filtered
-         +- profiles.txt               <- Filtered
 +------------------
 
   Below is the corresponding POM snippet for the plugin configuration:

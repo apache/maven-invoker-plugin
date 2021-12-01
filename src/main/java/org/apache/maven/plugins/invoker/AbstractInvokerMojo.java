@@ -72,7 +72,6 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -102,7 +101,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -957,26 +955,6 @@ public abstract class AbstractInvokerMojo
      */
     abstract void processResults( InvokerSession invokerSession )
         throws MojoFailureException;
-
-    /**
-     * Creates a new reader for the specified file, using the plugin's {@link #encoding} parameter.
-     *
-     * @param file The file to create a reader for, must not be <code>null</code>.
-     * @return The reader for the file, never <code>null</code>.
-     * @throws java.io.IOException If the specified file was not found or the configured encoding is not supported.
-     */
-    private Reader newReader( File file )
-        throws IOException
-    {
-        if ( StringUtils.isNotEmpty( encoding ) )
-        {
-            return ReaderFactory.newReader( file, encoding );
-        }
-        else
-        {
-            return ReaderFactory.newPlatformReader( file );
-        }
-    }
 
     /**
      * Collects all projects locally reachable from the specified project. The method will as such try to read the POM
@@ -2018,10 +1996,6 @@ public abstract class AbstractInvokerMojo
             }
         }
 
-        List<String> goals = getGoals( basedir );
-
-        List<String> profiles = getProfiles( basedir );
-
         Map<String, Object> context = new LinkedHashMap<>();
 
         boolean selectorResult = true;
@@ -2354,48 +2328,6 @@ public abstract class AbstractInvokerMojo
         }
     }
 
-    /**
-     * Gets the goal list for the specified project.
-     *
-     * @param basedir The base directory of the project, must not be <code>null</code>.
-     * @return The list of goals to run when building the project, may be empty but never <code>null</code>.
-     * @throws org.apache.maven.plugin.MojoExecutionException If the profile file could not be read.
-     */
-    List<String> getGoals( final File basedir )
-        throws MojoExecutionException
-    {
-        try
-        {
-            // FIXME: Currently we have null for goalsFile which has been removed.
-            // This might mean we can remove getGoals() at all ? Check this.
-            return getTokens( basedir, null, goals );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "error reading goals", e );
-        }
-    }
-
-    /**
-     * Gets the profile list for the specified project.
-     *
-     * @param basedir The base directory of the project, must not be <code>null</code>.
-     * @return The list of profiles to activate when building the project, may be empty but never <code>null</code>.
-     * @throws org.apache.maven.plugin.MojoExecutionException If the profile file could not be read.
-     */
-    List<String> getProfiles( File basedir )
-        throws MojoExecutionException
-    {
-        try
-        {
-            return getTokens( basedir, null, profiles );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "error reading profiles", e );
-        }
-    }
-
     private List<String> calculateIncludes()
     {
         if ( invokerTest != null )
@@ -2669,86 +2601,6 @@ public abstract class AbstractInvokerMojo
             url = url.substring( 0, url.length() - 1 );
         }
         return url;
-    }
-
-    /**
-     * Gets goal/profile names for the specified project, either directly from the plugin configuration or from an
-     * external token file.
-     *
-     * @param basedir The base directory of the test project, must not be <code>null</code>.
-     * @param filename The (simple) name of an optional file in the project base directory from which to read
-     *            goals/profiles, may be <code>null</code>.
-     * @param defaultTokens The list of tokens to return in case the specified token file does not exist, may be
-     *            <code>null</code>.
-     * @return The list of goal/profile names, may be empty but never <code>null</code>.
-     * @throws java.io.IOException If the token file exists but could not be parsed.
-     */
-    private List<String> getTokens( File basedir, String filename, List<String> defaultTokens )
-        throws IOException
-    {
-        List<String> tokens = ( defaultTokens != null ) ? defaultTokens : new ArrayList<String>();
-
-        if ( StringUtils.isNotEmpty( filename ) )
-        {
-            File tokenFile = new File( basedir, filename );
-
-            if ( tokenFile.exists() )
-            {
-                tokens = readTokens( tokenFile );
-            }
-        }
-
-        return tokens;
-    }
-
-    /**
-     * Reads the tokens from the specified file. Tokens are separated either by line terminators or commas. During
-     * parsing, the file contents will be interpolated.
-     *
-     * @param tokenFile The file to read the tokens from, must not be <code>null</code>.
-     * @return The list of tokens, may be empty but never <code>null</code>.
-     * @throws java.io.IOException If the token file could not be read.
-     */
-    private List<String> readTokens( final File tokenFile )
-        throws IOException
-    {
-        List<String> result = new ArrayList<>();
-
-        Map<String, Object> composite = getInterpolationValueSource( false );
-
-        try ( BufferedReader reader =
-            new BufferedReader( new InterpolationFilterReader( newReader( tokenFile ), composite ) ) )
-        {
-            for ( String line = reader.readLine(); line != null; line = reader.readLine() )
-            {
-                result.addAll( collectListFromCSV( line ) );
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Gets a list of comma separated tokens from the specified line.
-     *
-     * @param csv The line with comma separated tokens, may be <code>null</code>.
-     * @return The list of tokens from the line, may be empty but never <code>null</code>.
-     */
-    private List<String> collectListFromCSV( final String csv )
-    {
-        final List<String> result = new ArrayList<>();
-
-        if ( ( csv != null ) && ( csv.trim().length() > 0 ) )
-        {
-            final StringTokenizer st = new StringTokenizer( csv, "," );
-
-            while ( st.hasMoreTokens() )
-            {
-                result.add( st.nextToken().trim() );
-            }
-        }
-
-        return result;
     }
 
     /**
