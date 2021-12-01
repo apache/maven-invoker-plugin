@@ -21,8 +21,6 @@ package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.Reader;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -57,7 +55,6 @@ public class InterpolationTest
     }
 
     public void testCompositeMap()
-        throws Exception
     {
 
         Properties properties = new Properties();
@@ -107,20 +104,5 @@ public class InterpolationTest
         {
             IOUtil.close( reader );
         }
-    }
-
-    public void testProfilesWithNoFile()
-        throws Exception
-    {
-
-        InvokerMojo invokerMojo = new InvokerMojo();
-        setVariableValueToObject( invokerMojo, "profiles", Collections.singletonList( "zloug" ) );
-        setVariableValueToObject( invokerMojo, "settings", new Settings() );
-        String dirPath = getBasedir() + File.separatorChar + "src" + File.separatorChar + "test" + File.separatorChar
-            + "resources" + File.separatorChar + "unit" + File.separatorChar + "profiles-from-file";
-        List<String> profiles = invokerMojo.getProfiles( new File( dirPath ) );
-        assertTrue( profiles.contains( "zloug" ) );
-        assertEquals( 1, profiles.size() );
-
     }
 }

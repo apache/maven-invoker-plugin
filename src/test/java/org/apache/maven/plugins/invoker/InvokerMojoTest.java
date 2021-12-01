@@ -38,9 +38,9 @@ public class InvokerMojoTest extends AbstractMojoTestCase
 {
 
     private static final String DUMMY_PROJECT = "dummy" + File.separator + "pom.xml";
-    private static final String GOALS_FROM_FILE_PROJECT = "goals-from-file" + File.separator + "pom.xml";
+    private static final String WITH_POM_DIR_PROJECT = "with-pom-project-dir" + File.separator + "pom.xml";
     private static final String INTERPOLATION_PROJECT = "interpolation" + File.separator + "pom.xml";
-    private static final String PROFILES_FROM_FILE_PROJECT = "profiles-from-file";
+    private static final String WITHOUT_POM_PROJECT = "without-pom-project-dir";
 
     private MavenProject getMavenProject()
     {
@@ -107,8 +107,8 @@ public class InvokerMojoTest extends AbstractMojoTestCase
         assertThat( jobs )
                 .map( BuildJob::getProject )
                 .containsExactlyInAnyOrder(
-                        DUMMY_PROJECT, GOALS_FROM_FILE_PROJECT,
-                        INTERPOLATION_PROJECT, PROFILES_FROM_FILE_PROJECT );
+                        DUMMY_PROJECT, WITH_POM_DIR_PROJECT, WITHOUT_POM_PROJECT,
+                        INTERPOLATION_PROJECT );
     }
 
     public void testSetupInProjectList() throws Exception
@@ -131,7 +131,7 @@ public class InvokerMojoTest extends AbstractMojoTestCase
         assertThat( jobs )
                 .map( BuildJob::getProject )
                 .containsExactlyInAnyOrder(
-                        DUMMY_PROJECT, GOALS_FROM_FILE_PROJECT, INTERPOLATION_PROJECT );
+                        DUMMY_PROJECT, WITH_POM_DIR_PROJECT, INTERPOLATION_PROJECT );
 
         // and we have one setup project
         assertThat( jobs )
@@ -150,7 +150,7 @@ public class InvokerMojoTest extends AbstractMojoTestCase
         setVariableValueToObject( invokerMojo, "project", getMavenProject() );
         setVariableValueToObject( invokerMojo, "settings", new Settings() );
         setVariableValueToObject( invokerMojo, "setupIncludes", Collections.singletonList( "dum*/pom.xml" ) );
-        setVariableValueToObject( invokerMojo, "invokerTest", "*from-file*" );
+        setVariableValueToObject( invokerMojo, "invokerTest", "*project-dir*" );
 
 
         // when
@@ -162,7 +162,7 @@ public class InvokerMojoTest extends AbstractMojoTestCase
         assertThat( jobs )
                 .map( BuildJob::getProject )
                 .containsExactlyInAnyOrder(
-                        GOALS_FROM_FILE_PROJECT, PROFILES_FROM_FILE_PROJECT );
+                        WITH_POM_DIR_PROJECT, WITHOUT_POM_PROJECT );
 
         // and we don't have a setup project
         assertThat( jobs )
