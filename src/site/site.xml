@@ -62,6 +62,7 @@ under the License.
       <item name="Selector Conditions" href="examples/selector-conditions.html"/>
       <item name="Selector Scripts" href="examples/selector-scripts.html"/>
       <item name="Using a Post Build Script" href="examples/post-build-script.html"/>
+      <item name="Parallel projects execution" href="examples/parallel-projects-execution.html"/>
       <item name="Preparing the Build Environment" href="examples/prepare-build-env.html"/>
       <item name="Skipping Invocations" href="examples/skipping.html"/>
       <item name="Using with other integration test frameworks" href="examples/integration-test-verify.html"/>

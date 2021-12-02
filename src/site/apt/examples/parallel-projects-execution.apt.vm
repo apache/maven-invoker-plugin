@@ -1,0 +1,75 @@
+ ------
+ Parallel projects execution
+ ------
+ Slawomir Jaranowski
+ ------
+ 2021-12-02
+ ------
+
+ ~~ Licensed to the Apache Software Foundation (ASF) under one
+ ~~ or more contributor license agreements.  See the NOTICE file
+ ~~ distributed with this work for additional information
+ ~~ regarding copyright ownership.  The ASF licenses this file
+ ~~ to you under the Apache License, Version 2.0 (the
+ ~~ "License"); you may not use this file except in compliance
+ ~~ with the License.  You may obtain a copy of the License at
+ ~~
+ ~~   http://www.apache.org/licenses/LICENSE-2.0
+ ~~
+ ~~ Unless required by applicable law or agreed to in writing,
+ ~~ software distributed under the License is distributed on an
+ ~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~~ KIND, either express or implied.  See the License for the
+ ~~ specific language governing permissions and limitations
+ ~~ under the License.
+
+ ~~ NOTE: For help with the syntax of this file, see:
+ ~~ http://maven.apache.org/doxia/references/apt-format.html
+
+Parallel projects execution
+
+  In order to speed up your tests execution you can use options <<<parallelThreads>>>.
+  This will be the number of maven forked process in parallel.
+  When terminated with "C", the number part is multiplied by the number of processors (cores) available
+  to the Java virtual machine.
+
+  Example configuration:
+
++---+
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <parallelThreads>2C</parallelThreads>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  ...
+</project>
++---+
+
+Order of projects execution in parallel mode
+
+  When use parallel, at any point, at most <<<parallelThreads>>> threads will be active for projects executions.
+
+  Projects are send to execute by available thread in <<non guaranteed sequence>>,
+  the most time it is determined by file system ordering.
+  Internally <<<java.io.File#list()>>> is used for scanning projects.
+
+  Some of projects can take more time and some can finish quicker.
+  Next projects from queue will be executed as soon as thread in pool will be available.
+  So order of executing can change, depends on many thing, like available processor, current system load etc...
+
+  If you need be sure of execution sequence, you can use <<<invoker.ordinal>>> property
+  in {{{./invoker-properties.html}Invoker Properties}}
+
+  In parallel mode projects are <<grouped>> by <<<invoker.ordinal>>> and projects from each groups
+  are running in parallel. Projects from next group will start running after all projects from previous group are finished.
+
+  <<<Setup>>> projects are executed first in sequential always on one thread.

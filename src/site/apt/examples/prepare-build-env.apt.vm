@@ -73,3 +73,6 @@ Preparing the Build Environment
   The build order of several such setup projects is still undefined. So if the setup projects have inter-dependencies
   that require a certain build order, you should group them by an aggregator POM and feed that into the Invoker Plugin
   such that the correct build order will be determined by Maven's multi-module reactor.
+
+  You can also apply <<<invoker.ordinal>>> property in {{{./invoker-properties.html}Invoker Properties}}
+  for setup projects to ensure order
