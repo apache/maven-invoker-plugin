@@ -94,6 +94,8 @@ ${project.name}
 
   * {{{./examples/selector-conditions.html}Use Selector Conditions}} to skip projects based on JRE version or OS family.
 
+  * {{{./examples/parallel-projects-execution.html}Parallel projects execution}} to speed up project execution.
+
   * {{{./examples/prepare-build-env.html}Prepare the Build Environment}} by building some setup projects before other projects.
 
   * {{{./examples/integration-test-verify.html}Using with other integration test frameworks}} by decoupling checking 

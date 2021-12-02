@@ -19,6 +19,37 @@ package org.apache.maven.plugins.invoker;
  * under the License.
  */
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
@@ -71,41 +102,6 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -568,9 +564,9 @@ public abstract class AbstractInvokerMojo
      *
      * # An integer value to control run order of projects. sorted in the descending order of the ordinal.
      * # In other words, the BuildJobs with the highest numbers will be executed first
+     * # Default value is 0 (zero)
      * # Since plugin version 3.2.1
      * invoker.ordinal = 3
-     * invoker.ordinal = 1
      *
      * # The additional value for the environment variable.
      * # Since plugin version 3.2.2
@@ -1355,47 +1351,17 @@ public abstract class AbstractInvokerMojo
             if ( runWithParallelThreads > 1 )
             {
                 getLog().info( "use parallelThreads " + runWithParallelThreads );
-
-                ExecutorService executorService = Executors.newFixedThreadPool( runWithParallelThreads );
-                for ( final BuildJob job : buildJobs )
-                {
-                    executorService.execute( () ->
-                    {
-                        try
-                        {
-                            Path ancestorFolder = getAncestorFolder( projectsPath.resolve( job.getProject() ) );
-
-                            runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion,
-                                      globalInvokerProperties.get( ancestorFolder ) );
-                        }
-                        catch ( MojoExecutionException e )
-                        {
-                            throw new RuntimeException( e.getMessage(), e );
-                        }
-                    } );
-                }
-
-                try
-                {
-                    executorService.shutdown();
-                    // TODO add a configurable time out
-                    executorService.awaitTermination( Long.MAX_VALUE, TimeUnit.MILLISECONDS );
-                }
-                catch ( InterruptedException e )
-                {
-                    throw new MojoExecutionException( e.getMessage(), e );
-                }
             }
-            else
+
+            JobExecutor jobExecutor = new JobExecutor( buildJobs, runWithParallelThreads );
+            jobExecutor.forEach( job ->
             {
-                for ( BuildJob job : buildJobs )
-                {
-                    Path ancestorFolder = getAncestorFolder( projectsPath.resolve( job.getProject() ) );
+                Path ancestorFolder = getAncestorFolder( projectsPath.resolve( job.getProject() ) );
 
-                    runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion,
-                              globalInvokerProperties.get( ancestorFolder ) );
-                }
-            }
+                runBuild( projectsDir, job, mergedSettingsFile, javaHome, actualJreVersion,
+                    globalInvokerProperties.get( ancestorFolder ) );
+
+            } );
         }
         finally
         {
@@ -2371,17 +2337,6 @@ public abstract class AbstractInvokerMojo
 
     }
 
-    private static class OrdinalComparator implements Comparator<BuildJob>
-    {
-        private static final OrdinalComparator INSTANCE = new OrdinalComparator();
-
-        @Override
-        public int compare( BuildJob o1, BuildJob o2 )
-        {
-            return Integer.compare( o2.getOrdinal(), o1.getOrdinal() );
-        }
-    }
-
     /**
      * Gets the build jobs that should be processed. Note that the order of the returned build jobs is significant.
      *
@@ -2413,9 +2368,6 @@ public abstract class AbstractInvokerMojo
                             null );
             job.setOrdinal( invokerProperties.getOrdinal() );
         }
-
-        // setup ordinal values to have an order here
-        buildJobsAll.sort( OrdinalComparator.INSTANCE );
 
         relativizeProjectPaths( buildJobsAll );
 
