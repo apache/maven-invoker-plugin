@@ -339,6 +339,10 @@ under the License.
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.1.2</version>
         </plugin>
+        <plugin>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <version>3.2.2</version>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -404,7 +408,6 @@ under the License.
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-invoker-plugin</artifactId>
-              <version>3.2.2</version>
               <configuration>
                 <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                 <preBuildHookScript>setup</preBuildHookScript>
