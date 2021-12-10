@@ -1721,43 +1721,33 @@ public abstract class AbstractInvokerMojo
             {
                 buildJob.setResult( BuildJob.Result.SKIPPED );
 
-                StringBuilder message = new StringBuilder();
+                List<String> messages = new ArrayList<>();
+
                 if ( selection == Selector.SELECTOR_MULTI )
                 {
-                    message.append( "non-matching selectors" );
+                    messages.add( "non-matching selectors" );
                 }
                 else
                 {
                     if ( ( selection & Selector.SELECTOR_MAVENVERSION ) != 0 )
                     {
-                        message.append( "Maven version" );
+                        messages.add( "Maven version" );
                     }
                     if ( ( selection & Selector.SELECTOR_JREVERSION ) != 0 )
                     {
-                        if ( message.length() > 0 )
-                        {
-                            message.append( ", " );
-                        }
-                        message.append( "JRE version" );
+                        messages.add( "JRE version" );
                     }
                     if ( ( selection & Selector.SELECTOR_OSFAMILY ) != 0 )
                     {
-                        if ( message.length() > 0 )
-                        {
-                            message.append( ", " );
-                        }
-                        message.append( "OS" );
+                        messages.add( "OS" );
                     }
                     if ( ( selection & Selector.SELECTOR_TOOLCHAIN ) != 0 )
                     {
-                        if ( message.length() > 0 )
-                        {
-                            message.append( ", " );
-                        }
-                        message.append( "Toolchain" );
+                        messages.add( "Toolchain" );
                     }
                 }
 
+                String message = String.join( ", ", messages );
                 if ( !suppressSummaries )
                 {
                     getLog().info( pad( buildJob ).warning( "SKIPPED" ) + " due to " + message );
