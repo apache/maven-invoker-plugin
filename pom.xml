@@ -415,6 +415,7 @@ under the License.
                 <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
                 <settingsFile>src/it/settings.xml</settingsFile>
                 <mavenOpts>-Djava.io.tmpdir=${project.build.directory}</mavenOpts>
+                <streamLogsOnFailures>true</streamLogsOnFailures>
                 <properties>
                   <maven.compiler.source>${maven.compiler.source}</maven.compiler.source>
                   <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
@@ -466,7 +467,6 @@ under the License.
               <version>${project.version}</version>
               <configuration>
                 <writeJunitReport>true</writeJunitReport>
-                <streamLogsOnFailures>true</streamLogsOnFailures>
               </configuration>
             </plugin>
           </plugins>
