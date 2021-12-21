@@ -67,7 +67,7 @@ under the License.
   <properties>
     <javaVersion>8</javaVersion>
     <mavenVersion>3.2.5</mavenVersion>
-    <doxiaVersion>1.10</doxiaVersion>
+    <doxiaVersion>1.11.1</doxiaVersion>
     <doxiaSitetoolsVersion>1.10</doxiaSitetoolsVersion>
     <beanshell-groupId>org.apache-extras.beanshell</beanshell-groupId>
     <beanshell-artifactId>bsh</beanshell-artifactId>
