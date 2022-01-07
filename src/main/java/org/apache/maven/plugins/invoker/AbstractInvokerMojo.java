@@ -492,32 +492,41 @@ public abstract class AbstractInvokerMojo
      * invoker.goals.2 = ${project.groupId}:${project.artifactId}:${project.version}:run
      *
      * # A comma or space separated list of profiles to activate
+     * # can be indexed
      * invoker.profiles = its,jdk15
      *
      * # The path to an alternative POM or base directory to invoke Maven on, defaults to the
      * # project that was originally specified in the plugin configuration
      * # Since plugin version 1.4
+     * # can be indexed
      * invoker.project = sub-module
      *
      * # The value for the environment variable MAVEN_OPTS
+     * # can be indexed
      * invoker.mavenOpts = -Dfile.encoding=UTF-16 -Xms32m -Xmx256m
      *
      * # Possible values are &quot;fail-fast&quot; (default), &quot;fail-at-end&quot; and &quot;fail-never&quot;
+     * # can be indexed
      * invoker.failureBehavior = fail-never
      *
      * # The expected result of the build, possible values are &quot;success&quot; (default) and &quot;failure&quot;
+     * # can be indexed
      * invoker.buildResult = failure
      *
      * # A boolean value controlling the aggregator mode of Maven, defaults to &quot;false&quot;
+     *
+     * # can be indexed
      * invoker.nonRecursive = true
      *
      * # A boolean value controlling the network behavior of Maven, defaults to &quot;false&quot;
      * # Since plugin version 1.4
+     * # can be indexed
      * invoker.offline = true
      *
      * # The path to the properties file from which to load system properties, defaults to the
      * # filename given by the plugin parameter testPropertiesFile
      * # Since plugin version 1.4
+     * # can be indexed
      * invoker.systemPropertiesFile = test.properties
      *
      * # An optional human friendly name for this build job to be included in the build reports.
@@ -556,10 +565,17 @@ public abstract class AbstractInvokerMojo
      *
      * # A boolean value controlling the debug logging level of Maven, , defaults to &quot;false&quot;
      * # Since plugin version 1.8
+     * # can be indexed
      * invoker.debug = true
+     *
+     * The execution timeout in seconds.
+     * # Since plugin version 3.0.2
+     * # can be indexed
+     * invoker.timeoutInSeconds = 5
      *
      * # Path to an alternate settings.xml to use for Maven invocation with this IT.
      * # Since plugin version 3.0.1
+     * # can be indexed
      * invoker.settingsFile = ../
      *
      * # An integer value to control run order of projects. sorted in the descending order of the ordinal.
@@ -1981,43 +1997,12 @@ public abstract class AbstractInvokerMojo
                 throw new RunFailureException( BuildJob.Result.FAILURE_PRE_HOOK, e );
             }
 
-            final InvocationRequest request = new DefaultInvocationRequest();
-
-            request.setLocalRepositoryDirectory( localRepositoryPath );
-
-            request.setBatchMode( true );
-
-            request.setShowErrors( showErrors );
-
-            request.setDebug( debug );
-
-            request.setShowVersion( showVersion );
-
-            setupLoggerForBuildJob( logger, request );
-
-            if ( mavenHome != null )
-            {
-                invoker.setMavenHome( mavenHome );
-                // FIXME: Should we really take care of M2_HOME?
-                request.addShellEnvironment( "M2_HOME", mavenHome.getAbsolutePath() );
-            }
+            // TODO - move to request
+            invoker.setMavenHome( mavenHome );
 
             if ( mavenExecutable != null )
             {
                 invoker.setMavenExecutable( new File( mavenExecutable ) );
-            }
-
-            if ( actualJavaHome != null )
-            {
-                request.setJavaHome( actualJavaHome );
-            }
-
-            if ( environmentVariables != null )
-            {
-                for ( Map.Entry<String, String> variable : environmentVariables.entrySet() )
-                {
-                    request.addShellEnvironment( variable.getKey(), variable.getValue() );
-                }
             }
 
             for ( int invocationIndex = 1;; invocationIndex++ )
@@ -2027,21 +2012,20 @@ public abstract class AbstractInvokerMojo
                     break;
                 }
 
+                final InvocationRequest request = new DefaultInvocationRequest();
+
+                request.setBatchMode( true );
+
+                // values only from Mojo configurations
+                request.setLocalRepositoryDirectory( localRepositoryPath );
+                request.setShowErrors( showErrors );
+                request.setShowVersion( showVersion );
+                request.setJavaHome( actualJavaHome );
+
+                setupLoggerForBuildJob( logger, request );
+
                 request.setBaseDirectory( basedir );
-
                 request.setPomFile( pomFile );
-
-                request.setGoals( goals );
-
-                request.setProfiles( profiles );
-
-                request.setMavenOpts( mavenOpts );
-
-                request.setOffline( false );
-
-                int timeOut = invokerProperties.getTimeoutInSeconds( invocationIndex );
-                // not set so we use the one at the mojo level
-                request.setTimeoutInSeconds( timeOut < 0 ? timeoutInSeconds : timeOut );
 
                 String customSettingsFile = invokerProperties.getSettingsFile( invocationIndex );
                 if ( customSettingsFile != null )
@@ -2137,7 +2121,6 @@ public abstract class AbstractInvokerMojo
         if ( logger != null )
         {
             request.setErrorHandler( logger );
-
             request.setOutputHandler( logger );
         }
     }
@@ -2639,7 +2622,19 @@ public abstract class AbstractInvokerMojo
             }
             props.setProperty( key, value );
         }
-        return new InvokerProperties( props );
+
+        InvokerProperties invokerProperties = new InvokerProperties( props );
+
+        // set default value for Invoker - it will be used if not present in properties
+        invokerProperties.setDefaultDebug( debug );
+        invokerProperties.setDefaultGoals( goals );
+        invokerProperties.setDefaultProfiles( profiles );
+        invokerProperties.setDefaultMavenOpts( mavenOpts );
+        invokerProperties.setDefaultTimeoutInSeconds( timeoutInSeconds );
+        invokerProperties.setDefaultEnvironmentVariables( environmentVariables );
+
+
+        return invokerProperties;
     }
 
     static class ToolchainPrivateManager

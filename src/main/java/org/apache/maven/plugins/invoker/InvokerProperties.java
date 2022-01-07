@@ -20,17 +20,19 @@ package org.apache.maven.plugins.invoker;
  */
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.maven.shared.invoker.InvocationRequest;
-import org.apache.maven.shared.invoker.InvocationRequest.ReactorFailureBehavior;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -45,9 +47,18 @@ class InvokerProperties
     private static final Pattern ENVIRONMENT_VARIABLES_PATTERN =
             Pattern.compile( "invoker\\.environmentVariables\\.([A-Za-z][^.]+)(\\.([0-9]+))?" );
 
+    // default values from Mojo configuration
+    private Boolean defaultDebug;
+    private List<String> defaultGoals;
+    private List<String> defaultProfiles;
+    private String defaultMavenOpts;
+    private Integer defaultTimeoutInSeconds;
+    private Map<String, String> defaultEnvironmentVariables;
+
     private enum InvocationProperty
     {
         PROJECT( "invoker.project" ),
+        BUILD_RESULT( "invoker.buildResult" ),
         GOALS( "invoker.goals" ),
         PROFILES( "invoker.profiles" ),
         MAVEN_OPTS( "invoker.mavenOpts" ),
@@ -57,8 +68,7 @@ class InvokerProperties
         SYSTEM_PROPERTIES_FILE( "invoker.systemPropertiesFile" ),
         DEBUG( "invoker.debug" ),
         SETTINGS_FILE( "invoker.settingsFile" ),
-        TIMEOUT_IN_SECONDS( "invoker.timeoutInSeconds" ),
-        ORDINAL( "invoker.ordinal" );
+        TIMEOUT_IN_SECONDS( "invoker.timeoutInSeconds" );
 
         private final String key;
 
@@ -108,6 +118,60 @@ class InvokerProperties
     InvokerProperties( Properties properties )
     {
         this.properties = ( properties != null ) ? properties : new Properties();
+    }
+
+    /**
+     * Default value for debug
+     * @param defaultDebug a default value
+     */
+    public void setDefaultDebug( boolean defaultDebug )
+    {
+        this.defaultDebug = defaultDebug;
+    }
+
+    /**
+     * Default value for goals
+     * @param defaultGoals a default value
+     */
+    public void setDefaultGoals( List<String> defaultGoals )
+    {
+        this.defaultGoals = defaultGoals;
+    }
+
+    /**
+     * Default value for profiles
+     * @param defaultProfiles a default value
+     */
+    public void setDefaultProfiles( List<String> defaultProfiles )
+    {
+        this.defaultProfiles =  defaultProfiles;
+    }
+
+    /**
+     * Default value for mavenOpts
+     * @param defaultMavenOpts a default value
+     */
+    public void setDefaultMavenOpts( String defaultMavenOpts )
+    {
+        this.defaultMavenOpts = defaultMavenOpts;
+    }
+
+    /**
+     * Default value for timeoutInSeconds
+     * @param defaultTimeoutInSeconds a default value
+     */
+    public void setDefaultTimeoutInSeconds( int defaultTimeoutInSeconds )
+    {
+        this.defaultTimeoutInSeconds = defaultTimeoutInSeconds;
+    }
+
+    /**
+     * Default value for environmentVariables
+     * @param defaultEnvironmentVariables a default value
+     */
+    public void setDefaultEnvironmentVariables( Map<String, String> defaultEnvironmentVariables )
+    {
+        this.defaultEnvironmentVariables = defaultEnvironmentVariables;
     }
 
     /**
@@ -294,14 +358,10 @@ class InvokerProperties
      */
     public boolean isInvocationDefined( int index )
     {
-        for ( InvocationProperty prop : InvocationProperty.values() )
-        {
-            if ( properties.getProperty( prop.toString() + '.' + index ) != null )
-            {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream( InvocationProperty.values() )
+            .map( InvocationProperty::toString )
+            .map( v -> properties.getProperty( v + '.' + index ) )
+            .anyMatch( Objects::nonNull );
     }
 
     /**
@@ -313,14 +373,18 @@ class InvokerProperties
      */
     public boolean isSelectorDefined( int index )
     {
-        for ( SelectorProperty prop : SelectorProperty.values() )
+        return Arrays.stream( SelectorProperty.values() )
+            .map( v -> v.suffix )
+            .map( v -> properties.getProperty( SELECTOR_PREFIX + index + v ) )
+            .anyMatch( Objects::nonNull );
+    }
+
+    private <T> void setIfNotNull( Consumer<T> consumer,  T value )
+    {
+        if ( value != null )
         {
-            if ( properties.getProperty( SELECTOR_PREFIX + index + prop.suffix ) != null )
-            {
-                return true;
-            }
+            consumer.accept( value );
         }
-        return false;
     }
 
     /**
@@ -332,8 +396,7 @@ class InvokerProperties
      */
     public void configureInvocation( InvocationRequest request, int index )
     {
-        String project = get( InvocationProperty.PROJECT, index );
-        if ( project != null )
+        get( InvocationProperty.PROJECT, index ).ifPresent( project ->
         {
             File file = new File( request.getBaseDirectory(), project );
             if ( file.isFile() )
@@ -346,59 +409,48 @@ class InvokerProperties
                 request.setBaseDirectory( file );
                 request.setPomFile( null );
             }
-        }
+        } );
 
-        String goals = get( InvocationProperty.GOALS, index );
-        if ( goals != null )
-        {
-            request.setGoals( new ArrayList<>( Arrays.asList( StringUtils.split( goals, ", \t\n\r\f" ) ) ) );
-        }
+        setIfNotNull( request::setGoals,  get( InvocationProperty.GOALS, index )
+            .map( s -> StringUtils.split( s, ", \t\n\r\f" ) )
+            .map( Arrays::asList )
+            .filter( l -> !l.isEmpty() )
+            .orElse( defaultGoals ) );
 
-        String profiles = get( InvocationProperty.PROFILES, index );
-        if ( profiles != null )
-        {
-            // CHECKSTYLE_OFF: LineLength
-            request.setProfiles( new ArrayList<>( Arrays.asList( StringUtils.split( profiles,
-                                                                                          ", \t\n\r\f" ) ) ) );
-            // CHECKSTYLE_ON: LineLength
-        }
+        setIfNotNull( request::setProfiles, get( InvocationProperty.PROFILES, index )
+            .map( s -> StringUtils.split( s, ", \t\n\r\f" ) )
+            .map( Arrays::asList )
+            .filter( l -> !l.isEmpty() )
+            .orElse( defaultProfiles ) );
 
-        String mvnOpts = get( InvocationProperty.MAVEN_OPTS, index );
-        if ( mvnOpts != null )
-        {
-            request.setMavenOpts( mvnOpts );
-        }
+        setIfNotNull( request::setMavenOpts, get( InvocationProperty.MAVEN_OPTS, index ).orElse( defaultMavenOpts ) );
 
-        String failureBehavior = get( InvocationProperty.FAILURE_BEHAVIOR, index );
-        if ( failureBehavior != null )
-        {
-            ReactorFailureBehavior valueOf =
-                InvocationRequest.ReactorFailureBehavior.valueOfByLongOption( failureBehavior );
-            request.setReactorFailureBehavior( valueOf );
-        }
+        get( InvocationProperty.FAILURE_BEHAVIOR, index )
+            .map( InvocationRequest.ReactorFailureBehavior::valueOfByLongOption )
+            .ifPresent( request::setReactorFailureBehavior );
 
-        String nonRecursive = get( InvocationProperty.NON_RECURSIVE, index );
-        if ( nonRecursive != null )
-        {
-            request.setRecursive( !Boolean.parseBoolean( nonRecursive ) );
-        }
+        get( InvocationProperty.NON_RECURSIVE, index )
+            .map( Boolean::parseBoolean )
+            .map( b -> !b )
+            .ifPresent( request::setRecursive );
 
-        String offline = get( InvocationProperty.OFFLINE, index );
-        if ( offline != null )
-        {
-            request.setOffline( Boolean.parseBoolean( offline ) );
-        }
+        get( InvocationProperty.OFFLINE, index )
+            .map( Boolean::parseBoolean )
+            .ifPresent( request::setOffline );
 
-        String debug = get( InvocationProperty.DEBUG, index );
-        if ( debug != null )
-        {
-            request.setDebug( Boolean.parseBoolean( debug ) );
-        }
+        setIfNotNull( request::setDebug, get( InvocationProperty.DEBUG, index )
+            .map( Boolean::parseBoolean )
+            .orElse( defaultDebug ) );
 
-        for ( Map.Entry<String, String> envItem : getEnvironmentVariables( index ).entrySet() )
-        {
-            request.addShellEnvironment( envItem.getKey(), envItem.getValue() );
-        }
+        setIfNotNull( request::setTimeoutInSeconds, get( InvocationProperty.TIMEOUT_IN_SECONDS, index )
+            .map( Integer::parseInt )
+            .orElse( defaultTimeoutInSeconds ) );
+
+        Optional.ofNullable( defaultEnvironmentVariables )
+                .ifPresent( evn -> evn.forEach( request::addShellEnvironment ) );
+
+        getEnvironmentVariables( index )
+            .forEach( request::addShellEnvironment );
     }
 
     /**
@@ -411,7 +463,8 @@ class InvokerProperties
      */
     public boolean isExpectedResult( int exitCode, int index )
     {
-        boolean nonZeroExit = "failure".equalsIgnoreCase( get( "invoker.buildResult", index ) );
+        boolean nonZeroExit = "failure".equalsIgnoreCase(
+            get( InvocationProperty.BUILD_RESULT, index ).orElse( null ) );
         return ( exitCode != 0 ) == nonZeroExit;
     }
 
@@ -423,7 +476,7 @@ class InvokerProperties
      */
     public String getSystemPropertiesFile( int index )
     {
-        return get( InvocationProperty.SYSTEM_PROPERTIES_FILE, index );
+        return get( InvocationProperty.SYSTEM_PROPERTIES_FILE, index ).orElse( null );
     }
 
     /**
@@ -434,24 +487,9 @@ class InvokerProperties
      */
     public String getSettingsFile( int index )
     {
-        return get( InvocationProperty.SETTINGS_FILE, index );
+        return get( InvocationProperty.SETTINGS_FILE, index ).orElse( null );
     }
 
-    /**
-     * Get timeout to execute the project
-     * @param index index The index of the invocation, must not be negative.
-     * @return the value for the timeout or -1
-     */
-    public int getTimeoutInSeconds( int index )
-    {
-        String timeoutInSecondsStr = get( InvocationProperty.TIMEOUT_IN_SECONDS, index );
-        if ( StringUtils.isEmpty( timeoutInSecondsStr ) )
-        {
-            return -1;
-        }
-        // catch NumberFormatException? well we assume users knows what they do :-)
-        return Integer.parseInt( timeoutInSecondsStr );
-    }
     /**
      * Gets a value from the invoker properties. The invoker properties are intended to describe the invocation settings
      * for multiple builds of the same project. For this reason, the properties are indexed. First, a property named
@@ -462,22 +500,23 @@ class InvokerProperties
      * @param index The index of the invocation for which to retrieve the value, must not be negative.
      * @return The value for the requested invoker property or <code>null</code> if not defined.
      */
-    String get( String key, int index )
+    Optional<String> get( String key, int index )
     {
         if ( index < 0 )
         {
             throw new IllegalArgumentException( "invalid invocation index: " + index );
         }
 
-        String value = properties.getProperty( key + '.' + index );
-        if ( value == null )
-        {
-            value = properties.getProperty( key );
-        }
-        return value;
+        // lookup in properties
+        String value = Optional.ofNullable( properties.getProperty( key + '.' + index ) )
+            .orElseGet( () -> properties.getProperty( key ) );
+
+        return Optional.ofNullable( value )
+            .map( String::trim )
+            .filter( s -> !s.isEmpty() );
     }
 
-    private String get( InvocationProperty prop, int index )
+    private Optional<String> get( InvocationProperty prop, int index )
     {
         return get( prop.toString(), index );
     }
