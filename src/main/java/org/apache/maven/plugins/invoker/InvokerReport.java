@@ -191,7 +191,7 @@ public class InvokerReport
 
         for ( BuildJob buildJob : buildJobs )
         {
-            renderBuildJob( buildJob, locale );
+            renderBuildJob( buildJob );
         }
 
         sink.table_();
@@ -279,7 +279,7 @@ public class InvokerReport
 
     }
 
-    private void renderBuildJob( BuildJob buildJob, Locale locale )
+    private void renderBuildJob( BuildJob buildJob )
     {
         Sink sink = getSink();
         sink.tableRow();
