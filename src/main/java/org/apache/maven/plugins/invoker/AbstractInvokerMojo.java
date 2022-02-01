@@ -529,12 +529,10 @@ public abstract class AbstractInvokerMojo
      * # can be indexed
      * invoker.systemPropertiesFile = test.properties
      *
-     * # An optional human friendly name for this build job to be included in the build reports.
+     * # An optional human friendly name and description for this build job.
+     * # Both name and description have to be set to be included in the build reports.
      * # Since plugin version 1.4
      * invoker.name = Test Build 01
-     *
-     * # An optional description for this build job to be included in the build reports.
-     * # Since plugin version 1.4
      * invoker.description = Checks the support for build reports.
      *
      * # A comma separated list of JRE versions on which this build job should be run.
