@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,12 +100,19 @@ public class InvokerReport
      */
     private NumberFormat secondsFormat;
 
+    /**
+     * The format used to print build name and description.
+     */
+    private MessageFormat nameAndDescriptionFormat;
+
     protected void executeReport( Locale locale )
         throws MavenReportException
     {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols( locale );
         percentFormat = new DecimalFormat( getText( locale, "report.invoker.format.percent" ), symbols );
         secondsFormat = new DecimalFormat( getText( locale, "report.invoker.format.seconds" ), symbols );
+        nameAndDescriptionFormat =
+                new MessageFormat( getText( locale, "report.invoker.format.name_with_description" ) );
 
         Sink sink = getSink();
 
@@ -283,23 +291,31 @@ public class InvokerReport
     {
         Sink sink = getSink();
         sink.tableRow();
-        StringBuilder buffer = new StringBuilder();
-        if ( !StringUtils.isEmpty( buildJob.getName() ) && !StringUtils.isEmpty( buildJob.getDescription() ) )
-        {
-            buffer.append( buildJob.getName() );
-            buffer.append( " : " );
-            buffer.append( buildJob.getDescription() );
-        }
-        else
-        {
-            buffer.append( buildJob.getProject() );
-        }
-        sinkCell( sink, buffer.toString() );
+        sinkCell( sink, getBuildJobReportName( buildJob ) );
         // FIXME image
         sinkCell( sink, buildJob.getResult() );
         sinkCell( sink, secondsFormat.format( buildJob.getTime() ) );
         sinkCell( sink, buildJob.getFailureMessage() );
         sink.tableRow_();
+    }
+
+    private String getBuildJobReportName( BuildJob buildJob )
+    {
+        StringBuilder buffer = new StringBuilder();
+        if ( !StringUtils.isEmpty( buildJob.getName() ) && !StringUtils.isEmpty( buildJob.getDescription() ) )
+        {
+            buffer.append( getFormattedName( buildJob.getName(), buildJob.getDescription() ) );
+        }
+        else
+        {
+            buffer.append( buildJob.getProject() );
+        }
+        return buffer.toString();
+    }
+
+    private String getFormattedName( String name, String description )
+    {
+        return nameAndDescriptionFormat.format( new Object[] { name, description } );
     }
 
     protected String getOutputDirectory()
