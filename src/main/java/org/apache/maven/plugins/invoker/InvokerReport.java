@@ -301,16 +301,35 @@ public class InvokerReport
 
     private String getBuildJobReportName( BuildJob buildJob )
     {
-        StringBuilder buffer = new StringBuilder();
-        if ( !StringUtils.isEmpty( buildJob.getName() ) && !StringUtils.isEmpty( buildJob.getDescription() ) )
+        String buildJobName = buildJob.getName();
+        String buildJobDescription = buildJob.getDescription();
+        boolean emptyJobName = StringUtils.isEmpty( buildJobName );
+        boolean emptyJobDescription = StringUtils.isEmpty( buildJobDescription );
+        boolean isReportJobNameComplete = !emptyJobName && !emptyJobDescription;
+        if ( isReportJobNameComplete )
         {
-            buffer.append( getFormattedName( buildJob.getName(), buildJob.getDescription() ) );
+            return getFormattedName( buildJobName, buildJobDescription );
         }
         else
         {
-            buffer.append( buildJob.getProject() );
+            String buildJobProject = buildJob.getProject();
+            if ( !emptyJobName )
+            {
+                getLog().warn( incompleteNameWarning( "description", buildJobProject ) );
+            }
+            else if ( !emptyJobDescription )
+            {
+                getLog().warn( incompleteNameWarning( "name", buildJobProject ) );
+            }
+            return buildJobProject;
         }
-        return buffer.toString();
+    }
+
+    private static String incompleteNameWarning( String missing, String pom )
+    {
+        return String.format( "Incomplete job name-description: %s is missing. "
+                            + "POM (%s) will be used in place of job name.",
+                              missing, pom );
     }
 
     private String getFormattedName( String name, String description )
