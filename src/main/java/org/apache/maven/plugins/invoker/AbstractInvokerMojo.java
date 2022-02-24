@@ -1905,7 +1905,8 @@ public abstract class AbstractInvokerMojo
               Writer osw = new OutputStreamWriter( fos, buildJob.getModelEncoding() ) )
         {
             Xpp3DomWriter.write( osw, testsuite );
-        } catch ( IOException e )
+        }
+        catch ( IOException e )
         {
             throw new MojoExecutionException( "Failed to write JUnit build report " + reportFile, e );
         }
