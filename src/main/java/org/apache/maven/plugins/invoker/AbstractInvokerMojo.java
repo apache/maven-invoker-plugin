@@ -761,6 +761,8 @@ public abstract class AbstractInvokerMojo
             return;
         }
 
+        setupActualMavenVersion();
+
         handleScriptRunnerWithScriptClassPath();
 
         Collection<String> collectedProjects = new LinkedHashSet<>();
@@ -828,6 +830,25 @@ public abstract class AbstractInvokerMojo
 
         processResults( new InvokerSession( nonSetupBuildJobs ) );
 
+    }
+
+    private void setupActualMavenVersion() throws MojoExecutionException
+    {
+        if ( mavenHome != null )
+        {
+            try
+            {
+                actualMavenVersion = SelectorUtils.getMavenVersion( mavenHome );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( e.getMessage(), e );
+            }
+        }
+        else
+        {
+            actualMavenVersion = SelectorUtils.getMavenVersion();
+        }
     }
 
     /**
@@ -912,6 +933,7 @@ public abstract class AbstractInvokerMojo
         scriptRunner = new ScriptRunner( );
         scriptRunner.setScriptEncoding( encoding );
         scriptRunner.setGlobalVariable( "localRepositoryPath", localRepositoryPath );
+        scriptRunner.setGlobalVariable( "mavenVersion", actualMavenVersion );
         if ( scriptVariables != null )
         {
             scriptVariables.forEach( ( key, value ) -> scriptRunner.setGlobalVariable( key, value ) );
@@ -1266,16 +1288,6 @@ public abstract class AbstractInvokerMojo
         File interpolatedSettingsFile = interpolateSettings( settingsFile );
 
         final File mergedSettingsFile = mergeSettings( interpolatedSettingsFile );
-
-        if ( mavenHome != null )
-        {
-            actualMavenVersion = SelectorUtils.getMavenVersion( mavenHome );
-        }
-        else
-        {
-            actualMavenVersion = SelectorUtils.getMavenVersion();
-        }
-        scriptRunner.setGlobalVariable( "mavenVersion", actualMavenVersion );
 
         final CharSequence actualJreVersion;
         // @todo if ( javaVersions ) ... to be picked up from toolchains

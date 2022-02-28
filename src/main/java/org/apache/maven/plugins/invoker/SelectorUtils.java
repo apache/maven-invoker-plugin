@@ -20,7 +20,9 @@ package org.apache.maven.plugins.invoker;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -109,7 +111,8 @@ class SelectorUtils
             // if this ever changes, we will have to revisit this code.
             Properties properties = new Properties();
             // CHECKSTYLE_OFF: LineLength
-            properties.load( MavenProject.class.getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven/maven-core/pom.properties" ) );
+            properties.load( MavenProject.class.getClassLoader()
+                                 .getResourceAsStream( "META-INF/maven/org.apache.maven/maven-core/pom.properties" ) );
             // CHECKSTYLE_ON: LineLength
             return StringUtils.trim( properties.getProperty( "version" ) );
         }
@@ -119,33 +122,35 @@ class SelectorUtils
         }
     }
 
-    static String getMavenVersion( File mavenHome )
+    static String getMavenVersion( File mavenHome ) throws IOException
     {
         File mavenLib = new File( mavenHome, "lib" );
         File[] jarFiles = mavenLib.listFiles( ( dir, name ) -> name.endsWith( ".jar" ) );
+
+        if ( jarFiles == null )
+        {
+            throw new IllegalArgumentException( "Invalid Maven home installation directory: " + mavenHome );
+        }
 
         for ( File file : jarFiles )
         {
             try
             {
-                @SuppressWarnings( "deprecation" )
-                URL url =
-                    new URL( "jar:" + file.toURL().toExternalForm()
-                        + "!/META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+                URL url = new URL( "jar:" + file.toURI().toURL().toExternalForm()
+                                 + "!/META-INF/maven/org.apache.maven/maven-core/pom.properties" );
 
-                Properties properties = new Properties();
-                properties.load( url.openStream() );
-                String version = StringUtils.trim( properties.getProperty( "version" ) );
-                if ( version != null )
+                try ( InputStream in = url.openStream() )
                 {
-                    return version;
+                    Properties properties = new Properties();
+                    properties.load( in );
+                    String version = StringUtils.trim( properties.getProperty( "version" ) );
+                    if ( version != null )
+                    {
+                        return version;
+                    }
                 }
             }
-            catch ( MalformedURLException e )
-            {
-                // ignore
-            }
-            catch ( IOException e )
+            catch ( FileNotFoundException | MalformedURLException e )
             {
                 // ignore
             }
@@ -251,7 +256,7 @@ class SelectorUtils
 
     static int compareVersions( List<Integer> version1, List<Integer> version2 )
     {
-        for ( Iterator<Integer> it1 = version1.iterator(), it2 = version2.iterator();; )
+        for ( Iterator<Integer> it1 = version1.iterator(), it2 = version2.iterator(); ; )
         {
             if ( !it1.hasNext() )
             {
