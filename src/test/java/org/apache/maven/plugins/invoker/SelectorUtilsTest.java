@@ -19,13 +19,8 @@ package org.apache.maven.plugins.invoker;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.isA;
-
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +30,15 @@ import java.util.Map;
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests {@link SelectorUtils}.
@@ -120,26 +124,45 @@ public class SelectorUtilsTest
         when( jdkMismatch.getType() ).thenReturn( "jdk" );
 
         when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) )
-                .thenReturn( new ToolchainPrivate[] { jdkMatching } );
+            .thenReturn( new ToolchainPrivate[] {jdkMatching} );
         assertTrue( SelectorUtils.isToolchain( toolchainPrivateManager, Collections.singleton( openJdk9 ) ) );
 
         when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) )
-                .thenReturn( new ToolchainPrivate[] { jdkMismatch } );
+            .thenReturn( new ToolchainPrivate[] {jdkMismatch} );
         assertFalse( SelectorUtils.isToolchain( toolchainPrivateManager, Collections.singleton( openJdk9 ) ) );
 
         when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) )
-                .thenReturn( new ToolchainPrivate[] { jdkMatching, jdkMismatch, jdkMatching } );
+            .thenReturn( new ToolchainPrivate[] {jdkMatching, jdkMismatch, jdkMatching} );
         assertTrue( SelectorUtils.isToolchain( toolchainPrivateManager, Collections.singleton( openJdk9 ) ) );
 
         when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) )
-                .thenReturn( new ToolchainPrivate[0] );
+            .thenReturn( new ToolchainPrivate[0] );
         assertFalse( SelectorUtils.isToolchain( toolchainPrivateManager, Collections.singleton( openJdk9 ) ) );
 
         when( toolchainPrivateManager.getToolchainPrivates( "jdk" ) )
-                .thenReturn( new ToolchainPrivate[] { jdkMatching } );
+            .thenReturn( new ToolchainPrivate[] {jdkMatching} );
         when( toolchainPrivateManager.getToolchainPrivates( "maven" ) )
-                .thenReturn( new ToolchainPrivate[0] );
+            .thenReturn( new ToolchainPrivate[0] );
         assertFalse( SelectorUtils.isToolchain( toolchainPrivateManager, Arrays.asList( openJdk9, maven360 ) ) );
     }
 
+    @Test
+    public void mavenVersionForNotExistingMavenHomeThrowException()
+    {
+        File mavenHome = new File( "not-existing-path" );
+
+        assertThatCode( () -> SelectorUtils.getMavenVersion( mavenHome ) )
+            .isExactlyInstanceOf( IllegalArgumentException.class )
+            .hasMessage( "Invalid Maven home installation directory: not-existing-path" );
+    }
+
+    @Test
+    public void mavenVersionFromMavenHome() throws IOException
+    {
+        File mavenHome = new File( System.getProperty( "maven.home" ) );
+
+        String mavenVersion = SelectorUtils.getMavenVersion( mavenHome );
+
+        assertThat( mavenVersion ).isNotBlank();
+    }
 }
