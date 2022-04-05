@@ -47,7 +47,7 @@ under the License.
             <pomInclude>*/pom.xml</pomInclude>
           </pomIncludes>
           <goals>
-            <goal>process-resources</goal>
+            <goal>validate</goal>
           </goals>
         </configuration>
         <executions>
