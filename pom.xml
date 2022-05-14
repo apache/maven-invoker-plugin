@@ -72,7 +72,7 @@ under the License.
     <beanshell-version>2.0b6</beanshell-version>
     <groovy-groupId>org.codehaus.groovy</groovy-groupId>
     <groovy-artifactId>groovy-all</groovy-artifactId>
-    <groovy-version>3.0.9</groovy-version>
+    <groovy-version>3.0.10</groovy-version>
     <surefire.version>2.22.2</surefire.version>
     <project.build.outputTimestamp>2021-02-14T00:04:14Z</project.build.outputTimestamp>
   </properties>
