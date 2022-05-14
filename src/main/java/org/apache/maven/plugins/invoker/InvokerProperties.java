@@ -54,6 +54,7 @@ class InvokerProperties
     private String defaultMavenOpts;
     private Integer defaultTimeoutInSeconds;
     private Map<String, String> defaultEnvironmentVariables;
+    private File defaultMavenExecutable;
 
     private enum InvocationProperty
     {
@@ -61,6 +62,7 @@ class InvokerProperties
         BUILD_RESULT( "invoker.buildResult" ),
         GOALS( "invoker.goals" ),
         PROFILES( "invoker.profiles" ),
+        MAVEN_EXECUTABLE( "invoker.mavenExecutable" ),
         MAVEN_OPTS( "invoker.mavenOpts" ),
         FAILURE_BEHAVIOR( "invoker.failureBehavior" ),
         NON_RECURSIVE( "invoker.nonRecursive" ),
@@ -145,6 +147,15 @@ class InvokerProperties
     public void setDefaultProfiles( List<String> defaultProfiles )
     {
         this.defaultProfiles =  defaultProfiles;
+    }
+
+    /**
+     * Default value for mavenExecutable
+     * @param defaultMavenExecutable a default value
+     */
+    public void setDefaultMavenExecutable( File defaultMavenExecutable )
+    {
+        this.defaultMavenExecutable = defaultMavenExecutable;
     }
 
     /**
@@ -422,6 +433,10 @@ class InvokerProperties
             .map( Arrays::asList )
             .filter( l -> !l.isEmpty() )
             .orElse( defaultProfiles ) );
+
+        setIfNotNull( request::setMavenExecutable, get( InvocationProperty.MAVEN_EXECUTABLE, index )
+            .map( File::new )
+            .orElse( defaultMavenExecutable ) );
 
         setIfNotNull( request::setMavenOpts, get( InvocationProperty.MAVEN_OPTS, index ).orElse( defaultMavenOpts ) );
 

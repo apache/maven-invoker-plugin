@@ -415,13 +415,13 @@ public abstract class AbstractInvokerMojo
     private File mavenHome;
 
     /**
-     * mavenExecutable can either be a file relative to <code>${maven.home}/bin/</code> or an absolute file.
+     * mavenExecutable can either be a file relative to <code>${maven.home}/bin/</code>, test project workspace
+     * or an absolute file.
      *
      * @since 1.8
-     * @see Invoker#setMavenExecutable(File)
      */
     @Parameter( property = "invoker.mavenExecutable" )
-    private String mavenExecutable;
+    private File mavenExecutable;
 
     /**
      * The <code>JAVA_HOME</code> environment variable to use for forked Maven invocations. Defaults to the current Java
@@ -500,6 +500,12 @@ public abstract class AbstractInvokerMojo
      * # Since plugin version 1.4
      * # can be indexed
      * invoker.project = sub-module
+     *
+     * # The maven executable can either be a file relative to <code>${maven.home}/bin/</code>, test project workspace
+     * # or an absolute file.
+     * # Since plugin version 3.3.0
+     * # can be indexed
+     * invoker.mavenExecutable = mvnw
      *
      * # The value for the environment variable MAVEN_OPTS
      * # can be indexed
@@ -2007,14 +2013,6 @@ public abstract class AbstractInvokerMojo
                 throw new RunFailureException( BuildJob.Result.FAILURE_PRE_HOOK, e );
             }
 
-            // TODO - move to request
-            invoker.setMavenHome( mavenHome );
-
-            if ( mavenExecutable != null )
-            {
-                invoker.setMavenExecutable( new File( mavenExecutable ) );
-            }
-
             for ( int invocationIndex = 1;; invocationIndex++ )
             {
                 if ( invocationIndex > 1 && !invokerProperties.isInvocationDefined( invocationIndex ) )
@@ -2031,7 +2029,7 @@ public abstract class AbstractInvokerMojo
                 request.setShowErrors( showErrors );
                 request.setShowVersion( showVersion );
                 request.setJavaHome( actualJavaHome );
-
+                request.setMavenHome( mavenHome );
                 setupLoggerForBuildJob( logger, request );
 
                 request.setBaseDirectory( basedir );
@@ -2639,6 +2637,7 @@ public abstract class AbstractInvokerMojo
         invokerProperties.setDefaultDebug( debug );
         invokerProperties.setDefaultGoals( goals );
         invokerProperties.setDefaultProfiles( profiles );
+        invokerProperties.setDefaultMavenExecutable( mavenExecutable );
         invokerProperties.setDefaultMavenOpts( mavenOpts );
         invokerProperties.setDefaultTimeoutInSeconds( timeoutInSeconds );
         invokerProperties.setDefaultEnvironmentVariables( environmentVariables );

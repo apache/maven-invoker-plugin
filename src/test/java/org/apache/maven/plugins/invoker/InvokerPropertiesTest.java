@@ -224,10 +224,34 @@ public class InvokerPropertiesTest
     }
 
     @Test
+    public void testConfigureRequestMavenExecutable()
+    {
+        Properties props = new Properties();
+
+        InvokerProperties facade = new InvokerProperties( props );
+        File aDefExecutable = new File( "defExecutable" );
+        facade.setDefaultMavenExecutable( aDefExecutable );
+
+        props.setProperty( "invoker.mavenExecutable", "aPropExecutable" );
+        facade.configureInvocation( request, 0 );
+        verify( request ).setMavenExecutable( new File( "aPropExecutable" ) );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
+
+        props.clear();
+
+        facade.configureInvocation( request, 0 );
+        verify( request ).setMavenExecutable( aDefExecutable );
+        verifyNoMoreInteractions( request );
+    }
+
+    @Test
     public void testConfigureRequestMavenOpts()
     {
         Properties props = new Properties();
+
         InvokerProperties facade = new InvokerProperties( props );
+        facade.setDefaultMavenOpts( "-XxxDef" );
 
         props.setProperty( "invoker.mavenOpts", "-Xmx512m" );
         facade.configureInvocation( request, 0 );
@@ -237,11 +261,9 @@ public class InvokerPropertiesTest
 
         props.clear();
 
-        facade.setDefaultMavenOpts( "-Xxx" );
         facade.configureInvocation( request, 0 );
-        verify( request ).setMavenOpts( "-Xxx" );
+        verify( request ).setMavenOpts( "-XxxDef" );
         verifyNoMoreInteractions( request );
-
     }
 
     @Test
