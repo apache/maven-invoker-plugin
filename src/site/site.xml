@@ -22,21 +22,6 @@ under the License.
 <project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd">
 
-  <skin>
-    <groupId>org.apache.maven.skins</groupId>
-    <artifactId>maven-fluido-skin</artifactId>
-    <version>1.9</version>
-  </skin>
-
-  <custom>
-    <fluidoSkin>
-      <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
-      <googleSearch>
-        <sitesearch>maven.apache.org/plugins/maven-invoker-plugin/</sitesearch>
-      </googleSearch>
-    </fluidoSkin>
-  </custom>
-
   <body>
     <menu name="Overview">
       <item name="Introduction" href="index.html"/>
@@ -47,6 +32,7 @@ under the License.
       <item name="License" href="https://www.apache.org/licenses/"/>
       <item name="Download" href="download.html"/>
     </menu>
+
     <menu name="reference">
       <item name="build-job.xml" href="build-job.html"/>
     </menu>
