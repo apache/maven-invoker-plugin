@@ -219,6 +219,8 @@ class InvokerSession
     public void logFailedBuildLog( Log logger, boolean ignoreFailures )
             throws MojoFailureException
     {
+        updateStats();
+
         List<BuildJob> jobToLogs = new ArrayList<>( failedJobs );
         jobToLogs.addAll( errorJobs );
 
