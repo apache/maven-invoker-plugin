@@ -68,14 +68,14 @@ public class InvokerMojo
     void processResults( InvokerSession invokerSession )
         throws MojoFailureException
     {
-        if ( !suppressSummaries )
-        {
-            invokerSession.logSummary( getLog(), ignoreFailures );
-        }
-
         if ( streamLogsOnFailures )
         {
             invokerSession.logFailedBuildLog( getLog(), ignoreFailures );
+        }
+
+        if ( !suppressSummaries )
+        {
+            invokerSession.logSummary( getLog(), ignoreFailures );
         }
 
         invokerSession.handleFailures( getLog(), ignoreFailures );
