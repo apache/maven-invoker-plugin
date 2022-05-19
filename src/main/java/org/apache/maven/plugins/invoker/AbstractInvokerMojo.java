@@ -826,16 +826,27 @@ public abstract class AbstractInvokerMojo
             getLog().info( "Setup done." );
         }
 
-        // Afterwards run all other jobs.
+
         List<BuildJob> nonSetupBuildJobs = getNonSetupJobs( buildJobs );
-        // We will run the non setup jobs with the configured
-        // parallelThreads number.
-        runBuilds( projectsDir, nonSetupBuildJobs, getParallelThreadsCount() );
 
-        writeSummaryFile( nonSetupBuildJobs );
+        if ( setupBuildJobs.isEmpty() || setupBuildJobs.stream().allMatch( BuildJob::isNotError ) )
+        {
+            // We will run the non setup jobs with the configured
+            // parallelThreads number.
+            runBuilds( projectsDir, nonSetupBuildJobs, getParallelThreadsCount() );
+        }
+        else
+        {
+            for ( BuildJob buildJob : nonSetupBuildJobs )
+            {
+                buildJob.setResult( BuildJob.Result.SKIPPED );
+                buildJob.setFailureMessage( "Skipped due to setup job(s) failure" );
+                writeBuildReport( buildJob );
+            }
+        }
 
-        processResults( new InvokerSession( nonSetupBuildJobs ) );
-
+        writeSummaryFile( buildJobs );
+        processResults( new InvokerSession( buildJobs ) );
     }
 
     private void setupActualMavenVersion() throws MojoExecutionException
@@ -957,7 +968,7 @@ public abstract class AbstractInvokerMojo
         {
             for ( BuildJob buildJob : buildJobs )
             {
-                if ( !buildJob.getResult().equals( BuildJob.Result.SUCCESS ) )
+                if ( !BuildJob.Result.SUCCESS.equals( buildJob.getResult() ) )
                 {
                     writer.append( buildJob.getResult() );
                     writer.append( " [" );

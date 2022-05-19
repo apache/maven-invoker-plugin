@@ -133,6 +133,11 @@ under the License.
     {
         this.project = project;
     }
+
+    public boolean isNotError()
+    {
+        return Result.SUCCESS.equals( result ) || Result.SKIPPED.equals( result );
+    }
           ]]></code>
         </codeSegment>
         <codeSegment>
