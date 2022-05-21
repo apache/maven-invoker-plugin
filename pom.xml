@@ -71,7 +71,6 @@ under the License.
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
     <groovy-groupId>org.codehaus.groovy</groovy-groupId>
-    <groovy-artifactId>groovy-all</groovy-artifactId>
     <groovy-version>3.0.10</groovy-version>
     <surefire.version>2.22.2</surefire.version>
     <project.build.outputTimestamp>2021-02-14T00:04:14Z</project.build.outputTimestamp>
@@ -137,7 +136,7 @@ under the License.
       <artifactId>maven-script-interpreter</artifactId>
       <version>1.3</version>
       <exclusions>
-        <!-- there's already a direct dependency to groovy-all -->
+        <!-- there's already a direct dependency to groovy -->
         <exclusion>
           <groupId>org.codehaus.groovy</groupId>
           <artifactId>groovy</artifactId>
@@ -163,32 +162,24 @@ under the License.
       <version>${beanshell-version}</version>
       <scope>runtime</scope>
     </dependency>
+
     <dependency>
       <groupId>${groovy-groupId}</groupId>
-      <artifactId>${groovy-artifactId}</artifactId>
+      <artifactId>groovy</artifactId>
       <version>${groovy-version}</version>
-      <type>pom</type>
       <scope>runtime</scope>
-      <exclusions>
-        <exclusion> <!-- pulls in jline with shaded org.fusesource.jansi.Ansi, causing invalid output for M3.5.0- -->
-          <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy-groovysh</artifactId>
-        </exclusion>
-        <!-- MINVOKER-285 - exclude additional tests frameworks -->
-        <exclusion>
-          <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy-test</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy-test-junit5</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy-testng</artifactId>
-        </exclusion>
-        <!-- /MINVOKER-285 -->
-      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>${groovy-groupId}</groupId>
+      <artifactId>groovy-json</artifactId>
+      <version>${groovy-version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>${groovy-groupId}</groupId>
+      <artifactId>groovy-xml</artifactId>
+      <version>${groovy-version}</version>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
