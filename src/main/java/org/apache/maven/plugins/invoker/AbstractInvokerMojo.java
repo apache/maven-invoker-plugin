@@ -132,12 +132,16 @@ public abstract class AbstractInvokerMojo
      * only indication of the build's success or failure will be the effect it has on the main build (if it fails, the
      * main build should fail as well). If {@link #streamLogs} is enabled, the sub-build summary will also provide an
      * indication.
+     *
+     * @since 1.0
      */
     @Parameter( defaultValue = "false" )
     protected boolean suppressSummaries;
 
     /**
      * Flag used to determine whether the build logs should be output to the normal mojo log.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.streamLogs", defaultValue = "false" )
     private boolean streamLogs;
@@ -146,12 +150,16 @@ public abstract class AbstractInvokerMojo
      * The local repository for caching artifacts. It is strongly recommended to specify a path to an isolated
      * repository like <code>${project.build.directory}/it-repo</code>. Otherwise, your ordinary local repository will
      * be used, potentially soiling it with broken artifacts.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.localRepositoryPath", defaultValue = "${settings.localRepository}" )
     private File localRepositoryPath;
 
     /**
      * Directory to search for integration tests.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.projectsDirectory", defaultValue = "${basedir}/src/it/" )
     private File projectsDirectory;
@@ -211,6 +219,8 @@ public abstract class AbstractInvokerMojo
 
     /**
      * A single POM to build, skipping any scanning parameters and behavior.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.pom" )
     private File pom;
@@ -224,6 +234,8 @@ public abstract class AbstractInvokerMojo
      * pattern <code>*</code> will run Maven builds on all immediate sub directories of {@link #projectsDirectory},
      * regardless if they contain a <code>pom.xml</code>. This allows to perform builds that need/should not depend on
      * the existence of a POM.
+     *
+     * @since 1.0
      */
     @Parameter
     private List<String> pomIncludes = Collections.singletonList( "*/pom.xml" );
@@ -232,6 +244,8 @@ public abstract class AbstractInvokerMojo
      * Exclude patterns for searching the integration test directory. This parameter is meant to be set from the POM. By
      * default, no POM files are excluded. For the convenience of using an include pattern like <code>*</code>, the
      * custom settings file specified by the parameter {@link #settingsFile} will always be excluded automatically.
+     *
+     * @since 1.0
      */
     @Parameter
     private List<String> pomExcludes = Collections.emptyList();
@@ -250,20 +264,11 @@ public abstract class AbstractInvokerMojo
 
     /**
      * The list of goals to execute on each project. Default value is: <code>package</code>.
+     *
+     * @since 1.0
      */
     @Parameter
     private List<String> goals = Collections.singletonList( "package" );
-
-    /**
-     */
-    @Component
-    private Invoker invoker;
-
-    @Component
-    private SettingsBuilder settingsBuilder;
-
-    @Component
-    private ToolchainManagerPrivate toolchainManagerPrivate;
 
     /**
      * Relative path of a selector script to run prior in order to decide if the build should be executed. This script
@@ -287,6 +292,8 @@ public abstract class AbstractInvokerMojo
      * script exists for a particular project but returns any non-null value different from <code>true</code> or throws
      * an exception, the corresponding build is flagged as a failure. In this case, neither Maven nor the post-build
      * hook script will be invoked.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.preBuildHookScript", defaultValue = "prebuild" )
     private String preBuildHookScript;
@@ -297,12 +304,16 @@ public abstract class AbstractInvokerMojo
      * plugin searches for the file by trying out the well-known extensions <code>.bsh</code> and <code>.groovy</code>.
      * If this script exists for a particular project but returns any non-null value different from <code>true</code> or
      * throws an exception, the corresponding build is flagged as a failure.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.postBuildHookScript", defaultValue = "postbuild" )
     private String postBuildHookScript;
 
     /**
      * Location of a properties file that defines CLI properties for the test.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.testPropertiesFile", defaultValue = "test.properties" )
     private String testPropertiesFile;
@@ -317,18 +328,24 @@ public abstract class AbstractInvokerMojo
 
     /**
      * Whether to show errors in the build output.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.showErrors", defaultValue = "false" )
     private boolean showErrors;
 
     /**
      * Whether to show debug statements in the build output.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.debug", defaultValue = "false" )
     private boolean debug;
 
     /**
      * Suppress logging to the <code>build.log</code> file.
+     *
+     * @since 1.0
      */
     @Parameter( property = "invoker.noLog", defaultValue = "false" )
     private boolean noLog;
@@ -357,20 +374,6 @@ public abstract class AbstractInvokerMojo
      */
     @Parameter
     private Map<String, String> filterProperties;
-
-    /**
-     * The Maven Project Object
-     *
-     * @since 1.1
-     */
-    @Parameter( defaultValue = "${project}", readonly = true, required = true )
-    private MavenProject project;
-
-    @Parameter( defaultValue = "${session}", readonly = true, required = true )
-    private MavenSession session;
-
-    @Parameter( defaultValue = "${mojoExecution}", readonly = true, required = true )
-    private MojoExecution mojoExecution;
 
     /**
      * A comma separated list of projectname patterns to run. Specify this parameter to run individual tests by file
@@ -441,14 +444,6 @@ public abstract class AbstractInvokerMojo
     private String encoding;
 
     /**
-     * The current user system settings for use in Maven.
-     *
-     * @since 1.2
-     */
-    @Parameter( defaultValue = "${settings}", readonly = true, required = true )
-    private Settings settings;
-
-    /**
      * A flag whether the test class path of the project under test should be included in the class path of the
      * pre-/post-build scripts. If set to <code>false</code>, the class path of script interpreter consists only of the
      * <a href="dependencies.html">runtime dependencies</a> of the Maven Invoker Plugin. If set the <code>true</code>,
@@ -459,12 +454,6 @@ public abstract class AbstractInvokerMojo
      */
     @Parameter( property = "invoker.addTestClassPath", defaultValue = "false" )
     private boolean addTestClassPath;
-
-    /**
-     * The test class path of the project under test.
-     */
-    @Parameter( defaultValue = "${project.testClasspathElements}", readonly = true )
-    private List<String> testClassPath;
 
     /**
      * The name of an optional project-specific file that contains properties used to specify settings for an individual
@@ -621,12 +610,6 @@ public abstract class AbstractInvokerMojo
     private String parallelThreads;
 
     /**
-     * @since 1.6
-     */
-    @Parameter( property = "plugin.artifacts", required = true, readonly = true )
-    private List<Artifact> pluginArtifacts;
-
-    /**
      * If enable and if you have a settings file configured for the execution, it will be merged with your user
      * settings.
      *
@@ -681,6 +664,8 @@ public abstract class AbstractInvokerMojo
     @Parameter( defaultValue = "false", property = "invoker.updateOnly" )
     private boolean updateOnly = false;
 
+    // internal state variables
+
     /**
      * The scripter runner that is responsible to execute hook scripts.
      */
@@ -702,6 +687,35 @@ public abstract class AbstractInvokerMojo
      * The version of Maven which is used to run the builds
      */
     private String actualMavenVersion;
+
+    // used components - readonly parameters
+
+    @Parameter( property = "plugin.artifacts", required = true, readonly = true )
+    private List<Artifact> pluginArtifacts;
+
+    @Parameter( defaultValue = "${project.testClasspathElements}", readonly = true )
+    private List<String> testClassPath;
+
+    @Parameter( defaultValue = "${mojoExecution}", readonly = true, required = true )
+    private MojoExecution mojoExecution;
+
+    @Parameter( defaultValue = "${project}", readonly = true, required = true )
+    private MavenProject project;
+
+    @Parameter( defaultValue = "${session}", readonly = true, required = true )
+    private MavenSession session;
+
+    @Parameter( defaultValue = "${settings}", readonly = true, required = true )
+    private Settings settings;
+
+    @Component
+    private Invoker invoker;
+
+    @Component
+    private SettingsBuilder settingsBuilder;
+
+    @Component
+    private ToolchainManagerPrivate toolchainManagerPrivate;
 
     /**
      * Invokes Maven on the configured test projects.
