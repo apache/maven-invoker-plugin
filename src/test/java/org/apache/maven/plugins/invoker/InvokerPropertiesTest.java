@@ -364,6 +364,38 @@ public class InvokerPropertiesTest
     }
 
     @Test
+    public void testConfigureRequestQuiet()
+    {
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties( props );
+
+        props.setProperty( "invoker.quiet", "true" );
+        facade.configureInvocation( request, 0 );
+        verify( request ).setQuiet( true );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
+
+        props.setProperty( "invoker.quiet", "false" );
+        facade.configureInvocation( request, 0 );
+        verify( request ).setQuiet( false );
+        verifyNoMoreInteractions( request );
+
+        props.clear();
+
+        facade.setDefaultQuiet( true );
+        facade.configureInvocation( request, 0 );
+        verify( request ).setQuiet( true );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
+
+        facade.setDefaultQuiet( false );
+        facade.configureInvocation( request, 0 );
+        verify( request ).setQuiet( false );
+        verifyNoMoreInteractions( request );
+        clearInvocations( request );
+    }
+
+    @Test
     public void testConfigureRequestTimeoutInSeconds()
     {
         Properties props = new Properties();
