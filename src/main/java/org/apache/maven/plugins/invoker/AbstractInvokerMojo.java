@@ -343,6 +343,14 @@ public abstract class AbstractInvokerMojo
     private boolean debug;
 
     /**
+     * Whether to execute Maven in quiet mode.
+     *
+     * @since 3.3.0
+     */
+    @Parameter( property = "invoker.quiet", defaultValue = "false" )
+    private boolean quiet;
+
+    /**
      * Suppress logging to the <code>build.log</code> file.
      *
      * @since 1.0
@@ -560,6 +568,11 @@ public abstract class AbstractInvokerMojo
      * # Since plugin version 1.8
      * # can be indexed
      * invoker.debug = true
+     *
+     * # Whether to execute Maven in quiet mode
+     * # Since plugin version 3.3.0
+     * # can be indexed
+     * invoker.quiet = true
      *
      * The execution timeout in seconds.
      * # Since plugin version 3.0.2
@@ -2660,6 +2673,7 @@ public abstract class AbstractInvokerMojo
 
         // set default value for Invoker - it will be used if not present in properties
         invokerProperties.setDefaultDebug( debug );
+        invokerProperties.setDefaultQuiet( quiet );
         invokerProperties.setDefaultGoals( goals );
         invokerProperties.setDefaultProfiles( profiles );
         invokerProperties.setDefaultMavenExecutable( mavenExecutable );

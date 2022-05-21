@@ -49,6 +49,7 @@ class InvokerProperties
 
     // default values from Mojo configuration
     private Boolean defaultDebug;
+    private Boolean defaultQuiet;
     private List<String> defaultGoals;
     private List<String> defaultProfiles;
     private String defaultMavenOpts;
@@ -69,6 +70,7 @@ class InvokerProperties
         OFFLINE( "invoker.offline" ),
         SYSTEM_PROPERTIES_FILE( "invoker.systemPropertiesFile" ),
         DEBUG( "invoker.debug" ),
+        QUIET( "invoker.quiet" ),
         SETTINGS_FILE( "invoker.settingsFile" ),
         TIMEOUT_IN_SECONDS( "invoker.timeoutInSeconds" );
 
@@ -129,6 +131,15 @@ class InvokerProperties
     public void setDefaultDebug( boolean defaultDebug )
     {
         this.defaultDebug = defaultDebug;
+    }
+
+    /**
+     * Default value for quiet
+     * @param defaultQuiet a default value
+     */
+    public void setDefaultQuiet( boolean defaultQuiet )
+    {
+        this.defaultQuiet = defaultQuiet;
     }
 
     /**
@@ -456,6 +467,10 @@ class InvokerProperties
         setIfNotNull( request::setDebug, get( InvocationProperty.DEBUG, index )
             .map( Boolean::parseBoolean )
             .orElse( defaultDebug ) );
+
+        setIfNotNull( request::setQuiet, get( InvocationProperty.QUIET, index )
+            .map( Boolean::parseBoolean )
+            .orElse( defaultQuiet ) );
 
         setIfNotNull( request::setTimeoutInSeconds, get( InvocationProperty.TIMEOUT_IN_SECONDS, index )
             .map( Integer::parseInt )
