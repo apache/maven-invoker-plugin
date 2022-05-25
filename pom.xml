@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven-invoker-plugin</artifactId>
-  <version>3.3.0-SNAPSHOT</version>
+  <version>3.3.0</version>
   <packaging>maven-plugin</packaging>
 
   <name>Apache Maven Invoker Plugin</name>
@@ -47,7 +47,7 @@ under the License.
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-invoker-plugin.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-invoker-plugin.git</developerConnection>
     <url>https://github.com/apache/maven-invoker-plugin/tree/${project.scm.tag}</url>
-    <tag>HEAD</tag>
+    <tag>maven-invoker-plugin-3.3.0</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -73,7 +73,7 @@ under the License.
     <groovy-groupId>org.codehaus.groovy</groovy-groupId>
     <groovy-version>3.0.10</groovy-version>
     <surefire.version>2.22.2</surefire.version>
-    <project.build.outputTimestamp>2021-02-14T00:04:14Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2022-05-25T15:26:32Z</project.build.outputTimestamp>
   </properties>
 
   <dependencyManagement>
