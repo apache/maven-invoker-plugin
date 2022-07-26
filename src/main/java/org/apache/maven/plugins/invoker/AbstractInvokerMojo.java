@@ -2431,6 +2431,10 @@ public abstract class AbstractInvokerMojo
         }
         if ( excludes != null )
         {
+            if ( ( includes == null || includes.isEmpty() ) && !excludes.isEmpty() )
+            {
+                scanner.setIncludes( new String[] { "*" } );
+            }
             scanner.setExcludes( excludes.toArray( new String[0] ) );
         }
         scanner.addDefaultExcludes();
