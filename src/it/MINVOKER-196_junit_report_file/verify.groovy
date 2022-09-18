@@ -19,7 +19,7 @@
 File buildLog = new File( basedir, 'build.log' )
 assert buildLog.text.contains( '[INFO] run post-build script verify.groovy' )
 
-File invokerReports = new File( new File(basedir, "target"), 'invoker-reports' )
+File invokerReports = new File( new File(basedir, "target"), 'invoker-reports-test' )
 assert invokerReports.exists()
 
 // test on first project

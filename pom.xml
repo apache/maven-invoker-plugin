@@ -359,6 +359,9 @@ under the License.
                 <properties>
                   <maven.compiler.source>${maven.compiler.source}</maven.compiler.source>
                   <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
+                  <!-- in order to stop Jenkins to recognized reports from test as project report -->
+                  <invoker.reportsDirectory>target/invoker-reports-test</invoker.reportsDirectory>
+                  <invoker.streamLogsOnFailures>true</invoker.streamLogsOnFailures>
                 </properties>
                 <scriptVariables>
                   <projectVersion>${project.version}</projectVersion>

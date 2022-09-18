@@ -59,7 +59,7 @@ try
         return false;
     }
 
-    File reportFile = new File( basedir, "target/invoker-reports/BUILD-project1.xml" );
+    File reportFile = new File( basedir, "target/invoker-reports-test/BUILD-project1.xml" );
     if ( !reportFile.exists() )
     {
         System.out.println( "reportFile not exists FAILED!" );

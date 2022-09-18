@@ -49,6 +49,7 @@ under the License.
           </goals>
           <ignoreFailures>true</ignoreFailures>
           <streamLogs>false</streamLogs>
+          <streamLogsOnFailures>false</streamLogsOnFailures>
         </configuration>
         <executions>
           <execution>

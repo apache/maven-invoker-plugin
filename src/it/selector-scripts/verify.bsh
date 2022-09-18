@@ -57,8 +57,8 @@ try
     }
 
     String[] success = {
-            "target/invoker-reports/BUILD-script-ret-true.xml",
-            "target/invoker-reports/BUILD-script-ret-quiet.xml",
+            "target/invoker-reports-test/BUILD-script-ret-true.xml",
+            "target/invoker-reports-test/BUILD-script-ret-quiet.xml",
       };
     for ( String file : success )
     {
@@ -73,8 +73,8 @@ try
     }
 
     String[] skipped = {
-            "target/invoker-reports/BUILD-script-ret-false.xml",
-            "target/invoker-reports/BUILD-script-ret-other.xml",
+            "target/invoker-reports-test/BUILD-script-ret-false.xml",
+            "target/invoker-reports-test/BUILD-script-ret-other.xml",
       };
     for ( String file : skipped )
     {
@@ -90,7 +90,7 @@ try
 
 
     String[] inerror = {
-            "target/invoker-reports/BUILD-script-throw.xml",
+            "target/invoker-reports-test/BUILD-script-throw.xml",
       };
     for ( String file : inerror )
     {
