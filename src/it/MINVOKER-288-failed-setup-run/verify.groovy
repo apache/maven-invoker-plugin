@@ -18,7 +18,7 @@
  */
 
 
-File invokerReports = new File( new File(basedir, 'target'), 'invoker-reports' )
+File invokerReports = new File( new File(basedir, 'target'), 'invoker-reports-test' )
 assert invokerReports.exists()
 
 def build1 = new XmlSlurper().parse( new File( invokerReports, 'BUILD-project1.xml' ) )

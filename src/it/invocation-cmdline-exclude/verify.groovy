@@ -16,6 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-assert new File(basedir, 'target/invoker-reports/BUILD-minvoker-140-executable.xml').exists()
-assert !new File(basedir, 'target/invoker-reports/BUILD-minvoker-140-ignorable.xml').exists()
+assert new File(basedir, 'target/invoker-reports-test/BUILD-minvoker-140-executable.xml').exists()
+assert !new File(basedir, 'target/invoker-reports-test/BUILD-minvoker-140-ignorable.xml').exists()
 

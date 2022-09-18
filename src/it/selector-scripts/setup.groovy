@@ -21,7 +21,7 @@ import org.apache.commons.io.FileUtils
 
 // Previous potential target 'content' has impact on IT execution
 // (Some new file should be created by verify.sh) 
-FileUtils.deleteQuietly( new File( basedir, "target/invoker-reports" ) );
+FileUtils.deleteQuietly( new File( basedir, "target/invoker-reports-test" ) );
 FileUtils.deleteQuietly( new File( basedir, "src/it/script-ret-quiet/target" ) );
 FileUtils.deleteQuietly( new File( basedir, "src/it/script-ret-true/target" ) );
 return true;
