@@ -71,7 +71,7 @@ under the License.
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
     <groovy-groupId>org.codehaus.groovy</groovy-groupId>
-    <groovy-version>3.0.12</groovy-version>
+    <groovy-version>3.0.13</groovy-version>
     <project.build.outputTimestamp>2022-05-25T15:26:55Z</project.build.outputTimestamp>
   </properties>
 
