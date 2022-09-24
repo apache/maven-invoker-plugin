@@ -595,6 +595,11 @@ public abstract class AbstractInvokerMojo
      * invoker.environmentVariables.&lt;variableName&gt; = variableValue
      * invoker.environmentVariables.MY_ENV_NAME = myEnvValue
      *
+     * # A boolean value indicating a check for missing releases and updated snapshots on remote repositories to be done
+     * # Passed to the invoker. Same as passing -U, --update-snapshots flag on the command line
+     * # Since plugin version 3.4.0
+     * invoker.updateSnapshots = true
+     *
      * </pre>
      *
      * @since 1.2
@@ -676,6 +681,15 @@ public abstract class AbstractInvokerMojo
      */
     @Parameter( defaultValue = "false", property = "invoker.updateOnly" )
     private boolean updateOnly = false;
+
+    /**
+     * Force a check for missing releases and updated snapshots on remote repositories. This is passed to the invoked
+     * maven projects (it is the same as if you were to use the -U, --update-snapshots flag on the command line).
+     *
+     * @since 3.4.0
+     */
+    @Parameter( defaultValue = "false", property = "invoker.updateSnapshots" )
+    private boolean updateSnapshots;
 
     // internal state variables
 
@@ -2684,6 +2698,7 @@ public abstract class AbstractInvokerMojo
         invokerProperties.setDefaultMavenOpts( mavenOpts );
         invokerProperties.setDefaultTimeoutInSeconds( timeoutInSeconds );
         invokerProperties.setDefaultEnvironmentVariables( environmentVariables );
+        invokerProperties.setDefaultUpdateSnapshots( updateSnapshots );
 
 
         return invokerProperties;
