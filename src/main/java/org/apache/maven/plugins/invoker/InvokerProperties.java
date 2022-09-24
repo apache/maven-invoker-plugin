@@ -56,6 +56,7 @@ class InvokerProperties
     private Integer defaultTimeoutInSeconds;
     private Map<String, String> defaultEnvironmentVariables;
     private File defaultMavenExecutable;
+    private Boolean defaultUpdateSnapshots;
 
     private enum InvocationProperty
     {
@@ -72,7 +73,8 @@ class InvokerProperties
         DEBUG( "invoker.debug" ),
         QUIET( "invoker.quiet" ),
         SETTINGS_FILE( "invoker.settingsFile" ),
-        TIMEOUT_IN_SECONDS( "invoker.timeoutInSeconds" );
+        TIMEOUT_IN_SECONDS( "invoker.timeoutInSeconds" ),
+        UPDATE_SNAPSHOTS( "invoker.updateSnapshots" );
 
         private final String key;
 
@@ -194,6 +196,15 @@ class InvokerProperties
     public void setDefaultEnvironmentVariables( Map<String, String> defaultEnvironmentVariables )
     {
         this.defaultEnvironmentVariables = defaultEnvironmentVariables;
+    }
+
+    /**
+     * Default value for updateSnapshots
+     * @param defaultUpdateSnapshots a default value
+     */
+    public void setDefaultUpdateSnapshots( boolean defaultUpdateSnapshots )
+    {
+        this.defaultUpdateSnapshots = defaultUpdateSnapshots;
     }
 
     /**
@@ -475,6 +486,10 @@ class InvokerProperties
         setIfNotNull( request::setTimeoutInSeconds, get( InvocationProperty.TIMEOUT_IN_SECONDS, index )
             .map( Integer::parseInt )
             .orElse( defaultTimeoutInSeconds ) );
+
+        setIfNotNull( request::setUpdateSnapshots, get( InvocationProperty.UPDATE_SNAPSHOTS, index )
+                .map( Boolean::parseBoolean )
+                .orElse( defaultUpdateSnapshots ) );
 
         Optional.ofNullable( defaultEnvironmentVariables )
                 .ifPresent( evn -> evn.forEach( request::addShellEnvironment ) );

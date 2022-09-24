@@ -455,6 +455,43 @@ public class InvokerPropertiesTest
     }
 
     @Test
+    public void testConfigureUpdateSnapshots()
+    {
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties( props );
+
+        props.setProperty( "invoker.updateSnapshots", "true" );
+        facade.configureInvocation( request, 1 );
+        verify( request ).setUpdateSnapshots( true );
+        clearInvocations( request );
+        props.clear();
+
+        props.setProperty( "invoker.updateSnapshots", "false" );
+        facade.configureInvocation( request , 1 );
+        verify( request ).setUpdateSnapshots( false );
+
+        verifyNoMoreInteractions( request );
+    }
+
+    @Test
+    public void testConfigureUpdateSnapshotsDefault()
+    {
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties( props );
+
+        facade.setDefaultUpdateSnapshots( true );
+        facade.configureInvocation( request, 1 );
+        verify( request ).setUpdateSnapshots( true );
+        clearInvocations( request );
+
+        facade.setDefaultUpdateSnapshots( false );
+        facade.configureInvocation( request, 1 );
+        verify( request ).setUpdateSnapshots( false );
+
+        verifyNoMoreInteractions( request );
+    }
+
+    @Test
     public void testIsInvocationDefined()
     {
         Properties props = new Properties();
@@ -541,5 +578,4 @@ public class InvokerPropertiesTest
         assertThat( toolchain.getType() ).isEqualTo( "jdk" );
         assertThat( toolchain.getProvides() ).containsExactlyEntriesOf( Collections.singletonMap( "version", "11" ) );
     }
-
 }
