@@ -20,6 +20,7 @@ package org.apache.maven.plugins.invoker;
  */
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -199,7 +200,7 @@ public class InvokerPropertiesTest
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties( props );
 
-        File tempPom = File.createTempFile( "maven-invoker-plugin-test", ".pom" );
+        File tempPom = Files.createTempFile( "maven-invoker-plugin-test", ".pom" ).toFile();
         try
         {
             File tempDir = tempPom.getParentFile();
