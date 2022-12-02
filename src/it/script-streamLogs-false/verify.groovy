@@ -40,9 +40,8 @@ assert beanshellLog.contains('java.lang.OutOfMemoryError: Requested array size e
 
 // groovy failed and no log message
 assert !buildLog.contains('[INFO] Output from groovy script')
-assert !buildLog.contains('Assertion failed:')
-assert !buildLog.contains('assert pom.contains("<modelVersion>9.9.9</modelVersion>")')
-assert buildLog.contains('[INFO]   org.apache.maven.shared.scriptinterpreter.ScriptEvaluationException: Assertion Error')
+assert buildLog.contains('Assertion failed:')
+assert buildLog.contains('assert pom.contains("<modelVersion>9.9.9</modelVersion>")')
 assert buildLog.contains('[INFO]           groovy' + FS + 'pom.xml ................................... FAILED')
 
 assert groovyLog.contains('Output from groovy script')

@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven-invoker-plugin</artifactId>
-  <version>3.3.1-SNAPSHOT</version>
+  <version>3.4.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Apache Maven Invoker Plugin</name>
@@ -70,9 +70,8 @@ under the License.
     <beanshell-groupId>org.apache-extras.beanshell</beanshell-groupId>
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
-    <groovy-groupId>org.codehaus.groovy</groovy-groupId>
-    <groovy-version>3.0.12</groovy-version>
     <project.build.outputTimestamp>2022-05-25T15:26:55Z</project.build.outputTimestamp>
+    <groovy-version>4.0.6</groovy-version>
   </properties>
 
   <dependencyManagement>
@@ -97,6 +96,13 @@ under the License.
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>2.11.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.groovy</groupId>
+        <artifactId>groovy-bom</artifactId>
+        <version>${groovy-version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -159,14 +165,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-script-interpreter</artifactId>
-      <version>1.3</version>
-      <exclusions>
-        <!-- there's already a direct dependency to groovy -->
-        <exclusion>
-          <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>1.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -189,21 +188,18 @@ under the License.
     </dependency>
 
     <dependency>
-      <groupId>${groovy-groupId}</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy</artifactId>
-      <version>${groovy-version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>${groovy-groupId}</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-json</artifactId>
-      <version>${groovy-version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>${groovy-groupId}</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-xml</artifactId>
-      <version>${groovy-version}</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -265,7 +261,6 @@ under the License.
       <version>1.7.36</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -331,6 +326,29 @@ under the License.
           </models>
           <version>1.0.0</version>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>ban-org-codehaus-groovy</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.codehaus.groovy:*</exclude>
+                  </excludes>
+                  <searchTransitive>true</searchTransitive>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

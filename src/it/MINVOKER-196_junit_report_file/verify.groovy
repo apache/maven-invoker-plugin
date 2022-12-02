@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import groovy.xml.XmlSlurper
+
 File buildLog = new File( basedir, 'build.log' )
 assert buildLog.text.contains( '[INFO] run post-build script verify.groovy' )
 

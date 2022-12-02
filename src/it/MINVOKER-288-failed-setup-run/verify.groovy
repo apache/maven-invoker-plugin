@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+import groovy.xml.XmlSlurper
 
 File invokerReports = new File( new File(basedir, 'target'), 'invoker-reports-test' )
 assert invokerReports.exists()
