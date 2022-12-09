@@ -31,13 +31,13 @@ Groovy version and extensions
   <<NOTICE>>: Plugin <<<maven-invoker-plugin>>> in versions older than <<<3.3.0>>> has dependency
   on <<<groovy-all>>> artifact from <<<Groovy 2>>>.
 
-  Plugin <<<maven-invoker-plugin>>> in version <<<3.3.0>>> has only dependency on <<<Groovy 3>>> core add common extensions:
+  Plugin <<<maven-invoker-plugin>>> in version <<<3.4.0>>> has only dependency on <<<Groovy 4>>> core add common extensions:
 
-  * <<<org.codehaus.groovy:groovy:3.0.10>>>
+  * <<<org.apache.groovy:groovy:${groovy-version}>>>
 
-  * <<<org.codehaus.groovy:groovy-json:3.0.10>>>
+  * <<<org.apache.groovy:groovy-json:${groovy-version}>>>
 
-  * <<<org.codehaus.groovy:groovy-xml:3.0.10>>>
+  * <<<org.apache.groovy:groovy-xml:${groovy-version}>>>
 
   []
 
@@ -54,7 +54,7 @@ Groovy version and extensions
         .....
         <dependencies>
           <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-yaml</artifactId>
             <version>3.0.10</version>
           </dependency>
@@ -65,14 +65,5 @@ Groovy version and extensions
 </project>
 +------------------
 
-  <<NOTICE>>: In plugin version <<<3.3.0>>> only <<<Groovy 3>>> extensions can be used.
+  <<NOTICE>>: In plugin version <<<3.3.0>>> only <<<Groovy 4>>> extensions can be used.
 
-Groovy 4
-
-  Please be noted that in <<<Groovy 4>>> maven <<<groupId>>> was changed
-  from <<org.codehaus.groovy>> to <<org.apache.groovy>>.
-
-  Plugin has dependency on <<<Groovy 3>>> artifacts with old <<<groupId>>>,
-  what causes that <<<Groovy 4>>> can not by used in scripts.
-
-  Next version of <<<maven-invoker-plugin>>> can contains <<<Groovy 4>>> as default.

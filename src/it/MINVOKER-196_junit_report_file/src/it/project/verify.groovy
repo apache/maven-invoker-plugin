@@ -17,6 +17,8 @@
  * under the License.
  */
 
+import groovy.xml.XmlSlurper
+
 // ensure script context contains localRepositoryPath
 assert new File( basedir, "../../../target/it-repo" ).canonicalFile.equals( localRepositoryPath )
 

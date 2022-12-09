@@ -25,3 +25,8 @@ jobs:
   build:
     name: Verify
     uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v3
+    with:
+      maven-args: '-D"invoker.streamLogsOnFailures" -U'
+      # put this back when 3.4.0 with jdk19 support has been released
+      #jdk-matrix: '[ "8", "11", "17", "19"]'
+      # verify-fail-fast: false

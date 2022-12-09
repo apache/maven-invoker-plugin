@@ -17,11 +17,11 @@
  * under the License.
  */
 
-import org.apache.commons.io.FileUtils
+import java.io.File
 
 // Previous potential target 'content' has impact on IT execution
 // (Some new file should be created by verify.sh) 
-FileUtils.deleteQuietly( new File( basedir, "target/invoker-reports-test" ) );
-FileUtils.deleteQuietly( new File( basedir, "src/it/script-ret-quiet/target" ) );
-FileUtils.deleteQuietly( new File( basedir, "src/it/script-ret-true/target" ) );
+new File( basedir, "target/invoker-reports-test" ).deleteDir()
+new File( basedir, "src/it/script-ret-quiet/target" ).deleteDir()
+new File( basedir, "src/it/script-ret-true/target" ).deleteDir()
 return true;
