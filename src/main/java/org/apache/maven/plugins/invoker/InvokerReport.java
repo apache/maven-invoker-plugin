@@ -30,13 +30,11 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Reader;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.plexus.i18n.I18N;
@@ -59,30 +57,10 @@ public class InvokerReport
 {
 
     /**
-     * The Maven Project.
-     */
-    @Parameter( defaultValue = "${project}", readonly = true, required = true )
-    protected MavenProject project;
-
-    /**
-     * Doxia Site Renderer component.
-     */
-    @Component
-    protected Renderer siteRenderer;
-
-    /**
      * Internationalization component.
      */
     @Component
     protected I18N i18n;
-
-    /**
-     * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
-     * the command line. If the goal is run indirectly as part of a site generation, the output directory configured in
-     * the Maven Site Plugin is used instead.
-     */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}", required = true )
-    protected File outputDirectory;
 
     /**
      * Base directory where all build reports have been written to.
@@ -185,6 +163,7 @@ public class InvokerReport
 
         // detail tests table header
         sink.table();
+        sink.tableRows( null, false );
 
         sink.tableRow();
         // -------------------------------------------
@@ -202,6 +181,7 @@ public class InvokerReport
             renderBuildJob( buildJob );
         }
 
+        sink.tableRows_();
         sink.table_();
 
         sink.body_();
@@ -228,6 +208,8 @@ public class InvokerReport
         // ------------------------------------------------------------------------
 
         sink.table();
+        sink.tableRows( null, false );
+
         sink.tableRow();
 
         sinkTableHeader( sink, getText( locale, "report.invoker.summary.number" ) );
@@ -283,6 +265,8 @@ public class InvokerReport
         sinkCell( sink, secondsFormat.format( totalTime / number ) );
 
         sink.tableRow_();
+
+        sink.tableRows_();
         sink.table_();
 
     }
@@ -335,21 +319,6 @@ public class InvokerReport
     private String getFormattedName( String name, String description )
     {
         return nameAndDescriptionFormat.format( new Object[] { name, description } );
-    }
-
-    protected String getOutputDirectory()
-    {
-        return outputDirectory.getAbsolutePath();
-    }
-
-    protected MavenProject getProject()
-    {
-        return project;
-    }
-
-    protected Renderer getSiteRenderer()
-    {
-        return siteRenderer;
     }
 
     public String getDescription( Locale locale )
