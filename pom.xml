@@ -357,7 +357,19 @@ under the License.
     <profile>
       <id>run-its</id>
       <properties>
-        <sitePluginVersion>3.7.1</sitePluginVersion>
+        <!-- plugins versions used in IT tests -->
+        <antrunPluginVersion>3.1.0</antrunPluginVersion>
+        <cleanPluginVersion>3.2.0</cleanPluginVersion>
+        <compilerPluginVersion>3.10.1</compilerPluginVersion>
+        <enforcerPluginVersion>3.1.0</enforcerPluginVersion>
+        <helpPluginVersion>3.3.0</helpPluginVersion>
+        <installPluginVersion>3.1.0</installPluginVersion>
+        <jarPluginVersion>3.3.0</jarPluginVersion>
+        <pluginPluginVersion>3.7.0</pluginPluginVersion>
+        <resourcesPluginVersion>3.3.0</resourcesPluginVersion>
+        <sitePluginVersion>3.12.1</sitePluginVersion>
+        <sourcePluginVersion>3.2.1</sourcePluginVersion>
+        <surefirePluginVersion>3.0.0-M7</surefirePluginVersion>
       </properties>
       <build>
         <pluginManagement>

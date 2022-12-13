@@ -36,7 +36,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>@enforcerPluginVersion@</version>
         <executions>
           <execution>
             <id>verify-properties</id>

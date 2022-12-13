@@ -31,6 +31,11 @@ under the License.
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <compilerPluginVersion>@compilerPluginVersion@</compilerPluginVersion>
+    <installPluginVersion>@installPluginVersion@</installPluginVersion>
+    <jarPluginVersion>@jarPluginVersion@</jarPluginVersion>
+    <resourcesPluginVersion>@resourcesPluginVersion@</resourcesPluginVersion>
+    <surefirePluginVersion>@surefirePluginVersion@</surefirePluginVersion>
   </properties>
 
   <build>

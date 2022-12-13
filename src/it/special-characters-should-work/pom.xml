@@ -33,6 +33,7 @@ under the License.
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <enforcerPluginVersion>@enforcerPluginVersion@</enforcerPluginVersion>
   </properties>
 
   <build>

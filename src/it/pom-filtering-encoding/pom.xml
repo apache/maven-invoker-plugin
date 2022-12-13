@@ -29,6 +29,10 @@ under the License.
 
   <description>Test to check for proper handling of file encoding during POM filtering.</description>
 
+  <properties>
+    <resourcesPluginVersion>@resourcesPluginVersion@</resourcesPluginVersion>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
