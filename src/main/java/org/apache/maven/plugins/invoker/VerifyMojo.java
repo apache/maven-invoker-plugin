@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.maven.plugins.invoker;
 
 /*
@@ -19,19 +37,19 @@ package org.apache.maven.plugins.invoker;
  * under the License.
  */
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Reader;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Reader;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Checks the results of maven-invoker-plugin based integration tests and fails the build if any tests failed.
@@ -39,17 +57,15 @@ import java.io.Reader;
  * @author Olivier Lamy
  * @since 1.4
  */
-@Mojo( name = "verify", defaultPhase = LifecyclePhase.VERIFY, threadSafe = true )
-public class VerifyMojo
-    extends AbstractMojo
-{
+@Mojo(name = "verify", defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
+public class VerifyMojo extends AbstractMojo {
 
     /**
      * Flag used to suppress certain invocations. This is useful in tailoring the build using profiles.
      *
      * @since 1.1
      */
-    @Parameter( property = "invoker.skip", defaultValue = "false" )
+    @Parameter(property = "invoker.skip", defaultValue = "false")
     private boolean skipInvocation;
 
     /**
@@ -57,7 +73,7 @@ public class VerifyMojo
      *
      * @since 1.4
      */
-    @Parameter( property = "invoker.reportsDirectory", defaultValue = "${project.build.directory}/invoker-reports" )
+    @Parameter(property = "invoker.reportsDirectory", defaultValue = "${project.build.directory}/invoker-reports")
     private File reportsDirectory;
 
     /**
@@ -66,7 +82,7 @@ public class VerifyMojo
      *
      * @since 1.3
      */
-    @Parameter( property = "maven.test.failure.ignore", defaultValue = "false" )
+    @Parameter(property = "maven.test.failure.ignore", defaultValue = "false")
     private boolean ignoreFailures;
 
     /**
@@ -74,7 +90,7 @@ public class VerifyMojo
      * only indication of the build's success or failure will be the effect it has on the main build (if it fails, the
      * main build should fail as well).
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter(defaultValue = "false")
     private boolean suppressSummaries;
 
     /**
@@ -82,7 +98,7 @@ public class VerifyMojo
      *
      * @since 1.9
      */
-    @Parameter( property = "invoker.failIfNoProjects" )
+    @Parameter(property = "invoker.failIfNoProjects")
     private Boolean failIfNoProjects;
 
     /**
@@ -90,7 +106,7 @@ public class VerifyMojo
      *
      * @since 3.2.2
      */
-    @Parameter( property = "invoker.streamLogsOnFailures", defaultValue = "false" )
+    @Parameter(property = "invoker.streamLogsOnFailures", defaultValue = "false")
     private boolean streamLogsOnFailures;
 
     /**
@@ -99,24 +115,19 @@ public class VerifyMojo
      * @throws org.apache.maven.plugin.MojoExecutionException If the goal encountered severe errors.
      * @throws org.apache.maven.plugin.MojoFailureException If any of the Maven builds failed.
      */
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        if ( skipInvocation )
-        {
-            getLog().info( "Skipping invocation per configuration."
-                               + " If this is incorrect, ensure the skipInvocation parameter is not set to true." );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skipInvocation) {
+            getLog().info("Skipping invocation per configuration."
+                    + " If this is incorrect, ensure the skipInvocation parameter is not set to true.");
             return;
         }
 
-        File[] reportFiles = ReportUtils.getReportFiles( reportsDirectory );
-        if ( reportFiles.length <= 0 )
-        {
-            if ( Boolean.TRUE.equals( failIfNoProjects ) )
-            {
-                throw new MojoFailureException( "No projects to invoke!" );
+        File[] reportFiles = ReportUtils.getReportFiles(reportsDirectory);
+        if (reportFiles.length <= 0) {
+            if (Boolean.TRUE.equals(failIfNoProjects)) {
+                throw new MojoFailureException("No projects to invoke!");
             }
-            getLog().info( "No invoker report files found, nothing to check." );
+            getLog().info("No invoker report files found, nothing to check.");
             return;
         }
 
@@ -124,33 +135,24 @@ public class VerifyMojo
 
         InvokerSession invokerSession = new InvokerSession();
 
-        for ( File reportFile : reportFiles )
-        {
-            try ( Reader xmlReader = ReaderFactory.newXmlReader( reportFile ) )
-            {
-                invokerSession.addJob( reader.read( xmlReader ) );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new MojoExecutionException( "Failed to parse report file: " + reportFile, e );
-            }
-            catch ( IOException e )
-            {
-                throw new MojoExecutionException( "Failed to read report file: " + reportFile, e );
+        for (File reportFile : reportFiles) {
+            try (Reader xmlReader = ReaderFactory.newXmlReader(reportFile)) {
+                invokerSession.addJob(reader.read(xmlReader));
+            } catch (XmlPullParserException e) {
+                throw new MojoExecutionException("Failed to parse report file: " + reportFile, e);
+            } catch (IOException e) {
+                throw new MojoExecutionException("Failed to read report file: " + reportFile, e);
             }
         }
 
-        if ( streamLogsOnFailures )
-        {
-            invokerSession.logFailedBuildLog( getLog(), ignoreFailures );
+        if (streamLogsOnFailures) {
+            invokerSession.logFailedBuildLog(getLog(), ignoreFailures);
         }
 
-        if ( !suppressSummaries )
-        {
-            invokerSession.logSummary( getLog(), ignoreFailures );
+        if (!suppressSummaries) {
+            invokerSession.logSummary(getLog(), ignoreFailures);
         }
 
-        invokerSession.handleFailures( getLog(), ignoreFailures );
+        invokerSession.handleFailures(getLog(), ignoreFailures);
     }
-
 }
