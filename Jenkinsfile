@@ -17,5 +17,4 @@
  * under the License.
  */
 
-// put 19 back when 3.4.0 with jdk19 support has been released
-asfMavenTlpPlgnBuild(jdks:[ "8", "11", "17"])
+asfMavenTlpPlgnBuild(jdks:[ "8", "11", "17", "19"])

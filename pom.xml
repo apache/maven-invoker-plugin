@@ -403,6 +403,7 @@ under the License.
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-invoker-plugin</artifactId>
+              <version>3.4.0</version>
               <configuration>
                 <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                 <preBuildHookScript>setup</preBuildHookScript>
