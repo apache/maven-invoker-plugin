@@ -83,7 +83,7 @@ import org.codehaus.plexus.util.FileUtils;
 @Mojo(
         name = "install",
         defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST,
-        requiresDependencyResolution = ResolutionScope.RUNTIME,
+        requiresDependencyResolution = ResolutionScope.TEST,
         threadSafe = true)
 // CHECKSTYLE_ON: LineLength
 public class InstallMojo extends AbstractMojo {
