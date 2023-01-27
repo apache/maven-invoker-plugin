@@ -218,15 +218,12 @@ public class InstallMojo extends AbstractMojo {
      * originate from the current (reactor) build. Artifacts that have been grabbed from the user's local repository
      * should be installed to the test repository via {@link #copyArtifact(File, Artifact)}.
      *
-     * @param file The file associated with the artifact, must not be <code>null</code>. This is in most cases the value
-     *            of <code>artifact.getFile()</code> with the exception of the main artifact from a project with
-     *            packaging "pom". Projects with packaging "pom" have no main artifact file. They have however artifact
-     *            metadata (e.g. site descriptors) which needs to be installed.
      * @param artifact The artifact to install, must not be <code>null</code>.
      * @throws MojoExecutionException If the artifact could not be installed (e.g. has no associated file).
      */
-    private void installArtifact(File file, Artifact artifact) throws MojoExecutionException {
+    private void installArtifact(Artifact artifact) throws MojoExecutionException {
         try {
+            File file = artifact.getFile();
             if (file == null) {
                 throw new IllegalStateException("Artifact has no associated file: " + artifact.getId());
             }
@@ -235,7 +232,9 @@ public class InstallMojo extends AbstractMojo {
             }
 
             if (installedArtifacts.add(artifact.getId())) {
-                artifact.setFile(file);
+                if (!file.equals(artifact.getFile())) {
+                    artifact.setFile(file);
+                }
                 installer.install(projectBuildingRequest, localRepositoryPath, Collections.singletonList(artifact));
             } else {
                 getLog().debug("Not re-installing " + artifact + ", " + file);
@@ -247,7 +246,7 @@ public class InstallMojo extends AbstractMojo {
 
     /**
      * Installs the specified artifact to the local repository. This method serves basically the same purpose as
-     * {@link #installArtifact(File, Artifact)} but is meant for artifacts that have been resolved
+     * {@link #installArtifact(Artifact)} but is meant for artifacts that have been resolved
      * from the user's local repository (and not the current build outputs). The subtle difference here is that
      * artifacts from the repository have already undergone transformations and these manipulations should not be redone
      * by the artifact installer. For this reason, this method performs plain copy operations to install the artifacts.
@@ -304,13 +303,13 @@ public class InstallMojo extends AbstractMojo {
             // Install the main project artifact (if the project has one, e.g. has no "pom" packaging)
             Artifact mainArtifact = mvnProject.getArtifact();
             if (mainArtifact.getFile() != null) {
-                installArtifact(mainArtifact.getFile(), mainArtifact);
+                installArtifact(mainArtifact);
             }
 
             // Install any attached project artifacts
             Collection<Artifact> attachedArtifacts = mvnProject.getAttachedArtifacts();
             for (Artifact attachedArtifact : attachedArtifacts) {
-                installArtifact(attachedArtifact.getFile(), attachedArtifact);
+                installArtifact(attachedArtifact);
             }
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to install project artifacts: " + mvnProject, e);
@@ -354,7 +353,8 @@ public class InstallMojo extends AbstractMojo {
                 pomArtifact = artifactFactory.createProjectArtifact(
                         mvnProject.getGroupId(), mvnProject.getArtifactId(), mvnProject.getVersion());
             }
-            installArtifact(mvnProject.getFile(), pomArtifact);
+            pomArtifact.setFile(mvnProject.getFile());
+            installArtifact(pomArtifact);
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to install POM: " + mvnProject, e);
         }
