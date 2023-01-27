@@ -254,7 +254,9 @@ public class InstallMojo extends AbstractMojo {
             }
 
             if (installedArtifacts.add(artifact.getId())) {
-                artifact.setFile(file);
+                if (!file.equals(artifact.getFile())) {
+                    artifact.setFile(file);
+                }
                 installer.install(projectBuildingRequest, localRepositoryPath, Collections.singletonList(artifact));
             } else {
                 getLog().debug("Not re-installing " + artifact + ", " + file);
