@@ -18,7 +18,6 @@
  */
 package org.apache.maven.plugins.invoker;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
