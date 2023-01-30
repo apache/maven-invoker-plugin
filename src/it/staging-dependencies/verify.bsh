@@ -56,6 +56,8 @@ try
             "org/apache/maven/its/dep/2.0/dep-2.0.pom",
             "org/apache/maven/its/dep/2.0/dep-2.0.jar",
             "org/apache/maven/its/dep/maven-metadata-local.xml",
+            "test/staging-dependencies/1.0-SNAPSHOT/staging-dependencies-1.0-SNAPSHOT.jar",
+            "test/staging-dependencies/1.0-SNAPSHOT/staging-dependencies-1.0-SNAPSHOT.pom"
       };
     for ( String file : files )
     {
@@ -65,6 +67,12 @@ try
         {
             throw new IllegalStateException( "Missing: " + stagedFile );
         }
+    }
+
+    File stagedTestScope = new File(itRepoDir, "org/slf4j/slf4j-simple");
+    if ( stagedTestScope.exists() )
+    {
+        throw new IllegalStateException( "Test scope dependencies should not exists" );
     }
 
     Reader reader = ReaderFactory.newXmlReader( new File( itRepoDir, "org/apache/maven/its/dep/maven-metadata-local.xml" ) );
