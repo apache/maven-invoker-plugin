@@ -23,45 +23,22 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>test</groupId>
-  <artifactId>staging-dependencies</artifactId>
+  <artifactId>staging-dependencies-test-scope</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <description>
-    Test to check for staging of (runtime) dependencies directly from local repository (MINVOKER-64, MINVOKER-70).
+    Test to check for staging of test scope dependencies.
   </description>
 
   <dependencies>
-    <!-- released version -->
+    <!-- compile scope -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.36</version>
     </dependency>
-    <!-- snapshot version, must be staged using the base version and not the timestamped version -->
-    <dependency>
-      <groupId>org.apache.maven.its</groupId>
-      <artifactId>minvoker-70</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <!-- a dependency that does not contribute to the class path but must be staged, too -->
-    <dependency>
-      <groupId>org.apache.maven.its</groupId>
-      <artifactId>pom</artifactId>
-      <version>0.3-SNAPSHOT</version>
-      <type>pom</type>
-    </dependency>
-    <!-- two dependencies from the same g:a but with different versions -->
-    <dependency>
-      <groupId>org.apache.maven.its</groupId>
-      <artifactId>dep</artifactId>
-      <version>1.0</version>
-      <classifier>tests</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.its</groupId>
-      <artifactId>dep</artifactId>
-      <version>2.0</version>
-    </dependency>
+
+    <!-- test scope dependency -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -69,19 +46,6 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <repositories>
-    <repository>
-      <id>maven-invoker-plugin-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
 
   <build>
     <plugins>
@@ -91,6 +55,7 @@ under the License.
         <version>@pom.version@</version>
         <configuration>
           <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
+          <scope>test</scope>
         </configuration>
         <executions>
           <execution>

@@ -184,18 +184,6 @@ under the License.
     </dependency>
 
     <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-artifact-transfer</artifactId>
-      <version>0.13.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-common-artifact-filters</artifactId>
-      <version>3.2.0</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
       <groupId>${beanshell-groupId}</groupId>
       <artifactId>${beanshell-artifactId}</artifactId>
       <version>${beanshell-version}</version>
@@ -411,7 +399,6 @@ under the License.
                 <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
                 <settingsFile>src/it/settings.xml</settingsFile>
                 <mavenOpts>-Djava.io.tmpdir=${project.build.directory}</mavenOpts>
-                <streamLogsOnFailures>true</streamLogsOnFailures>
                 <properties>
                   <maven.compiler.source>${maven.compiler.source}</maven.compiler.source>
                   <maven.compiler.target>${maven.compiler.target}</maven.compiler.target>
