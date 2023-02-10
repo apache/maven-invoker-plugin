@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugins.invoker;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,11 +16,7 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+package org.apache.maven.plugins.invoker;
 
 import java.util.Collections;
 
@@ -30,25 +24,27 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.junit.Test;
 
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 /**
  * Unittest for {@link InvokerSession}
  */
-public class InvokerSessionTest
-{
+public class InvokerSessionTest {
 
     @Test
-    public void skipSummary()
-    {
-        Log logger = mock( Log.class );
-        BuildJob skippedBuildJob = new BuildJob( "minvoker-279" );
-        skippedBuildJob.setResult( BuildJob.Result.SKIPPED );
-        InvokerSession session = new InvokerSession( Collections.singletonList( skippedBuildJob ) );
+    public void skipSummary() {
+        Log logger = mock(Log.class);
+        BuildJob skippedBuildJob = new BuildJob("minvoker-279");
+        skippedBuildJob.setResult(BuildJob.Result.SKIPPED);
+        InvokerSession session = new InvokerSession(Collections.singletonList(skippedBuildJob));
 
-        session.logSummary( logger, false );
+        session.logSummary(logger, false);
 
-        verify( logger ).warn( "The following builds were skipped:" );
-        verify( logger ).warn( "*  minvoker-279" );
-        verify( logger, never() ).error( anyString() );
+        verify(logger).warn("The following builds were skipped:");
+        verify(logger).warn("*  minvoker-279");
+        verify(logger, never()).error(anyString());
     }
-
 }

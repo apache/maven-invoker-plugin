@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.Reader;
@@ -35,74 +34,66 @@ import org.codehaus.plexus.util.ReaderFactory;
  * @author Olivier Lamy
  * @since 22 nov. 07
  */
-public class InterpolationTest
-    extends AbstractMojoTestCase
-{
+public class InterpolationTest extends AbstractMojoTestCase {
 
-    protected MavenProjectStub buildMavenProjectStub()
-    {
+    protected MavenProjectStub buildMavenProjectStub() {
         ExtendedMavenProjectStub project = new ExtendedMavenProjectStub();
-        project.setVersion( "1.0-SNAPSHOT" );
-        project.setArtifactId( "foo" );
-        project.setGroupId( "bar" );
+        project.setVersion("1.0-SNAPSHOT");
+        project.setArtifactId("foo");
+        project.setGroupId("bar");
         Properties properties = new Properties();
-        properties.put( "fooOnProject", "barOnProject" );
-        project.setProperties( properties );
+        properties.put("fooOnProject", "barOnProject");
+        project.setProperties(properties);
         Scm scm = new Scm();
-        scm.setConnection( "http://blabla" );
-        project.setScm( scm );
+        scm.setConnection("http://blabla");
+        project.setScm(scm);
         return project;
     }
 
-    public void testCompositeMap()
-    {
+    public void testCompositeMap() {
 
         Properties properties = new Properties();
-        properties.put( "foo", "bar" );
-        properties.put( "version", "2.0-SNAPSHOT" );
-        CompositeMap compositeMap = new CompositeMap( buildMavenProjectStub(), (Map) properties, false );
-        assertEquals( "1.0-SNAPSHOT", compositeMap.get( "pom.version" ) );
-        assertEquals( "bar", compositeMap.get( "foo" ) );
-        assertEquals( "bar", compositeMap.get( "pom.groupId" ) );
-        assertEquals( "http://blabla", compositeMap.get( "pom.scm.connection" ) );
-        assertEquals( "barOnProject", compositeMap.get( "fooOnProject" ) );
+        properties.put("foo", "bar");
+        properties.put("version", "2.0-SNAPSHOT");
+        CompositeMap compositeMap = new CompositeMap(buildMavenProjectStub(), (Map) properties, false);
+        assertEquals("1.0-SNAPSHOT", compositeMap.get("pom.version"));
+        assertEquals("bar", compositeMap.get("foo"));
+        assertEquals("bar", compositeMap.get("pom.groupId"));
+        assertEquals("http://blabla", compositeMap.get("pom.scm.connection"));
+        assertEquals("barOnProject", compositeMap.get("fooOnProject"));
     }
 
-    public void testPomInterpolation()
-        throws Exception
-    {
+    public void testPomInterpolation() throws Exception {
         Reader reader = null;
         File interpolatedPomFile;
-        try
-        {
+        try {
             InvokerMojo invokerMojo = new InvokerMojo();
-            setVariableValueToObject( invokerMojo, "project", buildMavenProjectStub() );
-            setVariableValueToObject( invokerMojo, "settings", new Settings() );
+            setVariableValueToObject(invokerMojo, "project", buildMavenProjectStub());
+            setVariableValueToObject(invokerMojo, "settings", new Settings());
             Properties properties = new Properties();
-            properties.put( "foo", "bar" );
-            properties.put( "version", "2.0-SNAPSHOT" );
-            setVariableValueToObject( invokerMojo, "filterProperties", properties );
-            String dirPath = getBasedir() + File.separatorChar + "src" + File.separatorChar + "test"
-                + File.separatorChar + "resources" + File.separatorChar + "unit" + File.separatorChar + "interpolation";
+            properties.put("foo", "bar");
+            properties.put("version", "2.0-SNAPSHOT");
+            setVariableValueToObject(invokerMojo, "filterProperties", properties);
+            String dirPath =
+                    getBasedir() + File.separatorChar + "src" + File.separatorChar + "test" + File.separatorChar
+                            + "resources" + File.separatorChar + "unit" + File.separatorChar + "interpolation";
 
-            interpolatedPomFile = new File( getBasedir(), "target/interpolated-pom.xml" );
-            invokerMojo.buildInterpolatedFile( new File( dirPath, "pom.xml" ), interpolatedPomFile );
-            reader = ReaderFactory.newXmlReader( interpolatedPomFile );
-            String content = IOUtil.toString( reader );
-            assertTrue( content.indexOf( "<interpolateValue>bar</interpolateValue>" ) > 0 );
+            interpolatedPomFile = new File(getBasedir(), "target/interpolated-pom.xml");
+            invokerMojo.buildInterpolatedFile(new File(dirPath, "pom.xml"), interpolatedPomFile);
+            reader = ReaderFactory.newXmlReader(interpolatedPomFile);
+            String content = IOUtil.toString(reader);
+            assertTrue(content.indexOf("<interpolateValue>bar</interpolateValue>") > 0);
             reader.close();
             reader = null;
             // recreate it to test delete if exists before creation
-            invokerMojo.buildInterpolatedFile( new File( dirPath, "pom.xml" ), interpolatedPomFile );
-            reader = ReaderFactory.newXmlReader( interpolatedPomFile );
-            content = IOUtil.toString( reader );
-            assertTrue( content.indexOf( "<interpolateValue>bar</interpolateValue>" ) > 0 );
+            invokerMojo.buildInterpolatedFile(new File(dirPath, "pom.xml"), interpolatedPomFile);
+            reader = ReaderFactory.newXmlReader(interpolatedPomFile);
+            content = IOUtil.toString(reader);
+            assertTrue(content.indexOf("<interpolateValue>bar</interpolateValue>") > 0);
             reader.close();
             reader = null;
-        }
-        finally
-        {
-            IOUtil.close( reader );
+        } finally {
+            IOUtil.close(reader);
         }
     }
 }

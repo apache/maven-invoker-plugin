@@ -41,7 +41,7 @@ under the License.
         <!-- This triggers the download of a known version of this plugin which can then be safely invoked by the IT project -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.2</version>
+        <version>@resourcesPluginVersion@</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -51,6 +51,8 @@ under the License.
           <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
           <settingsFile>src/it/settings.xml</settingsFile>
           <goals>
+            <!-- Maven 4 require strict checksum by default, so relax here -->
+            <goal>-c</goal>
             <goal>validate</goal>
           </goals>
         </configuration>

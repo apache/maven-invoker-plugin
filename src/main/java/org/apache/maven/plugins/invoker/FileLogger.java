@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugins.invoker;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,10 +27,7 @@ import org.apache.maven.shared.invoker.InvocationOutputHandler;
 /**
  *
  */
-class FileLogger
-    extends org.apache.maven.shared.scriptinterpreter.FileLogger
-    implements InvocationOutputHandler
-{
+class FileLogger extends org.apache.maven.shared.scriptinterpreter.FileLogger implements InvocationOutputHandler {
 
     /**
      * Creates a new logger that writes to the specified file.
@@ -39,10 +35,8 @@ class FileLogger
      * @param outputFile The path to the output file, must not be <code>null</code>.
      * @throws IOException If the output file could not be created.
      */
-    FileLogger( File outputFile )
-        throws IOException
-    {
-        super( outputFile );
+    FileLogger(File outputFile) throws IOException {
+        super(outputFile);
     }
 
     /**
@@ -52,10 +46,7 @@ class FileLogger
      * @param log The mojo logger to additionally output messages to, may be <code>null</code> if not used.
      * @throws IOException If the output file could not be created.
      */
-    FileLogger( File outputFile, final Log log )
-        throws IOException
-    {
-        super( outputFile, log::info );
+    FileLogger(File outputFile, final Log log) throws IOException {
+        super(outputFile, log::info);
     }
-
 }

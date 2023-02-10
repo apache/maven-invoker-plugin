@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +33,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author Benjamin Bentmann
  */
-class PomUtils
-{
+class PomUtils {
 
     /**
      * Loads the (raw) model from the specified POM file.
@@ -44,21 +42,13 @@ class PomUtils
      * @return The raw model, never <code>null</code>.
      * @throws MojoExecutionException If the POM file could not be loaded.
      */
-    public static Model loadPom( File pomFile )
-        throws MojoExecutionException
-    {
-        try ( Reader reader = ReaderFactory.newXmlReader( pomFile ) )
-        {
-            return new MavenXpp3Reader().read( reader, false );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new MojoExecutionException( "Failed to parse POM: " + pomFile, e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to read POM: " + pomFile, e );
+    public static Model loadPom(File pomFile) throws MojoExecutionException {
+        try (Reader reader = ReaderFactory.newXmlReader(pomFile)) {
+            return new MavenXpp3Reader().read(reader, false);
+        } catch (XmlPullParserException e) {
+            throw new MojoExecutionException("Failed to parse POM: " + pomFile, e);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to read POM: " + pomFile, e);
         }
     }
-
 }

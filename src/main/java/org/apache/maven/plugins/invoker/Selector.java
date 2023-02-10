@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 
@@ -26,8 +25,7 @@ import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateMana
  * @author Robert Scholte
  *
  */
-class Selector
-{
+class Selector {
     static final int SELECTOR_MAVENVERSION = 1;
 
     static final int SELECTOR_JREVERSION = 2;
@@ -44,52 +42,40 @@ class Selector
 
     private final ToolchainPrivateManager toolchainPrivateManager;
 
-    Selector( String actualMavenVersion, String actualJavaVersion, ToolchainPrivateManager toolchainPrivateManager )
-    {
+    Selector(String actualMavenVersion, String actualJavaVersion, ToolchainPrivateManager toolchainPrivateManager) {
         this.actualMavenVersion = actualMavenVersion;
         this.actualJavaVersion = actualJavaVersion;
         this.toolchainPrivateManager = toolchainPrivateManager;
     }
 
-    public int getSelection( InvokerProperties invokerProperties )
-    {
-        if ( !invokerProperties.isSelectorDefined( 1 ) )
-        {
-            return getGlobal( invokerProperties );
+    public int getSelection(InvokerProperties invokerProperties) {
+        if (!invokerProperties.isSelectorDefined(1)) {
+            return getGlobal(invokerProperties);
         }
 
-        for ( int selectorIndex = 1;; selectorIndex++ )
-        {
-            if ( selectorIndex > 1 && !invokerProperties.isSelectorDefined( selectorIndex ) )
-            {
+        for (int selectorIndex = 1; ; selectorIndex++) {
+            if (selectorIndex > 1 && !invokerProperties.isSelectorDefined(selectorIndex)) {
                 break;
             }
 
             int selection = 0;
-            if ( !SelectorUtils.isMavenVersion( invokerProperties.getMavenVersion( selectorIndex ),
-                                                actualMavenVersion ) )
-            {
+            if (!SelectorUtils.isMavenVersion(invokerProperties.getMavenVersion(selectorIndex), actualMavenVersion)) {
                 selection |= SELECTOR_MAVENVERSION;
             }
 
-            if ( !SelectorUtils.isJreVersion( invokerProperties.getJreVersion( selectorIndex ), actualJavaVersion ) )
-            {
+            if (!SelectorUtils.isJreVersion(invokerProperties.getJreVersion(selectorIndex), actualJavaVersion)) {
                 selection |= SELECTOR_JREVERSION;
             }
 
-            if ( !SelectorUtils.isOsFamily( invokerProperties.getOsFamily( selectorIndex ) ) )
-            {
+            if (!SelectorUtils.isOsFamily(invokerProperties.getOsFamily(selectorIndex))) {
                 selection |= SELECTOR_OSFAMILY;
             }
 
-            if ( !SelectorUtils.isToolchain( toolchainPrivateManager,
-                                             invokerProperties.getToolchains( selectorIndex ) ) )
-            {
+            if (!SelectorUtils.isToolchain(toolchainPrivateManager, invokerProperties.getToolchains(selectorIndex))) {
                 selection |= SELECTOR_TOOLCHAIN;
             }
 
-            if ( selection == 0 )
-            {
+            if (selection == 0) {
                 return 0;
             }
         }
@@ -103,26 +89,21 @@ class Selector
      * @return <code>0</code> if the job corresponding to the properties should be run, otherwise a bitwise value
      *         representing the reason why it should be skipped.
      */
-    private int getGlobal( InvokerProperties invokerProperties )
-    {
+    private int getGlobal(InvokerProperties invokerProperties) {
         int selection = 0;
-        if ( !SelectorUtils.isMavenVersion( invokerProperties.getMavenVersion(), actualMavenVersion ) )
-        {
+        if (!SelectorUtils.isMavenVersion(invokerProperties.getMavenVersion(), actualMavenVersion)) {
             selection |= SELECTOR_MAVENVERSION;
         }
 
-        if ( !SelectorUtils.isJreVersion( invokerProperties.getJreVersion(), actualJavaVersion ) )
-        {
+        if (!SelectorUtils.isJreVersion(invokerProperties.getJreVersion(), actualJavaVersion)) {
             selection |= SELECTOR_JREVERSION;
         }
 
-        if ( !SelectorUtils.isOsFamily( invokerProperties.getOsFamily() ) )
-        {
+        if (!SelectorUtils.isOsFamily(invokerProperties.getOsFamily())) {
             selection |= SELECTOR_OSFAMILY;
         }
 
-        if ( !SelectorUtils.isToolchain( toolchainPrivateManager, invokerProperties.getToolchains() ) )
-        {
+        if (!SelectorUtils.isToolchain(toolchainPrivateManager, invokerProperties.getToolchains())) {
             selection |= SELECTOR_TOOLCHAIN;
         }
 

@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,64 +16,61 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
-import static org.junit.Assert.assertEquals;
 import java.util.Properties;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Test for {@link Selector}.
  */
-public class SelectorTest
-{
+public class SelectorTest {
     @Test
-    public void testGlobalMatch()
-    {
-        Selector selector = new Selector( "3.2.5", "1.7", null );
+    public void testGlobalMatch() {
+        Selector selector = new Selector("3.2.5", "1.7", null);
 
         Properties props = new Properties();
-        props.setProperty( "invoker.maven.version", "3.0+" );
-        InvokerProperties invokerProperties = new InvokerProperties( props );
-        assertEquals( 0, selector.getSelection( invokerProperties ) );
+        props.setProperty("invoker.maven.version", "3.0+");
+        InvokerProperties invokerProperties = new InvokerProperties(props);
+        assertEquals(0, selector.getSelection(invokerProperties));
     }
 
     @Test
-    public void testSelectorMatch()
-    {
-        Selector selector = new Selector( "3.2.5", "1.7", null );
+    public void testSelectorMatch() {
+        Selector selector = new Selector("3.2.5", "1.7", null);
 
         Properties props = new Properties();
-        props.setProperty( "selector.1.maven.version", "3.0+" );
-        InvokerProperties invokerProperties = new InvokerProperties( props );
-        assertEquals( 0, selector.getSelection( invokerProperties ) );
+        props.setProperty("selector.1.maven.version", "3.0+");
+        InvokerProperties invokerProperties = new InvokerProperties(props);
+        assertEquals(0, selector.getSelection(invokerProperties));
 
-        props.setProperty( "selector.1.maven.version", "3.3.1+" );
-        assertEquals( Selector.SELECTOR_MULTI, selector.getSelection( invokerProperties ) );
+        props.setProperty("selector.1.maven.version", "3.3.1+");
+        assertEquals(Selector.SELECTOR_MULTI, selector.getSelection(invokerProperties));
     }
 
     @Test
-    public void testSelectorWithGlobalMatch()
-    {
-        Selector selector = new Selector( "3.2.5", "1.7", null );
+    public void testSelectorWithGlobalMatch() {
+        Selector selector = new Selector("3.2.5", "1.7", null);
 
         Properties props = new Properties();
         // invoker.maven.version is used by all selectors
-        props.setProperty( "invoker.maven.version", "3.0+" );
-        props.setProperty( "selector.1.java.version", "1.4+" );
-        props.setProperty( "selector.2.os.family", "myos" );
-        InvokerProperties invokerProperties = new InvokerProperties( props );
-        assertEquals( 0, selector.getSelection( invokerProperties ) );
+        props.setProperty("invoker.maven.version", "3.0+");
+        props.setProperty("selector.1.java.version", "1.4+");
+        props.setProperty("selector.2.os.family", "myos");
+        InvokerProperties invokerProperties = new InvokerProperties(props);
+        assertEquals(0, selector.getSelection(invokerProperties));
 
-        props.setProperty( "invoker.maven.version", "3.3.1+" );
-        assertEquals( Selector.SELECTOR_MULTI, selector.getSelection( invokerProperties ) );
+        props.setProperty("invoker.maven.version", "3.3.1+");
+        assertEquals(Selector.SELECTOR_MULTI, selector.getSelection(invokerProperties));
 
-        props.setProperty( "invoker.maven.version", "3.0+" );
-        props.setProperty( "selector.1.maven.version", "3.3.1+" );
-        assertEquals( Selector.SELECTOR_MULTI, selector.getSelection( invokerProperties ) );
+        props.setProperty("invoker.maven.version", "3.0+");
+        props.setProperty("selector.1.maven.version", "3.3.1+");
+        assertEquals(Selector.SELECTOR_MULTI, selector.getSelection(invokerProperties));
 
-        props.setProperty( "selector.2.os.family", "!myos" );
-        assertEquals( 0, selector.getSelection( invokerProperties ) );
+        props.setProperty("selector.2.os.family", "!myos");
+        assertEquals(0, selector.getSelection(invokerProperties));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugins.invoker;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -32,16 +31,15 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * @author Stephen Connolly
  */
 // CHECKSTYLE_OFF: LineLength
-@Mojo( name = "integration-test", defaultPhase = LifecyclePhase.INTEGRATION_TEST, requiresDependencyResolution = ResolutionScope.TEST, threadSafe = true )
-public class IntegrationTestMojo
-    extends AbstractInvokerMojo
-{
+@Mojo(
+        name = "integration-test",
+        defaultPhase = LifecyclePhase.INTEGRATION_TEST,
+        requiresDependencyResolution = ResolutionScope.TEST,
+        threadSafe = true)
+public class IntegrationTestMojo extends AbstractInvokerMojo {
 
-    void processResults( InvokerSession invokerSession )
-        throws MojoFailureException
-    {
+    void processResults(InvokerSession invokerSession) throws MojoFailureException {
         // do nothing
     }
-
 }
 // CHECKSTYLE_ON: LineLength

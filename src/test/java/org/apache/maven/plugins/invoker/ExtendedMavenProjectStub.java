@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,40 +16,35 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
+
+import java.util.Properties;
 
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
-
-import java.util.Properties;
 
 /**
  * @author Olivier Lamy
  * @since 22 nov. 07
  */
-public class ExtendedMavenProjectStub
-    extends MavenProjectStub
-{
+public class ExtendedMavenProjectStub extends MavenProjectStub {
     private Scm scm;
 
     private Properties properties;
 
-    public Scm getScm()
-    {
+    public Scm getScm() {
         return scm;
     }
 
-    public void setScm( Scm scm )
-    {
+    public void setScm(Scm scm) {
         this.scm = scm;
     }
 
-    public Properties getProperties()
-    {
+    public Properties getProperties() {
         return properties;
     }
 
-    public void setProperties( Properties properties )
-    {
+    public void setProperties(Properties properties) {
         this.properties = properties;
     }
 }

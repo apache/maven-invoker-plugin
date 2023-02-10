@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugins.invoker;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,13 +29,11 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.doxia.siterenderer.Renderer;
-import org.apache.maven.plugins.invoker.model.BuildJob;
-import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Reader;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugins.invoker.model.BuildJob;
+import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Reader;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.plexus.i18n.I18N;
@@ -53,22 +50,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Olivier Lamy
  * @since 1.4
  */
-@Mojo( name = "report", threadSafe = true )
-public class InvokerReport
-    extends AbstractMavenReport
-{
-
-    /**
-     * The Maven Project.
-     */
-    @Parameter( defaultValue = "${project}", readonly = true, required = true )
-    protected MavenProject project;
-
-    /**
-     * Doxia Site Renderer component.
-     */
-    @Component
-    protected Renderer siteRenderer;
+@Mojo(name = "report", threadSafe = true)
+public class InvokerReport extends AbstractMavenReport {
 
     /**
      * Internationalization component.
@@ -77,17 +60,9 @@ public class InvokerReport
     protected I18N i18n;
 
     /**
-     * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
-     * the command line. If the goal is run indirectly as part of a site generation, the output directory configured in
-     * the Maven Site Plugin is used instead.
-     */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}", required = true )
-    protected File outputDirectory;
-
-    /**
      * Base directory where all build reports have been written to.
      */
-    @Parameter( defaultValue = "${project.build.directory}/invoker-reports", property = "invoker.reportsDirectory" )
+    @Parameter(defaultValue = "${project.build.directory}/invoker-reports", property = "invoker.reportsDirectory")
     private File reportsDirectory;
 
     /**
@@ -105,21 +80,18 @@ public class InvokerReport
      */
     private MessageFormat nameAndDescriptionFormat;
 
-    protected void executeReport( Locale locale )
-        throws MavenReportException
-    {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols( locale );
-        percentFormat = new DecimalFormat( getText( locale, "report.invoker.format.percent" ), symbols );
-        secondsFormat = new DecimalFormat( getText( locale, "report.invoker.format.seconds" ), symbols );
-        nameAndDescriptionFormat =
-                new MessageFormat( getText( locale, "report.invoker.format.name_with_description" ) );
+    protected void executeReport(Locale locale) throws MavenReportException {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+        percentFormat = new DecimalFormat(getText(locale, "report.invoker.format.percent"), symbols);
+        secondsFormat = new DecimalFormat(getText(locale, "report.invoker.format.seconds"), symbols);
+        nameAndDescriptionFormat = new MessageFormat(getText(locale, "report.invoker.format.name_with_description"));
 
         Sink sink = getSink();
 
         sink.head();
 
         sink.title();
-        sink.text( getText( locale, "report.invoker.result.title" ) );
+        sink.text(getText(locale, "report.invoker.result.title"));
         sink.title_();
 
         sink.head_();
@@ -128,39 +100,32 @@ public class InvokerReport
 
         sink.section1();
         sink.sectionTitle1();
-        sink.text( getText( locale, "report.invoker.result.title" ) );
+        sink.text(getText(locale, "report.invoker.result.title"));
         sink.sectionTitle1_();
         sink.paragraph();
-        sink.text( getText( locale, "report.invoker.result.description" ) );
+        sink.text(getText(locale, "report.invoker.result.description"));
         sink.paragraph_();
         sink.section1_();
 
         // ----------------------------------
         // build buildJob beans
         // ----------------------------------
-        File[] reportFiles = ReportUtils.getReportFiles( reportsDirectory );
-        if ( reportFiles.length <= 0 )
-        {
-            getLog().info( "no invoker report files found, skip report generation" );
+        File[] reportFiles = ReportUtils.getReportFiles(reportsDirectory);
+        if (reportFiles.length <= 0) {
+            getLog().info("no invoker report files found, skip report generation");
             return;
         }
 
         BuildJobXpp3Reader buildJobReader = new BuildJobXpp3Reader();
 
-        List<BuildJob> buildJobs = new ArrayList<>( reportFiles.length );
-        for ( File reportFile : reportFiles )
-        {
-            try ( XmlStreamReader xmlReader = ReaderFactory.newXmlReader( reportFile ) )
-            {
-                buildJobs.add( buildJobReader.read( xmlReader ) );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new MavenReportException( "Failed to parse report file: " + reportFile, e );
-            }
-            catch ( IOException e )
-            {
-                throw new MavenReportException( "Failed to read report file: " + reportFile, e );
+        List<BuildJob> buildJobs = new ArrayList<>(reportFiles.length);
+        for (File reportFile : reportFiles) {
+            try (XmlStreamReader xmlReader = ReaderFactory.newXmlReader(reportFile)) {
+                buildJobs.add(buildJobReader.read(xmlReader));
+            } catch (XmlPullParserException e) {
+                throw new MavenReportException("Failed to parse report file: " + reportFile, e);
+            } catch (IOException e) {
+                throw new MavenReportException("Failed to read report file: " + reportFile, e);
             }
         }
 
@@ -168,7 +133,7 @@ public class InvokerReport
         // summary
         // ----------------------------------
 
-        constructSummarySection( buildJobs, locale );
+        constructSummarySection(buildJobs, locale);
 
         // ----------------------------------
         // per file/it detail
@@ -177,7 +142,7 @@ public class InvokerReport
         sink.section2();
         sink.sectionTitle2();
 
-        sink.text( getText( locale, "report.invoker.detail.title" ) );
+        sink.text(getText(locale, "report.invoker.detail.title"));
 
         sink.sectionTitle2_();
 
@@ -185,23 +150,24 @@ public class InvokerReport
 
         // detail tests table header
         sink.table();
+        sink.tableRows(null, false);
 
         sink.tableRow();
         // -------------------------------------------
         // name | Result | time | message
         // -------------------------------------------
-        sinkTableHeader( sink, getText( locale, "report.invoker.detail.name" ) );
-        sinkTableHeader( sink, getText( locale, "report.invoker.detail.result" ) );
-        sinkTableHeader( sink, getText( locale, "report.invoker.detail.time" ) );
-        sinkTableHeader( sink, getText( locale, "report.invoker.detail.message" ) );
+        sinkTableHeader(sink, getText(locale, "report.invoker.detail.name"));
+        sinkTableHeader(sink, getText(locale, "report.invoker.detail.result"));
+        sinkTableHeader(sink, getText(locale, "report.invoker.detail.time"));
+        sinkTableHeader(sink, getText(locale, "report.invoker.detail.message"));
 
         sink.tableRow_();
 
-        for ( BuildJob buildJob : buildJobs )
-        {
-            renderBuildJob( buildJob );
+        for (BuildJob buildJob : buildJobs) {
+            renderBuildJob(buildJob);
         }
 
+        sink.tableRows_();
         sink.table_();
 
         sink.body_();
@@ -210,14 +176,13 @@ public class InvokerReport
         sink.close();
     }
 
-    private void constructSummarySection( List<? extends BuildJob> buildJobs, Locale locale )
-    {
+    private void constructSummarySection(List<? extends BuildJob> buildJobs, Locale locale) {
         Sink sink = getSink();
 
         sink.section2();
         sink.sectionTitle2();
 
-        sink.text( getText( locale, "report.invoker.summary.title" ) );
+        sink.text(getText(locale, "report.invoker.summary.title"));
 
         sink.sectionTitle2_();
         sink.section2_();
@@ -228,15 +193,17 @@ public class InvokerReport
         // ------------------------------------------------------------------------
 
         sink.table();
+        sink.tableRows(null, false);
+
         sink.tableRow();
 
-        sinkTableHeader( sink, getText( locale, "report.invoker.summary.number" ) );
-        sinkTableHeader( sink, getText( locale, "report.invoker.summary.success" ) );
-        sinkTableHeader( sink, getText( locale, "report.invoker.summary.failed" ) );
-        sinkTableHeader( sink, getText( locale, "report.invoker.summary.skipped" ) );
-        sinkTableHeader( sink, getText( locale, "report.invoker.summary.success.rate" ) );
-        sinkTableHeader( sink, getText( locale, "report.invoker.summary.time.total" ) );
-        sinkTableHeader( sink, getText( locale, "report.invoker.summary.time.avg" ) );
+        sinkTableHeader(sink, getText(locale, "report.invoker.summary.number"));
+        sinkTableHeader(sink, getText(locale, "report.invoker.summary.success"));
+        sinkTableHeader(sink, getText(locale, "report.invoker.summary.failed"));
+        sinkTableHeader(sink, getText(locale, "report.invoker.summary.skipped"));
+        sinkTableHeader(sink, getText(locale, "report.invoker.summary.success.rate"));
+        sinkTableHeader(sink, getText(locale, "report.invoker.summary.time.total"));
+        sinkTableHeader(sink, getText(locale, "report.invoker.summary.time.avg"));
 
         int number = buildJobs.size();
         int success = 0;
@@ -244,18 +211,12 @@ public class InvokerReport
         int skipped = 0;
         double totalTime = 0;
 
-        for ( BuildJob buildJob : buildJobs )
-        {
-            if ( BuildJob.Result.SUCCESS.equals( buildJob.getResult() ) )
-            {
+        for (BuildJob buildJob : buildJobs) {
+            if (BuildJob.Result.SUCCESS.equals(buildJob.getResult())) {
                 success++;
-            }
-            else if ( BuildJob.Result.SKIPPED.equals( buildJob.getResult() ) )
-            {
+            } else if (BuildJob.Result.SKIPPED.equals(buildJob.getResult())) {
                 skipped++;
-            }
-            else
-            {
+            } else {
                 failed++;
             }
             totalTime += buildJob.getTime();
@@ -264,131 +225,96 @@ public class InvokerReport
         sink.tableRow_();
         sink.tableRow();
 
-        sinkCell( sink, Integer.toString( number ) );
-        sinkCell( sink, Integer.toString( success ) );
-        sinkCell( sink, Integer.toString( failed ) );
-        sinkCell( sink, Integer.toString( skipped ) );
+        sinkCell(sink, Integer.toString(number));
+        sinkCell(sink, Integer.toString(success));
+        sinkCell(sink, Integer.toString(failed));
+        sinkCell(sink, Integer.toString(skipped));
 
-        if ( success + failed > 0 )
-        {
-            sinkCell( sink, percentFormat.format( (double) success / ( success + failed ) ) );
-        }
-        else
-        {
-            sinkCell( sink, "" );
+        if (success + failed > 0) {
+            sinkCell(sink, percentFormat.format((double) success / (success + failed)));
+        } else {
+            sinkCell(sink, "");
         }
 
-        sinkCell( sink, secondsFormat.format( totalTime ) );
+        sinkCell(sink, secondsFormat.format(totalTime));
 
-        sinkCell( sink, secondsFormat.format( totalTime / number ) );
+        sinkCell(sink, secondsFormat.format(totalTime / number));
 
         sink.tableRow_();
-        sink.table_();
 
+        sink.tableRows_();
+        sink.table_();
     }
 
-    private void renderBuildJob( BuildJob buildJob )
-    {
+    private void renderBuildJob(BuildJob buildJob) {
         Sink sink = getSink();
         sink.tableRow();
-        sinkCell( sink, getBuildJobReportName( buildJob ) );
+        sinkCell(sink, getBuildJobReportName(buildJob));
         // FIXME image
-        sinkCell( sink, buildJob.getResult() );
-        sinkCell( sink, secondsFormat.format( buildJob.getTime() ) );
-        sinkCell( sink, buildJob.getFailureMessage() );
+        sinkCell(sink, buildJob.getResult());
+        sinkCell(sink, secondsFormat.format(buildJob.getTime()));
+        sinkCell(sink, buildJob.getFailureMessage());
         sink.tableRow_();
     }
 
-    private String getBuildJobReportName( BuildJob buildJob )
-    {
+    private String getBuildJobReportName(BuildJob buildJob) {
         String buildJobName = buildJob.getName();
         String buildJobDescription = buildJob.getDescription();
-        boolean emptyJobName = StringUtils.isEmpty( buildJobName );
-        boolean emptyJobDescription = StringUtils.isEmpty( buildJobDescription );
+        boolean emptyJobName = StringUtils.isEmpty(buildJobName);
+        boolean emptyJobDescription = StringUtils.isEmpty(buildJobDescription);
         boolean isReportJobNameComplete = !emptyJobName && !emptyJobDescription;
-        if ( isReportJobNameComplete )
-        {
-            return getFormattedName( buildJobName, buildJobDescription );
-        }
-        else
-        {
+        if (isReportJobNameComplete) {
+            return getFormattedName(buildJobName, buildJobDescription);
+        } else {
             String buildJobProject = buildJob.getProject();
-            if ( !emptyJobName )
-            {
-                getLog().warn( incompleteNameWarning( "description", buildJobProject ) );
-            }
-            else if ( !emptyJobDescription )
-            {
-                getLog().warn( incompleteNameWarning( "name", buildJobProject ) );
+            if (!emptyJobName) {
+                getLog().warn(incompleteNameWarning("description", buildJobProject));
+            } else if (!emptyJobDescription) {
+                getLog().warn(incompleteNameWarning("name", buildJobProject));
             }
             return buildJobProject;
         }
     }
 
-    private static String incompleteNameWarning( String missing, String pom )
-    {
-        return String.format( "Incomplete job name-description: %s is missing. "
-                            + "POM (%s) will be used in place of job name.",
-                              missing, pom );
+    private static String incompleteNameWarning(String missing, String pom) {
+        return String.format(
+                "Incomplete job name-description: %s is missing. " + "POM (%s) will be used in place of job name.",
+                missing, pom);
     }
 
-    private String getFormattedName( String name, String description )
-    {
-        return nameAndDescriptionFormat.format( new Object[] { name, description } );
+    private String getFormattedName(String name, String description) {
+        return nameAndDescriptionFormat.format(new Object[] {name, description});
     }
 
-    protected String getOutputDirectory()
-    {
-        return outputDirectory.getAbsolutePath();
+    public String getDescription(Locale locale) {
+        return getText(locale, "report.invoker.result.description");
     }
 
-    protected MavenProject getProject()
-    {
-        return project;
+    public String getName(Locale locale) {
+        return getText(locale, "report.invoker.result.name");
     }
 
-    protected Renderer getSiteRenderer()
-    {
-        return siteRenderer;
-    }
-
-    public String getDescription( Locale locale )
-    {
-        return getText( locale, "report.invoker.result.description" );
-    }
-
-    public String getName( Locale locale )
-    {
-        return getText( locale, "report.invoker.result.name" );
-    }
-
-    public String getOutputName()
-    {
+    public String getOutputName() {
         return "invoker-report";
     }
 
-    public boolean canGenerateReport()
-    {
-        return ReportUtils.getReportFiles( reportsDirectory ).length > 0;
+    public boolean canGenerateReport() {
+        return ReportUtils.getReportFiles(reportsDirectory).length > 0;
     }
 
-    private String getText( Locale locale, String key )
-    {
-        return i18n.getString( "invoker-report", locale, key );
+    private String getText(Locale locale, String key) {
+        return i18n.getString("invoker-report", locale, key);
     }
 
-    private void sinkTableHeader( Sink sink, String header )
-    {
+    private void sinkTableHeader(Sink sink, String header) {
         sink.tableHeaderCell();
-        sink.text( header );
+        sink.text(header);
         sink.tableHeaderCell_();
     }
 
-    private void sinkCell( Sink sink, String text )
-    {
+    private void sinkCell(Sink sink, String text) {
         sink.tableCell();
-        sink.text( text );
+        sink.text(text);
         sink.tableCell_();
     }
-
 }

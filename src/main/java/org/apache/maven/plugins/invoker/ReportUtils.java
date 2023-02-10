@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugins.invoker;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -27,18 +26,13 @@ import java.io.FilenameFilter;
  *
  * @author Benjamin Bentmann
  */
-class ReportUtils
-{
+class ReportUtils {
 
-    private static class FileFilterOnlyXmlFile
-        implements FilenameFilter
-    {
+    private static class FileFilterOnlyXmlFile implements FilenameFilter {
 
-        public boolean accept( File dir, String name )
-        {
-            return name.startsWith( "BUILD-" ) && name.endsWith( ".xml" );
+        public boolean accept(File dir, String name) {
+            return name.startsWith("BUILD-") && name.endsWith(".xml");
         }
-
     }
 
     /**
@@ -47,17 +41,14 @@ class ReportUtils
      * @param reportsDirectory The base directory where the invoker reports are located in, may be <code>null</code>.
      * @return The paths to the invoker reports, can be empty but never <code>null</code>.
      */
-    public static File[] getReportFiles( File reportsDirectory )
-    {
+    public static File[] getReportFiles(File reportsDirectory) {
         File[] reportFiles =
-            ( reportsDirectory != null ) ? reportsDirectory.listFiles( new FileFilterOnlyXmlFile() ) : null;
+                (reportsDirectory != null) ? reportsDirectory.listFiles(new FileFilterOnlyXmlFile()) : null;
 
-        if ( reportFiles == null )
-        {
+        if (reportFiles == null) {
             reportFiles = new File[0];
         }
 
         return reportFiles;
     }
-
 }

@@ -17,6 +17,8 @@
  * under the License.
  */
 
+import groovy.xml.XmlSlurper
+
 File effectiveSettings = new File( basedir, "effective-settings.xml" )
 assert effectiveSettings.isFile()
 

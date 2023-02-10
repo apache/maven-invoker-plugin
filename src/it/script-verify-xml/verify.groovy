@@ -17,6 +17,8 @@
  * under the License.
  */
 
+import groovy.xml.XmlSlurper
+
 // from http://groovy-lang.org/processing-xml.html
 // A lot of examples covering xml assertions 
 

@@ -1,5 +1,3 @@
-package org.apache.maven.plugins.invoker;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugins.invoker;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugins.invoker;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,29 +26,24 @@ import java.util.Map;
  * @author Robert Scholte
  * @since 3.2.0
  */
-public class InvokerToolchain
-{
+public class InvokerToolchain {
     private final String type;
 
     private Map<String, String> provides = new HashMap<>();
 
-    public InvokerToolchain( String type )
-    {
+    public InvokerToolchain(String type) {
         this.type = type;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public void addProvides( String key, String value )
-    {
-        provides.put( key, value );
+    public void addProvides(String key, String value) {
+        provides.put(key, value);
     }
 
-    public Map<String, String> getProvides()
-    {
+    public Map<String, String> getProvides() {
         return provides;
     }
 }
