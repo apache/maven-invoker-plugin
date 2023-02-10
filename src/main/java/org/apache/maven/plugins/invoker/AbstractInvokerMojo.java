@@ -1398,7 +1398,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     private File writeMergedSettingsFile(Settings mergedSettings) throws IOException {
         File mergedSettingsFile;
-        mergedSettingsFile = File.createTempFile("invoker-settings", ".xml");
+        mergedSettingsFile = Files.createTempFile("invoker-settings", ".xml").toFile();
 
         SettingsXpp3Writer settingsWriter = new SettingsXpp3Writer();
 
