@@ -19,12 +19,15 @@
 package org.apache.maven.plugins.invoker;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -356,22 +359,42 @@ public class InstallMojo extends AbstractMojo {
      */
     private void installArtifacts(Collection<Artifact> resolvedArtifacts) throws InstallationException {
 
+        RepositorySystemSession systemSessionForLocalRepo = createSystemSessionForLocalRepo();
+
         // we can have on dependency two artifacts with the same groupId:artifactId
         // with different version, in such case when we install both in one request
         // metadata will contain only one version
 
         Map<String, List<Artifact>> collect = resolvedArtifacts.stream()
+                .filter(a -> !hasTheSamePathAsTarget(a, systemSessionForLocalRepo))
                 .collect(Collectors.groupingBy(
                         a -> String.format("%s:%s:%s", a.getGroupId(), a.getArtifactId(), a.getVersion()),
                         LinkedHashMap::new,
                         Collectors.toList()));
 
-        RepositorySystemSession systemSessionForLocalRepo = createSystemSessionForLocalRepo();
-
         for (List<Artifact> artifacts : collect.values()) {
             InstallRequest request = new InstallRequest();
             request.setArtifacts(artifacts);
             repositorySystem.install(systemSessionForLocalRepo, request);
+        }
+    }
+
+    private boolean hasTheSamePathAsTarget(Artifact artifact, RepositorySystemSession systemSession) {
+        try {
+            LocalRepositoryManager lrm = systemSession.getLocalRepositoryManager();
+            File targetBasedir = lrm.getRepository().getBasedir();
+            if (targetBasedir == null) {
+                return false;
+            }
+            File targetFile = new File(targetBasedir, lrm.getPathForLocalArtifact(artifact)).getCanonicalFile();
+            File sourceFile = artifact.getFile().getCanonicalFile();
+            if (Objects.equals(targetFile, sourceFile)) {
+                getLog().debug("Skip install the same target " + sourceFile);
+                return true;
+            }
+            return false;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
