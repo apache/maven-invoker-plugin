@@ -57,7 +57,10 @@ try
             "org/apache/maven/its/dep/2.0/dep-2.0.jar",
             "org/apache/maven/its/dep/maven-metadata-local.xml",
             "test/staging-dependencies/1.0-SNAPSHOT/staging-dependencies-1.0-SNAPSHOT.jar",
-            "test/staging-dependencies/1.0-SNAPSHOT/staging-dependencies-1.0-SNAPSHOT.pom"
+            "test/staging-dependencies/1.0-SNAPSHOT/staging-dependencies-1.0-SNAPSHOT.pom",
+            "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.pom",
+            "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
+            "org/slf4j/slf4j-parent/1.7.36/slf4j-parent-1.7.36.pom"
       };
     for ( String file : files )
     {

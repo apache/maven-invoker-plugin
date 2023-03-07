@@ -22,20 +22,19 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>test</groupId>
-  <artifactId>mod2-parent</artifactId>
+  <parent>
+    <groupId>test</groupId>
+    <artifactId>mod2-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>mod3</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <description>
     Test to check for proper staging during a multi module build, i.e. artifacts from the reactor need to be considered.
   </description>
-
-  <modules>
-    <module>mod1</module>
-    <module>mod2</module>
-    <module>mod3</module>
-  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -44,9 +43,16 @@ under the License.
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>@sitePluginVersion@</version>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>@sourcePluginVersion@</version>
+        <executions>
+          <execution>
+            <id>attach-resources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
