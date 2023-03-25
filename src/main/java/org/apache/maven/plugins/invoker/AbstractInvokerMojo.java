@@ -429,7 +429,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @since 1.8
      */
     @Parameter(property = "invoker.mavenExecutable")
-    private File mavenExecutable;
+    private String mavenExecutable;
 
     /**
      * The <code>JAVA_HOME</code> environment variable to use for forked Maven invocations. Defaults to the current Java
