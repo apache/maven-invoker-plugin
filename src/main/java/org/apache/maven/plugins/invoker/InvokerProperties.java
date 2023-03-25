@@ -153,8 +153,10 @@ class InvokerProperties {
      * Default value for mavenExecutable
      * @param defaultMavenExecutable a default value
      */
-    public void setDefaultMavenExecutable(File defaultMavenExecutable) {
-        this.defaultMavenExecutable = defaultMavenExecutable;
+    public void setDefaultMavenExecutable(String defaultMavenExecutable) {
+        if (StringUtils.isNotBlank(defaultMavenExecutable)) {
+            this.defaultMavenExecutable = new File(defaultMavenExecutable);
+        }
     }
 
     /**

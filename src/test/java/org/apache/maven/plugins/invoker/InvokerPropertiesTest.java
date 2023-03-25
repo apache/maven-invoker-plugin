@@ -216,7 +216,7 @@ public class InvokerPropertiesTest {
 
         InvokerProperties facade = new InvokerProperties(props);
         File aDefExecutable = new File("defExecutable");
-        facade.setDefaultMavenExecutable(aDefExecutable);
+        facade.setDefaultMavenExecutable(aDefExecutable.toString());
 
         props.setProperty("invoker.mavenExecutable", "aPropExecutable");
         facade.configureInvocation(request, 0);
