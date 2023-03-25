@@ -374,16 +374,16 @@ under the License.
         <!-- plugins versions used in IT tests -->
         <antrunPluginVersion>3.1.0</antrunPluginVersion>
         <cleanPluginVersion>3.2.0</cleanPluginVersion>
-        <compilerPluginVersion>3.10.1</compilerPluginVersion>
-        <enforcerPluginVersion>3.1.0</enforcerPluginVersion>
-        <helpPluginVersion>3.3.0</helpPluginVersion>
-        <installPluginVersion>3.1.0</installPluginVersion>
+        <compilerPluginVersion>3.11.0</compilerPluginVersion>
+        <enforcerPluginVersion>3.2.1</enforcerPluginVersion>
+        <helpPluginVersion>3.4.0</helpPluginVersion>
+        <installPluginVersion>3.1.1</installPluginVersion>
         <jarPluginVersion>3.3.0</jarPluginVersion>
-        <pluginPluginVersion>3.7.0</pluginPluginVersion>
-        <resourcesPluginVersion>3.3.0</resourcesPluginVersion>
+        <pluginPluginVersion>3.8.1</pluginPluginVersion>
+        <resourcesPluginVersion>3.3.1</resourcesPluginVersion>
         <sitePluginVersion>3.12.1</sitePluginVersion>
         <sourcePluginVersion>3.2.1</sourcePluginVersion>
-        <surefirePluginVersion>3.0.0-M7</surefirePluginVersion>
+        <surefirePluginVersion>3.0.0</surefirePluginVersion>
       </properties>
       <build>
         <pluginManagement>
@@ -391,7 +391,7 @@ under the License.
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-invoker-plugin</artifactId>
-              <version>3.4.0</version>
+              <version>3.5.0</version>
               <configuration>
                 <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                 <preBuildHookScript>setup</preBuildHookScript>
