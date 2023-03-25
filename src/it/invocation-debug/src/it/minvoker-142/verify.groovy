@@ -17,4 +17,4 @@
  * under the License.
  */
 File buildLog = new File( basedir, 'build.log' )
-assert buildLog.text.contains( '[DEBUG] Executing rule: org.apache.maven.plugins.enforcer.AlwaysPass' )  
+assert buildLog.text.contains( '[INFO] Rule 0: org.apache.maven.enforcer.rules.AlwaysPass passed' )

@@ -21,6 +21,6 @@ File buildLog = new File( basedir, 'build.log' )
 // if one of criteria matches
 if( buildLog.exists() )
 {
-  assert buildLog.text.contains( '[DEBUG] Executing rule: org.apache.maven.plugins.enforcer.AlwaysPass' )  
+  assert buildLog.text.contains( '[INFO] Rule 0: org.apache.maven.enforcer.rules.AlwaysPass passed' )
 }
 
