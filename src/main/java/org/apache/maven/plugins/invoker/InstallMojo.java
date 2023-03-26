@@ -21,8 +21,6 @@ package org.apache.maven.plugins.invoker;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -68,6 +66,7 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.artifact.SubArtifact;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
@@ -163,7 +162,7 @@ public class InstallMojo extends AbstractMojo {
             return;
         }
 
-        Collection<Artifact> resolvedArtifacts = new ArrayList<>();
+        Map<String, Artifact> resolvedArtifacts = new LinkedHashMap<>();
 
         try {
 
@@ -181,19 +180,20 @@ public class InstallMojo extends AbstractMojo {
         }
     }
 
-    private void resolveProjectArtifacts(Collection<Artifact> resolvedArtifacts) {
+    private void resolveProjectArtifacts(Map<String, Artifact> resolvedArtifacts) {
 
         // pom packaging doesn't have a main artifact
         if (project.getArtifact() != null && project.getArtifact().getFile() != null) {
-            resolvedArtifacts.add(RepositoryUtils.toArtifact(project.getArtifact()));
+            Artifact artifact = RepositoryUtils.toArtifact(project.getArtifact());
+            resolvedArtifacts.put(ArtifactIdUtils.toId(artifact), artifact);
         }
 
-        resolvedArtifacts.addAll(project.getAttachedArtifacts().stream()
+        project.getAttachedArtifacts().stream()
                 .map(RepositoryUtils::toArtifact)
-                .collect(Collectors.toList()));
+                .forEach(a -> resolvedArtifacts.put(ArtifactIdUtils.toId(a), a));
     }
 
-    private void resolveProjectPoms(MavenProject project, Collection<Artifact> resolvedArtifacts)
+    private void resolveProjectPoms(MavenProject project, Map<String, Artifact> resolvedArtifacts)
             throws ArtifactResolutionException {
 
         if (project == null) {
@@ -202,15 +202,15 @@ public class InstallMojo extends AbstractMojo {
 
         Artifact projectPom = RepositoryUtils.toArtifact(new ProjectArtifact(project));
         if (projectPom.getFile() != null) {
-            resolvedArtifacts.add(projectPom);
+            resolvedArtifacts.put(projectPom.toString(), projectPom);
         } else {
             Artifact artifact = resolveArtifact(projectPom, project.getRemoteProjectRepositories());
-            resolvedArtifacts.add(artifact);
+            resolvedArtifacts.put(ArtifactIdUtils.toId(artifact), artifact);
         }
         resolveProjectPoms(project.getParent(), resolvedArtifacts);
     }
 
-    private void resolveProjectDependencies(Collection<Artifact> resolvedArtifacts)
+    private void resolveProjectDependencies(Map<String, Artifact> resolvedArtifacts)
             throws ArtifactResolutionException, MojoExecutionException, DependencyResolutionException {
 
         DependencyFilter classpathFilter = DependencyFilterUtils.classpathFilter(scope);
@@ -245,7 +245,7 @@ public class InstallMojo extends AbstractMojo {
                 .map(ArtifactResult::getArtifact)
                 .collect(Collectors.toList());
 
-        resolvedArtifacts.addAll(artifacts);
+        artifacts.forEach(a -> resolvedArtifacts.put(ArtifactIdUtils.toId(a), a));
         resolvePomsForArtifacts(artifacts, resolvedArtifacts, collectRequest.getRepositories());
     }
 
@@ -254,7 +254,7 @@ public class InstallMojo extends AbstractMojo {
      *
      * @return
      */
-    private void resolveExtraArtifacts(Collection<Artifact> resolvedArtifacts)
+    private void resolveExtraArtifacts(Map<String, Artifact> resolvedArtifacts)
             throws MojoExecutionException, DependencyResolutionException, ArtifactDescriptorException,
                     ArtifactResolutionException {
 
@@ -309,13 +309,15 @@ public class InstallMojo extends AbstractMojo {
                     .map(ArtifactResult::getArtifact)
                     .collect(Collectors.toList());
 
-            resolvedArtifacts.addAll(artifacts);
+            artifacts.forEach(a -> resolvedArtifacts.put(ArtifactIdUtils.toId(a), a));
             resolvePomsForArtifacts(artifacts, resolvedArtifacts, collectRequest.getRepositories());
         }
     }
 
     private void resolvePomsForArtifacts(
-            List<Artifact> artifacts, Collection<Artifact> resolvedArtifacts, List<RemoteRepository> remoteRepositories)
+            List<Artifact> artifacts,
+            Map<String, Artifact> resolvedArtifacts,
+            List<RemoteRepository> remoteRepositories)
             throws ArtifactResolutionException, MojoExecutionException {
 
         for (Artifact a : artifacts) {
@@ -325,10 +327,10 @@ public class InstallMojo extends AbstractMojo {
     }
 
     private void resolvePomWithParents(
-            Artifact artifact, Collection<Artifact> resolvedArtifacts, List<RemoteRepository> remoteRepositories)
+            Artifact artifact, Map<String, Artifact> resolvedArtifacts, List<RemoteRepository> remoteRepositories)
             throws MojoExecutionException, ArtifactResolutionException {
 
-        if (resolvedArtifacts.contains(artifact)) {
+        if (resolvedArtifacts.containsKey(ArtifactIdUtils.toId(artifact))) {
             return;
         }
 
@@ -341,7 +343,7 @@ public class InstallMojo extends AbstractMojo {
             resolvePomWithParents(resolvedPom, resolvedArtifacts, remoteRepositories);
         }
 
-        resolvedArtifacts.add(artifact);
+        resolvedArtifacts.put(ArtifactIdUtils.toId(artifact), artifact);
     }
 
     private Artifact resolveArtifact(Artifact artifact, List<RemoteRepository> remoteRepositories)
@@ -357,7 +359,7 @@ public class InstallMojo extends AbstractMojo {
     /**
      * Install list of artifacts into local repository.
      */
-    private void installArtifacts(Collection<Artifact> resolvedArtifacts) throws InstallationException {
+    private void installArtifacts(Map<String, Artifact> resolvedArtifacts) throws InstallationException {
 
         RepositorySystemSession systemSessionForLocalRepo = createSystemSessionForLocalRepo();
 
@@ -365,7 +367,7 @@ public class InstallMojo extends AbstractMojo {
         // with different version, in such case when we install both in one request
         // metadata will contain only one version
 
-        Map<String, List<Artifact>> collect = resolvedArtifacts.stream()
+        Map<String, List<Artifact>> collect = resolvedArtifacts.values().stream()
                 .filter(a -> !hasTheSamePathAsTarget(a, systemSessionForLocalRepo))
                 .collect(Collectors.groupingBy(
                         a -> String.format("%s:%s:%s", a.getGroupId(), a.getArtifactId(), a.getVersion()),
