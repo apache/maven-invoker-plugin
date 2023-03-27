@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven-invoker-plugin</artifactId>
-  <version>3.5.1-SNAPSHOT</version>
+  <version>3.5.1</version>
   <packaging>maven-plugin</packaging>
 
   <name>Apache Maven Invoker Plugin</name>
@@ -42,7 +42,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-invoker-plugin.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-invoker-plugin.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>maven-invoker-plugin-3.5.1</tag>
     <url>https://github.com/apache/maven-invoker-plugin/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -66,7 +66,7 @@ under the License.
     <beanshell-groupId>org.apache-extras.beanshell</beanshell-groupId>
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
-    <project.build.outputTimestamp>2023-02-12T19:26:23Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-03-27T20:02:51Z</project.build.outputTimestamp>
     <groovy-version>4.0.10</groovy-version>
   </properties>
 
