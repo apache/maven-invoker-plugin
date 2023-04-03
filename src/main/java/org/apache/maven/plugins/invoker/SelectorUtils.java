@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Provides utility methods for selecting build jobs based on environmental conditions.
