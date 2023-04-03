@@ -31,8 +31,8 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.shared.invoker.InvocationRequest;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Provides a convenient facade around the <code>invoker.properties</code>.
