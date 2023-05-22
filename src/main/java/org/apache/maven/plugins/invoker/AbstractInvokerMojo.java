@@ -754,7 +754,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             return;
         }
 
-        if (StringUtils.isEmpty(encoding)) {
+        if (encoding == null || encoding.isEmpty()) {
             getLog().warn("File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING
                     + ", i.e. build is platform dependent!");
         }
@@ -1477,7 +1477,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private File interpolatePomFile(File pomFile, File basedir) throws MojoExecutionException {
         File interpolatedPomFile = null;
         if (pomFile != null) {
-            if (StringUtils.isNotEmpty(filteredPomPrefix)) {
+            if (filteredPomPrefix != null && !filteredPomPrefix.isEmpty()) {
                 interpolatedPomFile = new File(basedir, filteredPomPrefix + pomFile.getName());
                 buildInterpolatedFile(pomFile, interpolatedPomFile);
             } else {
@@ -1640,7 +1640,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @param interpolatedPomFile The interpolated pom file.
      */
     private void deleteInterpolatedPomFile(File interpolatedPomFile) {
-        if (interpolatedPomFile != null && StringUtils.isNotEmpty(filteredPomPrefix)) {
+        if (interpolatedPomFile != null && (filteredPomPrefix != null && !filteredPomPrefix.isEmpty())) {
             interpolatedPomFile.delete();
         }
     }
