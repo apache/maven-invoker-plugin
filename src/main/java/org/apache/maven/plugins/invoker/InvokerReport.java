@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -260,8 +259,8 @@ public class InvokerReport extends AbstractMavenReport {
     private String getBuildJobReportName(BuildJob buildJob) {
         String buildJobName = buildJob.getName();
         String buildJobDescription = buildJob.getDescription();
-        boolean emptyJobName = StringUtils.isEmpty(buildJobName);
-        boolean emptyJobDescription = StringUtils.isEmpty(buildJobDescription);
+        boolean emptyJobName = buildJobName == null || buildJobName.isEmpty();
+        boolean emptyJobDescription = buildJobDescription == null || buildJobDescription.isEmpty();
         boolean isReportJobNameComplete = !emptyJobName && !emptyJobDescription;
         if (isReportJobNameComplete) {
             return getFormattedName(buildJobName, buildJobDescription);
