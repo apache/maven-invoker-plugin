@@ -86,7 +86,7 @@ under the License.
           <name>time</name>
           <version>1.0.0</version>
           <required>true</required>
-          <type>double</type>
+          <type>float</type>
           <description>The number of seconds that this build job took to complete.</description>
         </field>
         <field xml.attribute="true">
@@ -126,7 +126,7 @@ under the License.
 
     /**
      * Creates a new build job with the specified project path.
-     * 
+     *
      * @param project The path to the project.
      */
     public BuildJob( String project )

@@ -111,6 +111,8 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
  * @since 15-Aug-2009 09:09:29
  */
 public abstract class AbstractInvokerMojo extends AbstractMojo {
+    private static final float ONE_SECOND = 1000.0f;
+
     /**
      * The zero-based column index where to print the invoker result.
      */
@@ -1534,7 +1536,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         try {
             int selection = getSelection(invokerProperties, actualJreVersion);
             if (selection == 0) {
-                long milliseconds = System.currentTimeMillis();
+                long startTime = System.currentTimeMillis();
                 boolean executed;
 
                 FileLogger buildLogger = setupBuildLogFile(basedir);
@@ -1546,8 +1548,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     executed = runBuild(
                             basedir, interpolatedPomFile, settingsFile, actualJavaHome, invokerProperties, buildLogger);
                 } finally {
-                    milliseconds = System.currentTimeMillis() - milliseconds;
-                    buildJob.setTime(milliseconds / 1000.0);
+                    long elapsedTime = System.currentTimeMillis() - startTime;
+                    buildJob.setTime(elapsedTime / ONE_SECOND);
 
                     if (buildLogger != null) {
                         buildLogger.close();
@@ -1697,7 +1699,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         File reportFile = new File(reportsDirectory, "TEST-" + safeFileName + ".xml");
         Xpp3Dom testsuite = new Xpp3Dom("testsuite");
         testsuite.setAttribute("name", junitPackageName + "." + safeFileName);
-        testsuite.setAttribute("time", Double.toString(buildJob.getTime()));
+        testsuite.setAttribute("time", Float.toString(buildJob.getTime()));
 
         // set default value for required attributes
         testsuite.setAttribute("tests", "1");
@@ -1729,7 +1731,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
         testcase.setAttribute("classname", junitPackageName + "." + safeFileName);
         testcase.setAttribute("name", safeFileName);
-        testcase.setAttribute("time", Double.toString(buildJob.getTime()));
+        testcase.setAttribute("time", Float.toString(buildJob.getTime()));
         Xpp3Dom systemOut = new Xpp3Dom("system-out");
         testcase.addChild(systemOut);
 
@@ -1755,13 +1757,13 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     }
 
     /**
-     * Formats the specified build duration time.
+     * Formats the specified elapsed time.
      *
-     * @param seconds The duration of the build.
+     * @param time The eapsed time of the build.
      * @return The formatted time, never <code>null</code>.
      */
-    private String formatTime(double seconds) {
-        return secFormat.format(seconds);
+    private String formatTime(float time) {
+        return secFormat.format(time);
     }
 
     /**
@@ -1882,8 +1884,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     int getParallelThreadsCount() {
         if (parallelThreads.endsWith("C")) {
-            double parallelThreadsMultiple =
-                    Double.parseDouble(parallelThreads.substring(0, parallelThreads.length() - 1));
+            float parallelThreadsMultiple =
+                    Float.parseFloat(parallelThreads.substring(0, parallelThreads.length() - 1));
             return (int) (parallelThreadsMultiple * Runtime.getRuntime().availableProcessors());
         } else {
             return Integer.parseInt(parallelThreads);
