@@ -18,10 +18,6 @@
  */
 package org.apache.maven.plugins.invoker;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,21 +32,6 @@ public class InvokerReportRenderer extends AbstractMavenReportRenderer {
     private final Locale locale;
     private final Log log;
     private final List<BuildJob> buildJobs;
-
-    /**
-     * The number format used to print percent values in the report locale.
-     */
-    private NumberFormat percentFormat;
-
-    /**
-     * The number format used to print time values in the report locale.
-     */
-    private NumberFormat secondsFormat;
-
-    /**
-     * The format used to print build name and description.
-     */
-    private MessageFormat nameAndDescriptionFormat;
 
     public InvokerReportRenderer(Sink sink, I18N i18n, Locale locale, Log log, List<BuildJob> buildJobs) {
         super(sink);
@@ -84,11 +65,6 @@ public class InvokerReportRenderer extends AbstractMavenReportRenderer {
 
     @Override
     protected void renderBody() {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
-        percentFormat = new DecimalFormat(getI18nString("format.percent"), symbols);
-        secondsFormat = new DecimalFormat(getI18nString("format.seconds"), symbols);
-        nameAndDescriptionFormat = new MessageFormat(getI18nString("format.name_with_description"));
-
         startSection(getTitle());
         paragraph(getI18nString("description"));
 
@@ -139,9 +115,9 @@ public class InvokerReportRenderer extends AbstractMavenReportRenderer {
             Integer.toString(totalFailures),
             Integer.toString(totalSkipped),
             (totalSuccess + totalFailures > 0)
-                    ? percentFormat.format(totalSuccess / (float) (totalSuccess + totalFailures))
+                    ? formatI18nString("value.successrate", (totalSuccess / (float) (totalSuccess + totalFailures)))
                     : "",
-            secondsFormat.format(totalTime)
+            formatI18nString("value.time", totalTime)
         });
 
         endTable();
@@ -175,7 +151,7 @@ public class InvokerReportRenderer extends AbstractMavenReportRenderer {
             getBuildJobReportName(buildJob),
             // FIXME image
             buildJob.getResult(),
-            secondsFormat.format(buildJob.getTime()),
+            formatI18nString("value.time", buildJob.getTime()),
             buildJob.getFailureMessage()
         });
     }
@@ -187,7 +163,7 @@ public class InvokerReportRenderer extends AbstractMavenReportRenderer {
         boolean emptyJobDescription = buildJobDescription == null || buildJobDescription.isEmpty();
         boolean isReportJobNameComplete = !emptyJobName && !emptyJobDescription;
         if (isReportJobNameComplete) {
-            return getFormattedName(buildJobName, buildJobDescription);
+            return formatI18nString("text.name_with_description", buildJobName, buildJobDescription);
         } else {
             String buildJobProject = buildJob.getProject();
             if (!emptyJobName) {
@@ -202,9 +178,5 @@ public class InvokerReportRenderer extends AbstractMavenReportRenderer {
     private static String incompleteNameWarning(String missing, String pom) {
         return "Incomplete job name-description: " + missing + " is missing. POM (" + pom
                 + ") will be used in place of job name!";
-    }
-
-    private String getFormattedName(String name, String description) {
-        return nameAndDescriptionFormat.format(new Object[] {name, description});
     }
 }
