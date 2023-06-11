@@ -34,6 +34,20 @@ ${project.name}
   This plugin is in particular handy to perform integration tests for other Maven plugins. The Invoker Plugin can be
   employed to run a set of test projects that have been designed to assert certain features of the plugin under test.
 
+* Upcoming Incompatibility Notice
+
+  With a future (minor) the report output filename will change for alignment with other
+  reporting plugins from <<<org.apache.maven.plugins>>>.
+  To make you aware of that, see the following table for the upcoming changes:
+
+*---------------------*----------------------*------------------*
+|| Mojo Class Name    || Output name         || New Output Name |
+*---------------------+----------------------+------------------+
+| <<<InvokerReport>>> | <<<invoker-report>>> | <<<invoker>>>    |
+*---------------------+----------------------+------------------+
+
+  Details about this change can be found in {{{https://issues.apache.org/jira/browse/MINVOKER-346}MINVOKER-346}}.
+
 * Goals Overview
 
   The plugin has four goals meant to participate in the default build lifecycle:
@@ -98,7 +112,7 @@ ${project.name}
 
   * {{{./examples/prepare-build-env.html}Prepare the Build Environment}} by building some setup projects before other projects.
 
-  * {{{./examples/integration-test-verify.html}Using with other integration test frameworks}} by decoupling checking 
+  * {{{./examples/integration-test-verify.html}Using with other integration test frameworks}} by decoupling checking
     the results of the integration tests from executing the integration tests.
 
   []
