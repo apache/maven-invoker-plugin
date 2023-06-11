@@ -31,8 +31,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -703,11 +702,6 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * <code>null</code> if the POMs have already been filtered during cloning.
      */
     private String filteredPomPrefix = "interpolated-";
-
-    /**
-     * The format for elapsed build time.
-     */
-    private final DecimalFormat secFormat = new DecimalFormat("(0.0 s)", new DecimalFormatSymbols(Locale.ENGLISH));
 
     /**
      * The version of Maven which is used to run the builds
@@ -1560,13 +1554,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     buildJob.setResult(BuildJob.Result.SUCCESS);
 
                     if (!suppressSummaries) {
-                        getLog().info(pad(buildJob).success("SUCCESS").a(' ') + formatTime(buildJob.getTime()));
+                        getLog().info(pad(buildJob).success("SUCCESS").a(' ') + "("
+                                + formatElapsedTime(buildJob.getTime()) + ")");
                     }
                 } else {
                     buildJob.setResult(BuildJob.Result.SKIPPED);
 
                     if (!suppressSummaries) {
-                        getLog().info(pad(buildJob).warning("SKIPPED").a(' ') + formatTime(buildJob.getTime()));
+                        getLog().info(pad(buildJob).warning("SKIPPED").a(' ') + "("
+                                + formatElapsedTime(buildJob.getTime()) + ")");
                     }
                 }
             } else {
@@ -1606,7 +1602,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
             if (!suppressSummaries) {
                 getLog().info("  " + e.getMessage());
-                getLog().info(pad(buildJob).failure("FAILED").a(' ') + formatTime(buildJob.getTime()));
+                getLog().info(pad(buildJob).failure("FAILED").a(' ') + "(" + formatElapsedTime(buildJob.getTime())
+                        + ")");
             }
         } finally {
             deleteInterpolatedPomFile(interpolatedPomFile);
@@ -1762,8 +1759,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @param time The eapsed time of the build.
      * @return The formatted time, never <code>null</code>.
      */
-    private String formatTime(float time) {
-        return secFormat.format(time);
+    private String formatElapsedTime(float time) {
+        /*
+         * Rationale: The idea is to always display four digits for visually consistent output
+         * Important: Keep in sync with src/main/resources/invoker-report.properties
+         */
+        final MessageFormat elapsedTimeFormat = new MessageFormat(
+                "{0,choice,0#0|0.0<{0,number,0.000}|10#{0,number,0.00}|100#{0,number,0.0}|1000#{0,number,0}} s",
+                Locale.ROOT);
+        return elapsedTimeFormat.format(new Object[] {time});
     }
 
     /**
