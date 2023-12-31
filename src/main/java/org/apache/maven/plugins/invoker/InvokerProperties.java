@@ -88,7 +88,7 @@ class InvokerProperties {
     private enum SelectorProperty {
         JAVA_VERSION(".java.version"),
         MAVEN_VERSION(".maven.version"),
-        OS_FAMLY(".os.family");
+        OS_FAMILY(".os.family");
 
         private final String suffix;
 
@@ -281,7 +281,7 @@ class InvokerProperties {
      * @since 3.0.0
      */
     public String getOsFamily(int index) {
-        return this.properties.getProperty(SELECTOR_PREFIX + index + SelectorProperty.OS_FAMLY, getOsFamily());
+        return this.properties.getProperty(SELECTOR_PREFIX + index + SelectorProperty.OS_FAMILY, getOsFamily());
     }
 
     public Collection<InvokerToolchain> getToolchains() {

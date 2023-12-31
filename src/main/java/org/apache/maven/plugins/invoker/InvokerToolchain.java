@@ -29,7 +29,7 @@ import java.util.Map;
 public class InvokerToolchain {
     private final String type;
 
-    private Map<String, String> provides = new HashMap<>();
+    private final Map<String, String> provides = new HashMap<>();
 
     public InvokerToolchain(String type) {
         this.type = type;
