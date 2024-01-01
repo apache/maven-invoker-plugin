@@ -43,12 +43,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
@@ -1020,8 +1020,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             String projectDir = pomFile.getParent();
 
             String parentPath = "../pom.xml";
-            if (model.getParent() != null
-                    && StringUtils.isNotEmpty(model.getParent().getRelativePath())) {
+            if (model.getParent() != null && isNotEmpty(model.getParent().getRelativePath())) {
                 parentPath = model.getParent().getRelativePath();
             }
             String parent = relativizePath(new File(projectDir, parentPath), projectsRoot);
@@ -1042,6 +1041,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to analyze POM: " + pomFile, e);
         }
+    }
+
+    private boolean isNotEmpty(String s) {
+        return Objects.nonNull(s) && !s.isEmpty();
     }
 
     /**
@@ -2031,7 +2034,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     private List<String> calculateIncludes() {
         if (invokerTest != null) {
-            String[] testRegexes = StringUtils.split(invokerTest, ",");
+            String[] testRegexes = invokerTest.split(",+");
             return Arrays.stream(testRegexes)
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
@@ -2049,7 +2052,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         List<String> excludes;
 
         if (invokerTest != null) {
-            String[] testRegexes = StringUtils.split(invokerTest, ",");
+            String[] testRegexes = invokerTest.split(",+");
             excludes = Arrays.stream(testRegexes)
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())

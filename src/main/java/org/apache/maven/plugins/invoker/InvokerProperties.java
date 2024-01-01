@@ -31,7 +31,6 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.shared.invoker.InvocationRequest;
 
 /**
@@ -43,7 +42,7 @@ class InvokerProperties {
     private static final String SELECTOR_PREFIX = "selector.";
 
     private static final Pattern ENVIRONMENT_VARIABLES_PATTERN =
-            Pattern.compile("invoker\\.environmentVariables\\.([A-Za-z][^.]+)(\\.([0-9]+))?");
+            Pattern.compile("invoker\\.environmentVariables\\.([A-Za-z][^.]+)(\\.(\\d+))?");
 
     // default values from Mojo configuration
     private Boolean defaultDebug;
@@ -154,7 +153,7 @@ class InvokerProperties {
      * @param defaultMavenExecutable a default value
      */
     public void setDefaultMavenExecutable(String defaultMavenExecutable) {
-        if (StringUtils.isNotBlank(defaultMavenExecutable)) {
+        if (Objects.nonNull(defaultMavenExecutable) && !defaultMavenExecutable.isEmpty()) {
             this.defaultMavenExecutable = new File(defaultMavenExecutable);
         }
     }
@@ -397,7 +396,7 @@ class InvokerProperties {
         setIfNotNull(
                 request::setGoals,
                 get(InvocationProperty.GOALS, index)
-                        .map(s -> StringUtils.split(s, ", \t\n\r\f"))
+                        .map(s -> s.trim().split("\\s*[ ,]+\\s*"))
                         .map(Arrays::asList)
                         .filter(l -> !l.isEmpty())
                         .orElse(defaultGoals));
@@ -405,7 +404,7 @@ class InvokerProperties {
         setIfNotNull(
                 request::setProfiles,
                 get(InvocationProperty.PROFILES, index)
-                        .map(s -> StringUtils.split(s, ", \t\n\r\f"))
+                        .map(s -> s.trim().split("\\s*[ ,]+\\s*"))
                         .map(Arrays::asList)
                         .filter(l -> !l.isEmpty())
                         .orElse(defaultProfiles));

@@ -29,10 +29,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
@@ -47,7 +47,11 @@ import org.codehaus.plexus.util.Os;
 class SelectorUtils {
 
     static void parseList(String list, Collection<String> includes, Collection<String> excludes) {
-        String[] tokens = (list != null) ? StringUtils.split(list, ",") : new String[0];
+        if (Objects.isNull(list)) {
+            return;
+        }
+
+        String[] tokens = list.split(",+");
 
         for (String token1 : tokens) {
             String token = token1.trim();
@@ -99,7 +103,8 @@ class SelectorUtils {
                     .getClassLoader()
                     .getResourceAsStream("META-INF/maven/org.apache.maven/maven-core/pom.properties"));
             // CHECKSTYLE_ON: LineLength
-            return StringUtils.trim(properties.getProperty("version"));
+            String str = properties.getProperty("version");
+            return str == null ? null : str.trim();
         } catch (Exception e) {
             return null;
         }
@@ -121,7 +126,8 @@ class SelectorUtils {
                 try (InputStream in = url.openStream()) {
                     Properties properties = new Properties();
                     properties.load(in);
-                    String version = StringUtils.trim(properties.getProperty("version"));
+                    String str = properties.getProperty("version");
+                    String version = str == null ? null : str.trim();
                     if (version != null) {
                         return version;
                     }
@@ -201,13 +207,14 @@ class SelectorUtils {
     }
 
     static List<Integer> parseVersion(String version) {
-        version = version.replaceAll("[^0-9]", ".");
+        version = version.replaceAll("\\D", ".");
 
-        String[] tokens = StringUtils.split(version, ".");
+        String[] tokens = version.split("\\s*\\.+\\s*");
 
-        List<Integer> numbers = Arrays.stream(tokens).map(Integer::valueOf).collect(Collectors.toList());
-
-        return numbers;
+        return Arrays.stream(tokens)
+                .filter(s -> !s.isEmpty())
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
     }
 
     static int compareVersions(List<Integer> version1, List<Integer> version2) {
