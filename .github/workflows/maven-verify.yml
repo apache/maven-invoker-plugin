@@ -26,5 +26,4 @@ jobs:
     name: Verify
     uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v3
     with:
-      jdk-matrix: '[ "8", "11", "17", "19"]'
       verify-fail-fast: false
