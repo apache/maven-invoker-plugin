@@ -73,17 +73,10 @@ class SelectorUtils {
     }
 
     static boolean isOsFamily(List<String> families, boolean defaultMatch) {
-        if (families != null && !families.isEmpty()) {
-            for (String family : families) {
-                if (Os.isFamily(family)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } else {
+        if (families == null || families.isEmpty()) {
             return defaultMatch;
         }
+        return families.stream().anyMatch(Os::isFamily);
     }
 
     /**
@@ -139,10 +132,6 @@ class SelectorUtils {
         return null;
     }
 
-    static boolean isMavenVersion(String mavenSpec) {
-        return isMavenVersion(mavenSpec, getMavenVersion());
-    }
-
     static boolean isMavenVersion(String mavenSpec, String actualVersion) {
         List<String> includes = new ArrayList<>();
         List<String> excludes = new ArrayList<>();
@@ -157,15 +146,6 @@ class SelectorUtils {
         return System.getProperty("java.version", "");
     }
 
-    static String getJreVersion(File javaHome) {
-        // @todo detect actual version
-        return null;
-    }
-
-    static boolean isJreVersion(String jreSpec) {
-        return isJreVersion(jreSpec, getJreVersion());
-    }
-
     static boolean isJreVersion(String jreSpec, String actualJreVersion) {
         List<String> includes = new ArrayList<>();
         List<String> excludes = new ArrayList<>();
@@ -176,33 +156,27 @@ class SelectorUtils {
         return isJreVersion(jreVersion, includes, true) && !isJreVersion(jreVersion, excludes, false);
     }
 
-    static boolean isJreVersion(List<Integer> jreVersion, List<String> versionPatterns, boolean defaultMatch) {
-        if (versionPatterns != null && !versionPatterns.isEmpty()) {
-            for (String versionPattern : versionPatterns) {
-                if (isJreVersion(jreVersion, versionPattern)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } else {
+    static boolean isJreVersion(List<Integer> jreVersions, List<String> versionPatterns, boolean defaultMatch) {
+        if (versionPatterns == null || versionPatterns.isEmpty()) {
             return defaultMatch;
         }
+
+        return versionPatterns.stream().anyMatch(versionPattern -> isJreVersion(jreVersions, versionPattern));
     }
 
-    static boolean isJreVersion(List<Integer> jreVersion, String versionPattern) {
+    static boolean isJreVersion(List<Integer> jreVersions, String versionPattern) {
         List<Integer> checkVersion = parseVersion(versionPattern);
 
         if (versionPattern.endsWith("+")) {
             // 1.5+ <=> [1.5,)
-            return compareVersions(jreVersion, checkVersion) >= 0;
+            return compareVersions(jreVersions, checkVersion) >= 0;
         } else if (versionPattern.endsWith("-")) {
             // 1.5- <=> (,1.5)
-            return compareVersions(jreVersion, checkVersion) < 0;
+            return compareVersions(jreVersions, checkVersion) < 0;
         } else {
             // 1.5 <=> [1.5,1.6)
-            return checkVersion.size() <= jreVersion.size()
-                    && checkVersion.equals(jreVersion.subList(0, checkVersion.size()));
+            return checkVersion.size() <= jreVersions.size()
+                    && checkVersion.equals(jreVersions.subList(0, checkVersion.size()));
         }
     }
 
