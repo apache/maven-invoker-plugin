@@ -96,7 +96,7 @@ public class InvokerReport extends AbstractMavenReport {
     }
 
     public String getOutputName() {
-        return "invoker-report";
+        return "invoker";
     }
 
     private File[] getReportFiles() {
