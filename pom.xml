@@ -195,7 +195,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-script-interpreter</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
     </dependency>
 
     <dependency>
