@@ -24,18 +24,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 import org.apache.maven.toolchain.ToolchainPrivate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.isA;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,63 +40,69 @@ import static org.mockito.Mockito.when;
  *
  * @author Benjamin Bentmann
  */
-public class SelectorUtilsTest {
+class SelectorUtilsTest {
 
     @Test
-    public void testParseList() {
+    void testParseList() {
         List<String> includes = new ArrayList<>();
         List<String> excludes = new ArrayList<>();
 
         SelectorUtils.parseList(null, includes, excludes);
 
         SelectorUtils.parseList(" 1.5, !1.4, 1.6+ ", includes, excludes);
-        assertEquals(Arrays.asList("1.5", "1.6+"), includes);
-        assertEquals(Collections.singletonList("1.4"), excludes);
+        assertThat(includes).containsExactly("1.5", "1.6+");
+        assertThat(excludes).containsExactly("1.4");
     }
 
     @Test
-    public void testParseVersion() {
-        assertEquals(Arrays.asList(1, 6, 0, 12), SelectorUtils.parseVersion("1.6.0_12"));
-
-        assertEquals(Arrays.asList(1, 6, 0, 12), SelectorUtils.parseVersion("1.6.0_12+"));
-        assertEquals(Arrays.asList(1, 6, 0, 12), SelectorUtils.parseVersion("1.6.0_12-"));
+    void testParseVersion() {
+        assertThat(SelectorUtils.parseVersion("1.6.0_12")).containsExactly(1, 6, 0, 12);
+        assertThat(SelectorUtils.parseVersion("1.6.0_12+")).containsExactly(1, 6, 0, 12);
+        assertThat(SelectorUtils.parseVersion("1.6.0_12-")).containsExactly(1, 6, 0, 12);
     }
 
     @Test
-    public void testCompareVersions() {
-        assertTrue(SelectorUtils.compareVersions(Arrays.asList(1, 6), Arrays.asList(1, 6)) == 0);
+    void testCompareVersions() {
+        assertThat(SelectorUtils.compareVersions(Arrays.asList(1, 6), Arrays.asList(1, 6)))
+                .isZero();
 
-        assertTrue(SelectorUtils.compareVersions(Arrays.asList(1, 5), Arrays.asList(1, 6)) < 0);
-        assertTrue(SelectorUtils.compareVersions(Arrays.asList(1, 6), Arrays.asList(1, 5)) > 0);
+        assertThat(SelectorUtils.compareVersions(Arrays.asList(1, 5), Arrays.asList(1, 6)))
+                .isNegative();
+        assertThat(SelectorUtils.compareVersions(Arrays.asList(1, 6), Arrays.asList(1, 5)))
+                .isPositive();
 
-        assertTrue(SelectorUtils.compareVersions(Collections.singletonList(1), Arrays.asList(1, 6)) < 0);
-        assertTrue(SelectorUtils.compareVersions(Arrays.asList(1, 6), Collections.singletonList(1)) > 0);
+        assertThat(SelectorUtils.compareVersions(Collections.singletonList(1), Arrays.asList(1, 6)))
+                .isNegative();
+        assertThat(SelectorUtils.compareVersions(Arrays.asList(1, 6), Collections.singletonList(1)))
+                .isPositive();
     }
 
     @Test
-    public void testIsMatchingJre() {
+    void testIsMatchingJre() {
 
-        assertFalse(SelectorUtils.isJreVersion(Arrays.asList(1, 4, 2, 8), "1.5"));
-        assertTrue(SelectorUtils.isJreVersion(Arrays.asList(1, 5), "1.5"));
-        assertTrue(SelectorUtils.isJreVersion(Arrays.asList(1, 5, 9), "1.5"));
-        assertFalse(SelectorUtils.isJreVersion(Arrays.asList(1, 6), "1.5"));
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 4, 2, 8), "1.5")).isFalse();
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 5), "1.5")).isTrue();
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 5, 9), "1.5")).isTrue();
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 6), "1.5")).isFalse();
 
-        assertFalse(SelectorUtils.isJreVersion(Arrays.asList(1, 4, 2, 8), "1.5+"));
-        assertTrue(SelectorUtils.isJreVersion(Arrays.asList(1, 5), "1.5+"));
-        assertTrue(SelectorUtils.isJreVersion(Arrays.asList(1, 5, 9), "1.5+"));
-        assertTrue(SelectorUtils.isJreVersion(Arrays.asList(1, 6), "1.5+"));
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 4, 2, 8), "1.5+"))
+                .isFalse();
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 5), "1.5+")).isTrue();
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 5, 9), "1.5+")).isTrue();
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 6), "1.5+")).isTrue();
 
-        assertTrue(SelectorUtils.isJreVersion(Arrays.asList(1, 4, 2, 8), "1.5-"));
-        assertFalse(SelectorUtils.isJreVersion(Arrays.asList(1, 5), "1.5-"));
-        assertFalse(SelectorUtils.isJreVersion(Arrays.asList(1, 5, 9), "1.5-"));
-        assertFalse(SelectorUtils.isJreVersion(Arrays.asList(1, 6), "1.5-"));
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 4, 2, 8), "1.5-"))
+                .isTrue();
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 5), "1.5-")).isFalse();
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 5, 9), "1.5-")).isFalse();
+        assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 6), "1.5-")).isFalse();
 
-        assertTrue(SelectorUtils.isJreVersion((String) null, "1.5"));
-        assertTrue(SelectorUtils.isJreVersion("", "1.5"));
+        assertThat(SelectorUtils.isJreVersion((String) null, "1.5")).isTrue();
+        assertThat(SelectorUtils.isJreVersion("", "1.5")).isTrue();
     }
 
     @Test
-    public void testIsMatchingToolchain() throws Exception {
+    void testIsMatchingToolchain() throws Exception {
         InvokerToolchain openJdk9 = new InvokerToolchain("jdk");
         openJdk9.addProvides("version", "9");
         openJdk9.addProvides("vendor", "openJDK");
@@ -110,32 +112,37 @@ public class SelectorUtilsTest {
 
         ToolchainPrivateManager toolchainPrivateManager = mock(ToolchainPrivateManager.class);
         ToolchainPrivate jdkMatching = mock(ToolchainPrivate.class);
-        when(jdkMatching.matchesRequirements(isA(Map.class))).thenReturn(true);
+        when(jdkMatching.matchesRequirements(anyMap())).thenReturn(true);
         when(jdkMatching.getType()).thenReturn("jdk");
 
         ToolchainPrivate jdkMismatch = mock(ToolchainPrivate.class);
         when(jdkMismatch.getType()).thenReturn("jdk");
 
         when(toolchainPrivateManager.getToolchainPrivates("jdk")).thenReturn(new ToolchainPrivate[] {jdkMatching});
-        assertTrue(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)));
+        assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)))
+                .isTrue();
 
         when(toolchainPrivateManager.getToolchainPrivates("jdk")).thenReturn(new ToolchainPrivate[] {jdkMismatch});
-        assertFalse(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)));
+        assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)))
+                .isFalse();
 
         when(toolchainPrivateManager.getToolchainPrivates("jdk"))
                 .thenReturn(new ToolchainPrivate[] {jdkMatching, jdkMismatch, jdkMatching});
-        assertTrue(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)));
+        assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)))
+                .isTrue();
 
         when(toolchainPrivateManager.getToolchainPrivates("jdk")).thenReturn(new ToolchainPrivate[0]);
-        assertFalse(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)));
+        assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)))
+                .isFalse();
 
         when(toolchainPrivateManager.getToolchainPrivates("jdk")).thenReturn(new ToolchainPrivate[] {jdkMatching});
         when(toolchainPrivateManager.getToolchainPrivates("maven")).thenReturn(new ToolchainPrivate[0]);
-        assertFalse(SelectorUtils.isToolchain(toolchainPrivateManager, Arrays.asList(openJdk9, maven360)));
+        assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Arrays.asList(openJdk9, maven360)))
+                .isFalse();
     }
 
     @Test
-    public void mavenVersionForNotExistingMavenHomeThrowException() {
+    void mavenVersionForNotExistingMavenHomeThrowException() {
         File mavenHome = new File("not-existing-path");
 
         assertThatCode(() -> SelectorUtils.getMavenVersion(mavenHome))
@@ -144,7 +151,7 @@ public class SelectorUtilsTest {
     }
 
     @Test
-    public void mavenVersionFromMavenHome() throws IOException {
+    void mavenVersionFromMavenHome() throws IOException {
         File mavenHome = new File(System.getProperty("maven.home"));
 
         String mavenVersion = SelectorUtils.getMavenVersion(mavenHome);

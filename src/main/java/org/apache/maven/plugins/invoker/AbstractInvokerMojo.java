@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -91,13 +92,13 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
-import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.codehaus.plexus.util.xml.XmlStreamWriter;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 
@@ -751,8 +752,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         if (encoding == null || encoding.isEmpty()) {
-            getLog().warn("File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING
-                    + ", i.e. build is platform dependent!");
+            getLog().warn("File encoding has not been set, using platform encoding "
+                    + Charset.defaultCharset().displayName() + ", i.e. build is platform dependent!");
         }
 
         // done it here to prevent issues with concurrent access in case of parallel run
@@ -1522,7 +1523,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         File interpolatedPomFile = interpolatePomFile(pomFile, basedir);
         // FIXME: Think about the following code part -- ^^^^^^^ END
 
-        getLog().info(buffer().a("Building: ").strong(buildJob.getProject()).toString());
+        getLog().info(buffer().a("Building: ").strong(buildJob.getProject()).build());
 
         InvokerProperties invokerProperties = getInvokerProperties(basedir, globalInvokerProperties);
 
@@ -2274,13 +2275,12 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
             // interpolation with token @...@
             try (Reader reader =
-                    new InterpolationFilterReader(ReaderFactory.newXmlReader(originalFile), composite, "@", "@")) {
+                    new InterpolationFilterReader(new XmlStreamReader(originalFile), composite, "@", "@")) {
                 xml = IOUtil.toString(reader);
             }
 
-            try (Writer writer = WriterFactory.newXmlWriter(interpolatedFile)) {
+            try (Writer writer = new XmlStreamWriter(interpolatedFile)) {
                 interpolatedFile.getParentFile().mkdirs();
-
                 writer.write(xml);
             }
         } catch (IOException e) {
