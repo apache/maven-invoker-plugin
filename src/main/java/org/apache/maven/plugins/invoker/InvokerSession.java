@@ -27,7 +27,7 @@ import java.util.List;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.invoker.model.BuildJob;
-import org.apache.maven.shared.utils.io.IOUtil;
+import org.codehaus.plexus.util.IOUtil;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -38,7 +38,7 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
  */
 class InvokerSession {
     private static final String SEPARATOR =
-            buffer().strong("-------------------------------------------------").toString();
+            buffer().strong("-------------------------------------------------").build();
 
     private List<BuildJob> buildJobs;
 

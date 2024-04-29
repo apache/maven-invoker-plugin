@@ -18,33 +18,18 @@
  */
 package org.apache.maven.plugins.invoker;
 
-import java.util.Properties;
+import java.io.File;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
+import org.codehaus.plexus.util.ReflectionUtils;
 
-/**
- * @author Olivier Lamy
- * @since 22 nov. 07
- */
-public class ExtendedMavenProjectStub extends MavenProjectStub {
-    private Scm scm;
+abstract class AbstractTestUtil {
 
-    private Properties properties;
-
-    public Scm getScm() {
-        return scm;
+    protected String getBasedir() {
+        String path = System.getProperty("basedir");
+        return path != null ? path : new File("").getAbsolutePath();
     }
 
-    public void setScm(Scm scm) {
-        this.scm = scm;
-    }
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
+    protected void setVariableValueToObject(Object object, String filed, Object value) throws IllegalAccessException {
+        ReflectionUtils.setVariableValueInObject(object, filed, value);
     }
 }
