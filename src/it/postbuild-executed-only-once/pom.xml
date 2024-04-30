@@ -31,8 +31,8 @@ under the License.
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <compilerPluginVersion>@compilerPluginVersion@</compilerPluginVersion>
-    <surefirePluginVersion>@surefirePluginVersion@</surefirePluginVersion>
+    <version.maven-compiler-plugin>@version.maven-compiler-plugin@</version.maven-compiler-plugin>
+    <version.maven-surefire>@version.maven-surefire@</version.maven-surefire>
   </properties>
 
   <build>

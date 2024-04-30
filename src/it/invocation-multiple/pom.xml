@@ -32,12 +32,12 @@ under the License.
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <mavenVersion>@mavenVersion@</mavenVersion>
-    <compilerPluginVersion>@compilerPluginVersion@</compilerPluginVersion>
-    <installPluginVersion>@installPluginVersion@</installPluginVersion>
-    <jarPluginVersion>@jarPluginVersion@</jarPluginVersion>
-    <pluginPluginVersion>@pluginPluginVersion@</pluginPluginVersion>
-    <resourcesPluginVersion>@resourcesPluginVersion@</resourcesPluginVersion>
-    <surefirePluginVersion>@surefirePluginVersion@</surefirePluginVersion>
+    <version.maven-compiler-plugin>@version.maven-compiler-plugin@</version.maven-compiler-plugin>
+    <version.maven-install-plugin>@version.maven-install-plugin@</version.maven-install-plugin>
+    <version.maven-jar-plugin>@version.maven-jar-plugin@</version.maven-jar-plugin>
+    <version.maven-plugin-tools>@version.maven-plugin-tools@</version.maven-plugin-tools>
+    <version.maven-resources-plugin>@version.maven-resources-plugin@</version.maven-resources-plugin>
+    <version.maven-surefire>@version.maven-surefire@</version.maven-surefire>
   </properties>
 
   <build>
@@ -45,7 +45,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
         <configuration>
           <debug>true</debug>
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>

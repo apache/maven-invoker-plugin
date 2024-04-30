@@ -47,7 +47,7 @@ under the License.
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>@compilerPluginVersion@</version>
+        <version>@version.maven-compiler-plugin@</version>
         <configuration>
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
@@ -55,23 +55,23 @@ under the License.
       </plugin>
       <plugin>
         <artifactId>maven-install-plugin</artifactId>
-        <version>@installPluginVersion@</version>
+        <version>@version.maven-install-plugin@</version>
       </plugin>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>@jarPluginVersion@</version>
+        <version>@version.maven-jar-plugin@</version>
       </plugin>
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>@pluginPluginVersion@</version>
+        <version>@version.maven-plugin-tools@</version>
       </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>@resourcesPluginVersion@</version>
+        <version>@version.maven-resources-plugin@</version>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>@surefirePluginVersion@</version>
+        <version>@version.maven-surefire@</version>
       </plugin>
     </plugins>
   </build>
