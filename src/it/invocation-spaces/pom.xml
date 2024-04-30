@@ -31,11 +31,11 @@ under the License.
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <compilerPluginVersion>@compilerPluginVersion@</compilerPluginVersion>
-    <installPluginVersion>@installPluginVersion@</installPluginVersion>
-    <jarPluginVersion>@jarPluginVersion@</jarPluginVersion>
-    <resourcesPluginVersion>@resourcesPluginVersion@</resourcesPluginVersion>
-    <surefirePluginVersion>@surefirePluginVersion@</surefirePluginVersion>
+    <version.maven-compiler-plugin>@version.maven-compiler-plugin@</version.maven-compiler-plugin>
+    <version.maven-install-plugin>@version.maven-install-plugin@</version.maven-install-plugin>
+    <version.maven-jar-plugin>@version.maven-jar-plugin@</version.maven-jar-plugin>
+    <version.maven-resources-plugin>@version.maven-resources-plugin@</version.maven-resources-plugin>
+    <version.maven-surefire>@version.maven-surefire@</version.maven-surefire>
   </properties>
 
   <build>
@@ -43,7 +43,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
         <configuration>
           <debug>true</debug>
           <projectsDirectory>src/it projects</projectsDirectory>

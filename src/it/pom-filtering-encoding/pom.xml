@@ -30,7 +30,7 @@ under the License.
   <description>Test to check for proper handling of file encoding during POM filtering.</description>
 
   <properties>
-    <resourcesPluginVersion>@resourcesPluginVersion@</resourcesPluginVersion>
+    <version.maven-resources-plugin>@version.maven-resources-plugin@</version.maven-resources-plugin>
   </properties>
 
   <build>
@@ -38,7 +38,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
         <configuration>
           <debug>true</debug>
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
