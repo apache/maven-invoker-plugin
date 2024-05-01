@@ -92,6 +92,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
+import org.codehaus.plexus.util.NioFiles;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -1178,14 +1179,18 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         /*
          * NOTE: Make sure the destination directory is always there (even if empty) to support POM-less ITs.
          */
-        destDir.mkdirs();
+        Files.createDirectories(destDir.toPath());
         // Create all the directories, including any symlinks present in source
         FileUtils.mkDirs(sourceDir, scanner.getIncludedDirectories(), destDir);
 
         for (String includedFile : scanner.getIncludedFiles()) {
             File sourceFile = new File(sourceDir, includedFile);
             File destFile = new File(destDir, includedFile);
-            FileUtils.copyFile(sourceFile, destFile);
+            if (NioFiles.isSymbolicLink(sourceFile)) {
+                NioFiles.createSymbolicLink(destFile, NioFiles.readSymbolicLink(sourceFile));
+            } else {
+                FileUtils.copyFile(sourceFile, destFile);
+            }
 
             // ensure clone project must be writable for additional changes
             destFile.setWritable(true);
