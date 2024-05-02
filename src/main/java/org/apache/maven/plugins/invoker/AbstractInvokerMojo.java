@@ -820,6 +820,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
         if (cloneProjectsTo != null) {
             cloneProjects(collectedProjects);
+            addMissingDotMvnDirectory(cloneProjectsTo, buildJobs);
             projectsDir = cloneProjectsTo;
         } else {
             getLog().warn("Filtering of parent/child POMs is not supported without cloning the projects");
@@ -854,6 +855,31 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
         writeSummaryFile(buildJobs);
         processResults(new InvokerSession(buildJobs));
+    }
+
+    /**
+     * We need add missing {@code .mnvn} directories for executing projects
+     *
+     * @param projectsDir base of projects
+     * @param buildJobs list of discovered jobs
+     */
+    private void addMissingDotMvnDirectory(File projectsDir, List<BuildJob> buildJobs) throws MojoExecutionException {
+        for (BuildJob buildJob : buildJobs) {
+            Path projectPath = projectsDir.toPath().resolve(buildJob.getProject());
+
+            if (Files.isRegularFile(projectPath)) {
+                projectPath = projectPath.getParent();
+            }
+
+            Path mvnDotPath = projectPath.resolve(".mvn");
+            if (!Files.exists(mvnDotPath)) {
+                try {
+                    Files.createDirectories(mvnDotPath);
+                } catch (IOException e) {
+                    throw new MojoExecutionException(e.getMessage(), e);
+                }
+            }
+        }
     }
 
     private void setupActualMavenVersion() throws MojoExecutionException {
