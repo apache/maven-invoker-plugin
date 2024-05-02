@@ -17,15 +17,8 @@
  * under the License.
  */
 
-import java.io.*;
 
-try
-{
-    File itRoot = new File( basedir, "target/it/clone-clean" );
-    return !new File( itRoot, "foobar.log" ).exists();
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
+File itRoot = new File(basedir, "target/it/clone-clean")
+assert !new File(itRoot, "foobar.log").exists()
+// .mnv will be created
+assert new File(itRoot, ".mvn").isDirectory()
