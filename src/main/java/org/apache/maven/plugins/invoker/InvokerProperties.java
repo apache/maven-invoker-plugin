@@ -32,6 +32,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.maven.shared.invoker.InvocationRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a convenient facade around the <code>invoker.properties</code>.
@@ -39,6 +41,9 @@ import org.apache.maven.shared.invoker.InvocationRequest;
  * @author Benjamin Bentmann
  */
 class InvokerProperties {
+
+    private final Logger logger = LoggerFactory.getLogger(InvokerProperties.class);
+
     private static final String SELECTOR_PREFIX = "selector.";
 
     private static final Pattern ENVIRONMENT_VARIABLES_PATTERN =
@@ -54,6 +59,7 @@ class InvokerProperties {
     private Map<String, String> defaultEnvironmentVariables;
     private File defaultMavenExecutable;
     private Boolean defaultUpdateSnapshots;
+    private String defaultUserPropertiesFiles;
 
     private enum InvocationProperty {
         PROJECT("invoker.project"),
@@ -66,6 +72,7 @@ class InvokerProperties {
         NON_RECURSIVE("invoker.nonRecursive"),
         OFFLINE("invoker.offline"),
         SYSTEM_PROPERTIES_FILE("invoker.systemPropertiesFile"),
+        USER_PROPERTIES_FILE("invoker.userPropertiesFile"),
         DEBUG("invoker.debug"),
         QUIET("invoker.quiet"),
         SETTINGS_FILE("invoker.settingsFile"),
@@ -188,6 +195,14 @@ class InvokerProperties {
      */
     public void setDefaultUpdateSnapshots(boolean defaultUpdateSnapshots) {
         this.defaultUpdateSnapshots = defaultUpdateSnapshots;
+    }
+
+    /**
+     * Default value for userPropertiesFile
+     * @param defaultUserPropertiesFiles a default value
+     */
+    public void setDefaultUserPropertiesFiles(String defaultUserPropertiesFiles) {
+        this.defaultUserPropertiesFiles = defaultUserPropertiesFiles;
     }
 
     /**
@@ -467,13 +482,33 @@ class InvokerProperties {
     }
 
     /**
-     * Gets the path to the properties file used to set the system properties for the specified invocation.
+     * Gets the path to the properties file used to set the user properties for the specified invocation.
      *
      * @param index The index of the invocation, must not be negative.
      * @return The path to the properties file or <code>null</code> if not set.
      */
-    public String getSystemPropertiesFile(int index) {
-        return get(InvocationProperty.SYSTEM_PROPERTIES_FILE, index).orElse(null);
+    public String getUserPropertiesFile(int index) {
+        Optional<String> userProperties = get(InvocationProperty.USER_PROPERTIES_FILE, index);
+        Optional<String> systemProperties = get(InvocationProperty.SYSTEM_PROPERTIES_FILE, index);
+
+        if (userProperties.isPresent() && systemProperties.isPresent()) {
+            throw new IllegalArgumentException("only one property '" + InvocationProperty.USER_PROPERTIES_FILE
+                    + "' or '" + InvocationProperty.SYSTEM_PROPERTIES_FILE + "' can be used");
+        }
+
+        if (userProperties.isPresent()) {
+            return userProperties.get();
+        }
+
+        if (systemProperties.isPresent()) {
+            logger.warn(
+                    "property {} is deprecated - please use {}",
+                    InvocationProperty.SYSTEM_PROPERTIES_FILE,
+                    InvocationProperty.USER_PROPERTIES_FILE);
+            return systemProperties.get();
+        }
+
+        return defaultUserPropertiesFiles;
     }
 
     /**

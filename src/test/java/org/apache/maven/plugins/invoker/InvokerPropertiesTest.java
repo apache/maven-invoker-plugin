@@ -545,4 +545,43 @@ class InvokerPropertiesTest {
         assertThat(toolchain.getType()).isEqualTo("jdk");
         assertThat(toolchain.getProvides()).containsExactlyEntriesOf(Collections.singletonMap("version", "11"));
     }
+
+    @Test
+    void defaultValueForUserPropertiesFileShouldBeReturned() {
+        InvokerProperties facade = new InvokerProperties(new Properties());
+        facade.setDefaultUserPropertiesFiles("test3.properties");
+
+        assertThat(facade.getUserPropertiesFile(0)).isEqualTo("test3.properties");
+    }
+
+    @Test
+    void userPropertiesFilesShouldBeUsed() {
+        Properties props = new Properties();
+        props.put("invoker.userPropertiesFile", "test1");
+        InvokerProperties facade = new InvokerProperties(props);
+
+        assertThat(facade.getUserPropertiesFile(0)).isEqualTo("test1");
+    }
+
+    @Test
+    void systemPropertiesFilesShouldBeUsed() {
+        Properties props = new Properties();
+        props.put("invoker.systemPropertiesFile", "test1");
+        InvokerProperties facade = new InvokerProperties(props);
+
+        assertThat(facade.getUserPropertiesFile(0)).isEqualTo("test1");
+    }
+
+    @Test
+    void userAndSystemPropertiesFilesShouldThrowException() {
+        Properties props = new Properties();
+        props.put("invoker.systemPropertiesFile", "test1");
+        props.put("invoker.userPropertiesFile", "test2");
+        InvokerProperties facade = new InvokerProperties(props);
+
+        assertThatCode(() -> facade.getUserPropertiesFile(0))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                        "only one property 'invoker.userPropertiesFile' or 'invoker.systemPropertiesFile' can be used");
+    }
 }

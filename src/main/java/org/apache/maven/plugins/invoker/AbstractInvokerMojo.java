@@ -526,11 +526,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * # can be indexed
      * invoker.offline = true
      *
-     * # The path to the properties file from which to load system properties, defaults to the
+     * # The path to the properties file from which to load user properties, defaults to the
      * # filename given by the plugin parameter testPropertiesFile
      * # Since plugin version 1.4
      * # can be indexed
-     * invoker.systemPropertiesFile = test.properties
+     * invoker.userPropertiesFile = test.properties
      *
      * # An optional human friendly name and description for this build job.
      * # Both name and description have to be set to be included in the build reports.
@@ -1887,9 +1887,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     request.setUserSettingsFile(settingsFile);
                 }
 
-                Properties systemProperties =
-                        getSystemProperties(basedir, invokerProperties.getSystemPropertiesFile(invocationIndex));
-                request.setProperties(systemProperties);
+                Properties userProperties =
+                        getUserProperties(basedir, invokerProperties.getUserPropertiesFile(invocationIndex));
+                request.setProperties(userProperties);
 
                 invokerProperties.configureInvocation(request, invocationIndex);
 
@@ -1999,7 +1999,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @return The system properties to use, may be empty but never <code>null</code>.
      * @throws org.apache.maven.plugin.MojoExecutionException If the properties file exists but could not be read.
      */
-    private Properties getSystemProperties(final File basedir, final String filename) throws MojoExecutionException {
+    private Properties getUserProperties(final File basedir, final String filename) throws MojoExecutionException {
         Properties collectedTestProperties = new Properties();
 
         if (properties != null) {
@@ -2014,18 +2014,16 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         File propertiesFile = null;
         if (filename != null) {
             propertiesFile = new File(basedir, filename);
-        } else if (testPropertiesFile != null) {
-            propertiesFile = new File(basedir, testPropertiesFile);
         }
 
         if (propertiesFile != null && propertiesFile.isFile()) {
 
-            try (InputStream fin = new FileInputStream(propertiesFile)) {
+            try (InputStream fin = Files.newInputStream(propertiesFile.toPath())) {
                 Properties loadedProperties = new Properties();
                 loadedProperties.load(fin);
                 collectedTestProperties.putAll(loadedProperties);
             } catch (IOException e) {
-                throw new MojoExecutionException("Error reading system properties from " + propertiesFile);
+                throw new MojoExecutionException("Error reading user properties from " + propertiesFile);
             }
         }
 
@@ -2369,6 +2367,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         invokerProperties.setDefaultTimeoutInSeconds(timeoutInSeconds);
         invokerProperties.setDefaultEnvironmentVariables(environmentVariables);
         invokerProperties.setDefaultUpdateSnapshots(updateSnapshots);
+        invokerProperties.setDefaultUserPropertiesFiles(testPropertiesFile);
 
         return invokerProperties;
     }
