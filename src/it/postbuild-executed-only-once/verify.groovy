@@ -17,25 +17,9 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+// make sure the Invoker Plugin was indeed run and the build didn't fail somewhere else
+def touchFile = new File(basedir, 'target/it/project/target/touch.txt')
+assert touchFile.exists()
 
-try
-{
-    // make sure the Invoker Plugin was indeed run and the build didn't fail somewhere else
-    File touchFile = new File( basedir, "target/it/project/target/touch.txt" );
-    System.out.println( "Checking for existence of touch file: " + touchFile );
-    if ( !touchFile.exists() )
-    {
-        System.out.println( "FAILED! no touchFile " + touchFile.toString() );
-        return false;
-    }
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
-
-return true;
+def logs = new File(basedir, 'build.log').text
+assert logs.contains('[WARNING] property invoker.systemPropertiesFile is deprecated - please use invoker.userPropertiesFile')
