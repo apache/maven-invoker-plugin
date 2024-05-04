@@ -56,7 +56,7 @@ Groovy version and extensions
           <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-yaml</artifactId>
-            <version>3.0.10</version>
+            <version>${groovy-version}</version>
           </dependency>
         </dependencies>
       </plugin>
