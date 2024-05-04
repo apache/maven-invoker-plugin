@@ -1838,24 +1838,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         Map<String, Object> context = new LinkedHashMap<>();
+        Properties scriptUserProperties = new Properties();
+        context.put("userProperties", scriptUserProperties);
 
-        boolean selectorResult = true;
+        if (!runSelectorHook(basedir, context, logger)) {
+            return false;
+        }
 
         try {
-            try {
-                scriptRunner.run("selector script", basedir, selectorScript, context, logger);
-            } catch (ScriptReturnException e) {
-                selectorResult = false;
-                return false;
-            } catch (ScriptException e) {
-                throw new RunFailureException(BuildJob.Result.ERROR, e);
-            }
-
-            try {
-                scriptRunner.run("pre-build script", basedir, preBuildHookScript, context, logger);
-            } catch (ScriptException e) {
-                throw new RunFailureException(BuildJob.Result.FAILURE_PRE_HOOK, e);
-            }
+            runPreBuildHook(basedir, context, logger);
 
             for (int invocationIndex = 1; ; invocationIndex++) {
                 if (invocationIndex > 1 && !invokerProperties.isInvocationDefined(invocationIndex)) {
@@ -1889,6 +1880,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
                 Properties userProperties =
                         getUserProperties(basedir, invokerProperties.getUserPropertiesFile(invocationIndex));
+                userProperties.putAll(scriptUserProperties);
                 request.setProperties(userProperties);
 
                 invokerProperties.configureInvocation(request, invocationIndex);
@@ -1911,12 +1903,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                             "Maven invocation failed. " + e.getMessage(), BuildJob.Result.FAILURE_BUILD);
                 }
             }
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
         } finally {
-            if (selectorResult) {
-                runPostBuildHook(basedir, context, logger);
-            }
+            runPostBuildHook(basedir, context, logger);
         }
         return true;
     }
@@ -1928,6 +1916,31 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             return (int) (parallelThreadsMultiple * Runtime.getRuntime().availableProcessors());
         } else {
             return Integer.parseInt(parallelThreads);
+        }
+    }
+
+    private boolean runSelectorHook(File basedir, Map<String, Object> context, FileLogger logger)
+            throws MojoExecutionException, RunFailureException {
+        try {
+            scriptRunner.run("selector script", basedir, selectorScript, context, logger);
+        } catch (ScriptReturnException e) {
+            return false;
+        } catch (ScriptException e) {
+            throw new RunFailureException(BuildJob.Result.ERROR, e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+        return true;
+    }
+
+    private void runPreBuildHook(File basedir, Map<String, Object> context, FileLogger logger)
+            throws MojoExecutionException, RunFailureException {
+        try {
+            scriptRunner.run("pre-build script", basedir, preBuildHookScript, context, logger);
+        } catch (ScriptException e) {
+            throw new RunFailureException(BuildJob.Result.FAILURE_PRE_HOOK, e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         }
     }
 

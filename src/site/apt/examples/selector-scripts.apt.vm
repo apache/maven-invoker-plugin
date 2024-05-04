@@ -85,4 +85,7 @@ Selector Scripts
   If the script returns any value other than <<<true>>>, then the project will not be executed.
 
   If the script throws an exception, then the project will be marked as being in ERROR.
- 
+
+Predefined global variables
+
+  In Selector Scripts the same global variables are defined as in {{{./pre-post-build-script.html#predefined-global-variables}Pre and Post Build Script}}
