@@ -28,7 +28,12 @@ def testFile = projectPath.resolve('test.txt')
 Files.createDirectory(testDir)
 Files.createFile(testFile)
 
-Files.createSymbolicLink(projectPath.resolve('testDirLink'), Paths.get('testDir'))
-Files.createSymbolicLink(projectPath.resolve('testLink.txt'), Paths.get('test.txt'))
+// If FS does not support symlinks we should skip test
+try {
+    Files.createSymbolicLink(projectPath.resolve('testDirLink'), Paths.get('testDir'))
+    Files.createSymbolicLink(projectPath.resolve('testLink.txt'), Paths.get('test.txt'))
+} catch (IOException e) {
+    return false
+}
 
-true
+return true
