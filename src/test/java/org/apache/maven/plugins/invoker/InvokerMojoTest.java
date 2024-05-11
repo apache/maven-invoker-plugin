@@ -49,11 +49,13 @@ class InvokerMojoTest extends AbstractTestUtil {
     @Test
     void testSingleInvokerTest() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "invokerTest", "*dummy*");
         setVariableValueToObject(invokerMojo, "settings", new Settings());
 
@@ -67,11 +69,13 @@ class InvokerMojoTest extends AbstractTestUtil {
     @Test
     void testMultiInvokerTest() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "invokerTest", "*dummy*,*terpolatio*");
         setVariableValueToObject(invokerMojo, "settings", new Settings());
 
@@ -85,11 +89,13 @@ class InvokerMojoTest extends AbstractTestUtil {
     @Test
     void testFullPatternInvokerTest() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "invokerTest", "*");
         setVariableValueToObject(invokerMojo, "settings", new Settings());
 
@@ -106,11 +112,13 @@ class InvokerMojoTest extends AbstractTestUtil {
     @Test
     void testSetupInProjectList() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "settings", new Settings());
         setVariableValueToObject(invokerMojo, "setupIncludes", Collections.singletonList("dum*/pom.xml"));
 
@@ -134,11 +142,13 @@ class InvokerMojoTest extends AbstractTestUtil {
     @Test
     void testSetupProjectIsFiltered() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "settings", new Settings());
         setVariableValueToObject(invokerMojo, "setupIncludes", Collections.singletonList("dum*/pom.xml"));
         setVariableValueToObject(invokerMojo, "invokerTest", "*project-dir*");

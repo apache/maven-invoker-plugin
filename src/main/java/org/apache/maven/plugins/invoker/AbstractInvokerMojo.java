@@ -410,6 +410,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     /**
      * The <code>MAVEN_OPTS</code> environment variable to use when invoking Maven. This value can be overridden for
      * individual integration tests by using {@link #invokerPropertiesFile}.
+     * <br>
+     * Since the version <b>3.7.0</b> using an alternate syntax for mavenOpts, <code>@{...}</code>
+     * allows late replacement of properties when the plugin is executed,
+     * so properties that have been modified by other plugins will be picked up correctly.
      *
      * @since 1.2
      */
@@ -738,6 +742,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     @Component
     private ToolchainManagerPrivate toolchainManagerPrivate;
+
+    @Component
+    private InterpolatorUtils interpolatorUtils;
 
     /**
      * Invokes Maven on the configured test projects.
@@ -2363,7 +2370,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         invokerProperties.setDefaultGoals(goals);
         invokerProperties.setDefaultProfiles(profiles);
         invokerProperties.setDefaultMavenExecutable(mavenExecutable);
-        invokerProperties.setDefaultMavenOpts(mavenOpts);
+        invokerProperties.setDefaultMavenOpts(interpolatorUtils.interpolateAtPattern(mavenOpts));
         invokerProperties.setDefaultTimeoutInSeconds(timeoutInSeconds);
         invokerProperties.setDefaultEnvironmentVariables(environmentVariables);
         invokerProperties.setDefaultUpdateSnapshots(updateSnapshots);
