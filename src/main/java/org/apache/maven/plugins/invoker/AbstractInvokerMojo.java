@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
@@ -98,6 +99,7 @@ import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.XmlStreamWriter;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -1640,7 +1642,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             }
         } catch (RunFailureException e) {
             buildJob.setResult(e.getType());
-            buildJob.setFailureMessage(e.getMessage());
+            buildJob.setFailureMessage(StringEscapeUtils.escapeXml10(e.getMessage()));
 
             if (!suppressSummaries) {
                 getLog().info("  " + e.getMessage());
@@ -1779,7 +1781,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         if (buildLogFile != null && buildLogFile.exists()) {
             getLog().debug("fileLogger:" + buildLogFile);
             try {
-                systemOut.setValue(FileUtils.fileRead(buildLogFile));
+                systemOut.setValue(StringEscapeUtils.escapeXml10(FileUtils.fileRead(buildLogFile)));
             } catch (IOException e) {
                 throw new MojoExecutionException("Failed to read logfile " + buildLogFile, e);
             }
@@ -1789,7 +1791,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
         try (FileOutputStream fos = new FileOutputStream(reportFile);
                 Writer osw = new OutputStreamWriter(fos, buildJob.getModelEncoding())) {
-            Xpp3DomWriter.write(osw, testsuite);
+            Xpp3DomWriter.write(new PrettyPrintXMLWriter(osw), testsuite, false);
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to write JUnit build report " + reportFile, e);
         }
