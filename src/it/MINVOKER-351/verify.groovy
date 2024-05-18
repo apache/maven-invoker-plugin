@@ -17,7 +17,11 @@
  * under the License.
  */
 
+// we have a special chars in build.log
+def buildLog = new File(basedir, 'target/it/minvoker-351/build.log').text
+buildLog.contains('\u0002 - name: START OF TEXT')
+buildLog.contains('\u0007 - name: BEL')
+
+
 def surefireReport = new File(basedir, 'target/site/surefire-report.html').text
-
 assert surefireReport.contains('maven.invoker.it.minvoker-351')
-

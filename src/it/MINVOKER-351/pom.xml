@@ -30,6 +30,8 @@ under the License.
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <version.maven-compiler-plugin>@version.maven-compiler-plugin@</version.maven-compiler-plugin>
+    <version.maven-surefire>@version.maven-surefire@</version.maven-surefire>
   </properties>
 
   <build>
@@ -69,7 +71,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>@version.maven-surefire@</version>
+        <version>${version.maven-surefire}</version>
         <configuration>
           <reportsDirectories>
             <reportsDirectory>${project.build.directory}/invoker-reports-test</reportsDirectory>

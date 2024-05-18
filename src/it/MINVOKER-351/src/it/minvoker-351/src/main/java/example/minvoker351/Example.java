@@ -21,7 +21,7 @@ package example.minvoker351;
 public class Example {
   public void printAscii() {
     for (int i = 0; i < Byte.MAX_VALUE; ++i) {
-      System.out.println((char) i);
+      System.out.println((char) i + " - name: " + Character.getName(i));
     }
   }
 }
