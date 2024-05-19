@@ -16,12 +16,5 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package example.minvoker351;
 
-public class Example {
-  public void printAscii() {
-    for (int i = 0; i < Byte.MAX_VALUE; ++i) {
-      System.out.println((char) i + " - name: " + Character.getName(i));
-    }
-  }
-}
+throw new Exception("Special chars \tcharName=" + Character.getName(7) + (char) 7 + ";")
