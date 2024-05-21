@@ -247,7 +247,8 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
-      <version>4.0.4-SNAPSHOT</version>
+      <!-- TODO check with next parent -->
+      <version>3.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
