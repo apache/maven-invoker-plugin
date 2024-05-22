@@ -17,4 +17,4 @@
  * under the License.
  */
 
-throw new Exception("Special chars \tcharName=" + Character.getName(7) + (char) 7 + ";")
+throw new Exception("Special chars \tcharName=" + Character.getName(7) + ": " + (char) 7)
