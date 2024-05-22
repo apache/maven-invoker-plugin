@@ -147,6 +147,12 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-api</artifactId>
+      <version>1.4.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-util</artifactId>
       <version>1.4.1</version>
     </dependency>
@@ -205,6 +211,11 @@ under the License.
       <artifactId>maven-script-interpreter</artifactId>
       <version>1.6</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.36</version>
+    </dependency>
 
     <dependency>
       <groupId>${beanshell-groupId}</groupId>
@@ -236,6 +247,8 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
+      <!-- TODO check with next parent -->
+      <version>3.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
