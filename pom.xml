@@ -148,7 +148,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-api</artifactId>
-      <version>1.4.1</version>
+      <version>1.9.20</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
