@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-plugins</artifactId>
-    <version>42</version>
+    <version>43</version>
     <relativePath />
   </parent>
 
@@ -334,6 +334,7 @@ under the License.
           <artifactId>maven-checkstyle-plugin</artifactId>
           <configuration>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
+            <suppressionsLocation>src/config/checkstyle-suppressions.xml</suppressionsLocation>
           </configuration>
         </plugin>
         <plugin>
