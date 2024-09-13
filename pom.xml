@@ -68,7 +68,7 @@ under the License.
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
     <project.build.outputTimestamp>2024-08-18T18:54:23Z</project.build.outputTimestamp>
-    <groovy-version>4.0.22</groovy-version>
+    <groovy-version>4.0.23</groovy-version>
   </properties>
 
   <dependencyManagement>
