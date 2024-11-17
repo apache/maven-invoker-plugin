@@ -43,7 +43,7 @@ under the License.
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy</artifactId>
-      <version>@groovy-version@</version>
+      <version>@groovyVersion@</version>
       <type>pom</type>
       <scope>test</scope>
     </dependency>
