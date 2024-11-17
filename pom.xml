@@ -68,7 +68,10 @@ under the License.
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
     <project.build.outputTimestamp>2024-10-18T16:49:15Z</project.build.outputTimestamp>
-    <groovy-version>4.0.23</groovy-version>
+    <groovyVersion>4.0.23</groovyVersion>
+    <!-- Doxia 2.0 -->
+    <version.maven-site-plugin>3.21.0</version.maven-site-plugin>
+    <version.maven-fluido-skin>2.0.0</version.maven-fluido-skin>
   </properties>
 
   <dependencyManagement>
@@ -97,7 +100,7 @@ under the License.
       <dependency>
         <groupId>org.apache.groovy</groupId>
         <artifactId>groovy-bom</artifactId>
-        <version>${groovy-version}</version>
+        <version>${groovyVersion}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -389,10 +392,6 @@ under the License.
   <profiles>
     <profile>
       <id>run-its</id>
-      <properties>
-        <!-- plugins versions used in IT tests -->
-        <version.maven-site-plugin>3.20.0</version.maven-site-plugin>
-      </properties>
       <build>
         <pluginManagement>
           <plugins>
