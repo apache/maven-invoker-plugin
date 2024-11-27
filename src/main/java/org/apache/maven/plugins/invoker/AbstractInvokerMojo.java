@@ -217,6 +217,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(defaultValue = "true")
     private boolean cloneClean;
 
+    @Parameter
+    private List<String> collectedProjects;
+
     /**
      * A single POM to build, skipping any scanning parameters and behavior.
      *
@@ -802,11 +805,6 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
         handleScriptRunnerWithScriptClassPath();
 
-        Collection<String> collectedProjects = new LinkedHashSet<>();
-        for (BuildJob buildJob : buildJobs) {
-            collectProjects(projectsDirectory, buildJob.getProject(), collectedProjects, true);
-        }
-
         File projectsDir = projectsDirectory;
 
         if (cloneProjectsTo == null && "maven-plugin".equals(project.getPackaging())) {
@@ -826,6 +824,13 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         if (cloneProjectsTo != null) {
+            Collection<String> collectedProjects = this.collectedProjects;
+            if (collectedProjects == null) {
+                collectedProjects = new LinkedHashSet<>();
+                for (BuildJob buildJob : buildJobs) {
+                    collectProjects(projectsDirectory, buildJob.getProject(), collectedProjects, true);
+                }
+            }
             cloneProjects(collectedProjects);
             addMissingDotMvnDirectory(cloneProjectsTo, buildJobs);
             projectsDir = cloneProjectsTo;
@@ -1088,7 +1093,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      *
      * @param projectPaths The paths to the projects to clone, relative to the projects directory, must not be
      *            <code>null</code> nor contain <code>null</code> elements.
-     * @throws org.apache.maven.plugin.MojoExecutionException If the the projects could not be copied/filtered.
+     * @throws org.apache.maven.plugin.MojoExecutionException If the projects could not be copied/filtered.
      */
     private void cloneProjects(Collection<String> projectPaths) throws MojoExecutionException {
         if (!cloneProjectsTo.mkdirs() && cloneClean) {
