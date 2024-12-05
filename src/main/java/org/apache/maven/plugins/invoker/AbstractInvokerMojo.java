@@ -217,9 +217,6 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(defaultValue = "true")
     private boolean cloneClean;
 
-    @Parameter
-    private List<String> collectedProjects;
-
     /**
      * A single POM to build, skipping any scanning parameters and behavior.
      *
@@ -697,6 +694,18 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "false", property = "invoker.updateSnapshots")
     private boolean updateSnapshots;
+
+    /**
+     * Projects that are cloned undergo some filtering. In order to grab all projects and make sure
+     * they are all filtered, projects are read and parsed. In some cases, this may not be a desired
+     * behavior (especially when some pom.xml cannot be parsed by Maven directly).  In such cases,
+     * the exact list of projects can be set using this field, avoiding the parsing of all pom.xml
+     * files found.
+     *
+     * @since 3.9.0
+     */
+    @Parameter
+    private List<String> collectedProjects;
 
     // internal state variables
 
