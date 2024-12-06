@@ -36,7 +36,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-help-plugin</artifactId>
-        <version>@helpPluginVersion@</version>
+        <version>@version.maven-help-plugin@</version>
         <executions>
           <execution>
             <phase>validate</phase>

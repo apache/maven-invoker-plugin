@@ -33,11 +33,11 @@ Groovy version and extensions
 
   Plugin <<<maven-invoker-plugin>>> in version <<<3.4.0>>> has only dependency on <<<Groovy 4>>> core add common extensions:
 
-  * <<<org.apache.groovy:groovy:${groovy-version}>>>
+  * <<<org.apache.groovy:groovy:${groovyVersion}>>>
 
-  * <<<org.apache.groovy:groovy-json:${groovy-version}>>>
+  * <<<org.apache.groovy:groovy-json:${groovyVersion}>>>
 
-  * <<<org.apache.groovy:groovy-xml:${groovy-version}>>>
+  * <<<org.apache.groovy:groovy-xml:${groovyVersion}>>>
 
   []
 
@@ -56,7 +56,7 @@ Groovy version and extensions
           <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-yaml</artifactId>
-            <version>3.0.10</version>
+            <version>${groovyVersion}</version>
           </dependency>
         </dependencies>
       </plugin>

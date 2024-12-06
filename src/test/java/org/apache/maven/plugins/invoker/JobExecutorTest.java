@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.plugins.invoker.model.BuildJob;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -36,17 +36,17 @@ import static org.assertj.core.api.Assertions.fail;
  *
  * @author Slawomir Jaranowski
  */
-public class JobExecutorTest {
+class JobExecutorTest {
 
     @Test
-    public void emptyJobList() {
+    void emptyJobList() {
         JobExecutor jobExecutor = new JobExecutor(Collections.emptyList(), 1);
 
         jobExecutor.forEach(job -> fail("fail"));
     }
 
     @Test
-    public void failedJob() {
+    void failedJob() {
         BuildJob job = aJob("job1", 100);
 
         JobExecutor jobExecutor = new JobExecutor(Collections.singletonList(job), 1);
@@ -58,7 +58,7 @@ public class JobExecutorTest {
     }
 
     @Test
-    public void jobsShouldBeGroupedAndExecutedInProperOrder() {
+    void jobsShouldBeGroupedAndExecutedInProperOrder() {
         Map<Integer, AtomicInteger> jobsCounter = new HashMap<>();
         jobsCounter.put(100, new AtomicInteger(3));
         jobsCounter.put(10, new AtomicInteger(2));

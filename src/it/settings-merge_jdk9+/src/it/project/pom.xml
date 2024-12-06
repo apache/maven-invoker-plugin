@@ -36,7 +36,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>@enforcerPluginVersion@</version>
+        <version>@version.maven-enforcer-plugin@</version>
         <executions>
           <execution>
             <id>verify-properties</id>
@@ -64,7 +64,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-help-plugin</artifactId>
-        <version>@helpPluginVersion@</version>
+        <version>@version.maven-help-plugin@</version>
         <executions>
           <execution>
             <id>effective-settings</id>

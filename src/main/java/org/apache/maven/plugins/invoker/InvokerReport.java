@@ -33,7 +33,6 @@ import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Reader;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.plexus.i18n.I18N;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -69,7 +68,7 @@ public class InvokerReport extends AbstractMavenReport {
         BuildJobXpp3Reader buildJobReader = new BuildJobXpp3Reader();
         List<BuildJob> buildJobs = new ArrayList<>(reportFiles.length);
         for (File reportFile : reportFiles) {
-            try (XmlStreamReader xmlReader = ReaderFactory.newXmlReader(reportFile)) {
+            try (XmlStreamReader xmlReader = new XmlStreamReader(reportFile)) {
                 buildJobs.add(buildJobReader.read(xmlReader));
             } catch (XmlPullParserException e) {
                 throw new MavenReportException("Failed to parse report file: " + reportFile, e);
@@ -101,13 +100,14 @@ public class InvokerReport extends AbstractMavenReport {
     }
 
     public String getOutputName() {
-        return "invoker-report";
+        return "invoker";
     }
 
     private File[] getReportFiles() {
         return ReportUtils.getReportFiles(reportsDirectory);
     }
 
+    @Override
     public boolean canGenerateReport() {
         return getReportFiles().length > 0;
     }

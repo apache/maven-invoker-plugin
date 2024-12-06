@@ -29,7 +29,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Reader;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -117,7 +117,7 @@ public class VerifyMojo extends AbstractMojo {
         InvokerSession invokerSession = new InvokerSession();
 
         for (File reportFile : reportFiles) {
-            try (Reader xmlReader = ReaderFactory.newXmlReader(reportFile)) {
+            try (Reader xmlReader = new XmlStreamReader(reportFile)) {
                 invokerSession.addJob(reader.read(xmlReader));
             } catch (XmlPullParserException e) {
                 throw new MojoExecutionException("Failed to parse report file: " + reportFile, e);

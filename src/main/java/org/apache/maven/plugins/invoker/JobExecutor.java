@@ -18,6 +18,7 @@
  */
 package org.apache.maven.plugins.invoker;
 
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ class JobExecutor {
     public void forEach(ThrowableJobConsumer jobConsumer) {
         // group and sort jobs by ordinal
         Map<Integer, List<BuildJob>> groupedJobs = jobs.stream()
-                .sorted((j1, j2) -> Integer.compare(j2.getOrdinal(), j1.getOrdinal()))
+                .sorted(Comparator.comparing(BuildJob::getOrdinal).reversed())
                 .collect(Collectors.groupingBy(BuildJob::getOrdinal, LinkedHashMap::new, Collectors.toList()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadsCount);

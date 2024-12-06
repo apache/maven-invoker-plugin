@@ -40,7 +40,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
         <configuration>
           <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
           <pomIncludes>

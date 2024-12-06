@@ -22,7 +22,7 @@ import java.util.Collections;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.invoker.model.BuildJob;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
@@ -32,10 +32,10 @@ import static org.mockito.Mockito.verify;
 /**
  * Unittest for {@link InvokerSession}
  */
-public class InvokerSessionTest {
+class InvokerSessionTest {
 
     @Test
-    public void skipSummary() {
+    void skipSummary() {
         Log logger = mock(Log.class);
         BuildJob skippedBuildJob = new BuildJob("minvoker-279");
         skippedBuildJob.setResult(BuildJob.Result.SKIPPED);

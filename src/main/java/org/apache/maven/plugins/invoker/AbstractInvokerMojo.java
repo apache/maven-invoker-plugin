@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,12 +44,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
@@ -90,13 +91,14 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.NioFiles;
 import org.codehaus.plexus.util.ReflectionUtils;
-import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.codehaus.plexus.util.xml.XmlStreamWriter;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 
@@ -407,6 +409,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     /**
      * The <code>MAVEN_OPTS</code> environment variable to use when invoking Maven. This value can be overridden for
      * individual integration tests by using {@link #invokerPropertiesFile}.
+     * <br>
+     * Since the version <b>3.7.0</b> using an alternate syntax for mavenOpts, <code>@{...}</code>
+     * allows late replacement of properties when the plugin is executed,
+     * so properties that have been modified by other plugins will be picked up correctly.
      *
      * @since 1.2
      */
@@ -523,11 +529,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * # can be indexed
      * invoker.offline = true
      *
-     * # The path to the properties file from which to load system properties, defaults to the
+     * # The path to the properties file from which to load user properties, defaults to the
      * # filename given by the plugin parameter testPropertiesFile
      * # Since plugin version 1.4
      * # can be indexed
-     * invoker.systemPropertiesFile = test.properties
+     * invoker.userPropertiesFile = test.properties
      *
      * # An optional human friendly name and description for this build job.
      * # Both name and description have to be set to be included in the build reports.
@@ -688,6 +694,18 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(defaultValue = "false", property = "invoker.updateSnapshots")
     private boolean updateSnapshots;
 
+    /**
+     * Projects that are cloned undergo some filtering. In order to grab all projects and make sure
+     * they are all filtered, projects are read and parsed. In some cases, this may not be a desired
+     * behavior (especially when some pom.xml cannot be parsed by Maven directly).  In such cases,
+     * the exact list of projects can be set using this field, avoiding the parsing of all pom.xml
+     * files found.
+     *
+     * @since 3.9.0
+     */
+    @Parameter
+    private List<String> collectedProjects;
+
     // internal state variables
 
     /**
@@ -740,6 +758,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         this.toolchainManagerPrivate = toolchainManagerPrivate;
     }
 
+    @Component
+    private InterpolatorUtils interpolatorUtils;
+
     /**
      * Invokes Maven on the configured test projects.
      *
@@ -754,8 +775,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         if (encoding == null || encoding.isEmpty()) {
-            getLog().warn("File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING
-                    + ", i.e. build is platform dependent!");
+            getLog().warn("File encoding has not been set, using platform encoding "
+                    + Charset.defaultCharset().displayName() + ", i.e. build is platform dependent!");
         }
 
         // done it here to prevent issues with concurrent access in case of parallel run
@@ -796,11 +817,6 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
         handleScriptRunnerWithScriptClassPath();
 
-        Collection<String> collectedProjects = new LinkedHashSet<>();
-        for (BuildJob buildJob : buildJobs) {
-            collectProjects(projectsDirectory, buildJob.getProject(), collectedProjects, true);
-        }
-
         File projectsDir = projectsDirectory;
 
         if (cloneProjectsTo == null && "maven-plugin".equals(project.getPackaging())) {
@@ -820,7 +836,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         if (cloneProjectsTo != null) {
+            Collection<String> collectedProjects = this.collectedProjects;
+            if (collectedProjects == null) {
+                collectedProjects = new LinkedHashSet<>();
+                for (BuildJob buildJob : buildJobs) {
+                    collectProjects(projectsDirectory, buildJob.getProject(), collectedProjects, true);
+                }
+            }
             cloneProjects(collectedProjects);
+            addMissingDotMvnDirectory(cloneProjectsTo, buildJobs);
             projectsDir = cloneProjectsTo;
         } else {
             getLog().warn("Filtering of parent/child POMs is not supported without cloning the projects");
@@ -855,6 +879,31 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
         writeSummaryFile(buildJobs);
         processResults(new InvokerSession(buildJobs));
+    }
+
+    /**
+     * We need add missing {@code .mnvn} directories for executing projects
+     *
+     * @param projectsDir base of projects
+     * @param buildJobs list of discovered jobs
+     */
+    private void addMissingDotMvnDirectory(File projectsDir, List<BuildJob> buildJobs) throws MojoExecutionException {
+        for (BuildJob buildJob : buildJobs) {
+            Path projectPath = projectsDir.toPath().resolve(buildJob.getProject());
+
+            if (Files.isRegularFile(projectPath)) {
+                projectPath = projectPath.getParent();
+            }
+
+            Path mvnDotPath = projectPath.resolve(".mvn");
+            if (!Files.exists(mvnDotPath)) {
+                try {
+                    Files.createDirectories(mvnDotPath);
+                } catch (IOException e) {
+                    throw new MojoExecutionException(e.getMessage(), e);
+                }
+            }
+        }
     }
 
     private void setupActualMavenVersion() throws MojoExecutionException {
@@ -1023,8 +1072,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             String projectDir = pomFile.getParent();
 
             String parentPath = "../pom.xml";
-            if (model.getParent() != null
-                    && StringUtils.isNotEmpty(model.getParent().getRelativePath())) {
+            if (model.getParent() != null && isNotEmpty(model.getParent().getRelativePath())) {
                 parentPath = model.getParent().getRelativePath();
             }
             String parent = relativizePath(new File(projectDir, parentPath), projectsRoot);
@@ -1047,13 +1095,17 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
     }
 
+    private boolean isNotEmpty(String s) {
+        return Objects.nonNull(s) && !s.isEmpty();
+    }
+
     /**
      * Copies the specified projects to the directory given by {@link #cloneProjectsTo}. A project may either be denoted
      * by a path to a POM file or merely by a path to a base directory. During cloning, the POM files will be filtered.
      *
      * @param projectPaths The paths to the projects to clone, relative to the projects directory, must not be
      *            <code>null</code> nor contain <code>null</code> elements.
-     * @throws org.apache.maven.plugin.MojoExecutionException If the the projects could not be copied/filtered.
+     * @throws org.apache.maven.plugin.MojoExecutionException If the projects could not be copied/filtered.
      */
     private void cloneProjects(Collection<String> projectPaths) throws MojoExecutionException {
         if (!cloneProjectsTo.mkdirs() && cloneClean) {
@@ -1177,14 +1229,18 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         /*
          * NOTE: Make sure the destination directory is always there (even if empty) to support POM-less ITs.
          */
-        destDir.mkdirs();
+        Files.createDirectories(destDir.toPath());
         // Create all the directories, including any symlinks present in source
         FileUtils.mkDirs(sourceDir, scanner.getIncludedDirectories(), destDir);
 
         for (String includedFile : scanner.getIncludedFiles()) {
             File sourceFile = new File(sourceDir, includedFile);
             File destFile = new File(destDir, includedFile);
-            FileUtils.copyFile(sourceFile, destFile);
+            if (NioFiles.isSymbolicLink(sourceFile)) {
+                NioFiles.createSymbolicLink(destFile, NioFiles.readSymbolicLink(sourceFile));
+            } else {
+                FileUtils.copyFile(sourceFile, destFile);
+            }
 
             // ensure clone project must be writable for additional changes
             destFile.setWritable(true);
@@ -1522,7 +1578,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         File interpolatedPomFile = interpolatePomFile(pomFile, basedir);
         // FIXME: Think about the following code part -- ^^^^^^^ END
 
-        getLog().info(buffer().a("Building: ").strong(buildJob.getProject()).toString());
+        getLog().info(buffer().a("Building: ").strong(buildJob.getProject()).build());
 
         InvokerProperties invokerProperties = getInvokerProperties(basedir, globalInvokerProperties);
 
@@ -1806,24 +1862,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         Map<String, Object> context = new LinkedHashMap<>();
+        Properties scriptUserProperties = new Properties();
+        context.put("userProperties", scriptUserProperties);
 
-        boolean selectorResult = true;
+        if (!runSelectorHook(basedir, context, logger)) {
+            return false;
+        }
 
         try {
-            try {
-                scriptRunner.run("selector script", basedir, selectorScript, context, logger);
-            } catch (ScriptReturnException e) {
-                selectorResult = false;
-                return false;
-            } catch (ScriptException e) {
-                throw new RunFailureException(BuildJob.Result.ERROR, e);
-            }
-
-            try {
-                scriptRunner.run("pre-build script", basedir, preBuildHookScript, context, logger);
-            } catch (ScriptException e) {
-                throw new RunFailureException(BuildJob.Result.FAILURE_PRE_HOOK, e);
-            }
+            runPreBuildHook(basedir, context, logger);
 
             for (int invocationIndex = 1; ; invocationIndex++) {
                 if (invocationIndex > 1 && !invokerProperties.isInvocationDefined(invocationIndex)) {
@@ -1855,9 +1902,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     request.setUserSettingsFile(settingsFile);
                 }
 
-                Properties systemProperties =
-                        getSystemProperties(basedir, invokerProperties.getSystemPropertiesFile(invocationIndex));
-                request.setProperties(systemProperties);
+                Properties userProperties =
+                        getUserProperties(basedir, invokerProperties.getUserPropertiesFile(invocationIndex));
+                userProperties.putAll(scriptUserProperties);
+                request.setProperties(userProperties);
 
                 invokerProperties.configureInvocation(request, invocationIndex);
 
@@ -1879,12 +1927,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                             "Maven invocation failed. " + e.getMessage(), BuildJob.Result.FAILURE_BUILD);
                 }
             }
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
         } finally {
-            if (selectorResult) {
-                runPostBuildHook(basedir, context, logger);
-            }
+            runPostBuildHook(basedir, context, logger);
         }
         return true;
     }
@@ -1896,6 +1940,31 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             return (int) (parallelThreadsMultiple * Runtime.getRuntime().availableProcessors());
         } else {
             return Integer.parseInt(parallelThreads);
+        }
+    }
+
+    private boolean runSelectorHook(File basedir, Map<String, Object> context, FileLogger logger)
+            throws MojoExecutionException, RunFailureException {
+        try {
+            scriptRunner.run("selector script", basedir, selectorScript, context, logger);
+        } catch (ScriptReturnException e) {
+            return false;
+        } catch (ScriptException e) {
+            throw new RunFailureException(BuildJob.Result.ERROR, e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+        return true;
+    }
+
+    private void runPreBuildHook(File basedir, Map<String, Object> context, FileLogger logger)
+            throws MojoExecutionException, RunFailureException {
+        try {
+            scriptRunner.run("pre-build script", basedir, preBuildHookScript, context, logger);
+        } catch (ScriptException e) {
+            throw new RunFailureException(BuildJob.Result.FAILURE_PRE_HOOK, e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         }
     }
 
@@ -1967,7 +2036,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @return The system properties to use, may be empty but never <code>null</code>.
      * @throws org.apache.maven.plugin.MojoExecutionException If the properties file exists but could not be read.
      */
-    private Properties getSystemProperties(final File basedir, final String filename) throws MojoExecutionException {
+    private Properties getUserProperties(final File basedir, final String filename) throws MojoExecutionException {
         Properties collectedTestProperties = new Properties();
 
         if (properties != null) {
@@ -1982,18 +2051,16 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         File propertiesFile = null;
         if (filename != null) {
             propertiesFile = new File(basedir, filename);
-        } else if (testPropertiesFile != null) {
-            propertiesFile = new File(basedir, testPropertiesFile);
         }
 
         if (propertiesFile != null && propertiesFile.isFile()) {
 
-            try (InputStream fin = new FileInputStream(propertiesFile)) {
+            try (InputStream fin = Files.newInputStream(propertiesFile.toPath())) {
                 Properties loadedProperties = new Properties();
                 loadedProperties.load(fin);
                 collectedTestProperties.putAll(loadedProperties);
             } catch (IOException e) {
-                throw new MojoExecutionException("Error reading system properties from " + propertiesFile);
+                throw new MojoExecutionException("Error reading user properties from " + propertiesFile);
             }
         }
 
@@ -2034,7 +2101,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     private List<String> calculateIncludes() {
         if (invokerTest != null) {
-            String[] testRegexes = StringUtils.split(invokerTest, ",");
+            String[] testRegexes = invokerTest.split(",+");
             return Arrays.stream(testRegexes)
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
@@ -2052,7 +2119,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         List<String> excludes;
 
         if (invokerTest != null) {
-            String[] testRegexes = StringUtils.split(invokerTest, ",");
+            String[] testRegexes = invokerTest.split(",+");
             excludes = Arrays.stream(testRegexes)
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
@@ -2274,13 +2341,12 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
             // interpolation with token @...@
             try (Reader reader =
-                    new InterpolationFilterReader(ReaderFactory.newXmlReader(originalFile), composite, "@", "@")) {
+                    new InterpolationFilterReader(new XmlStreamReader(originalFile), composite, "@", "@")) {
                 xml = IOUtil.toString(reader);
             }
 
-            try (Writer writer = WriterFactory.newXmlWriter(interpolatedFile)) {
+            try (Writer writer = new XmlStreamWriter(interpolatedFile)) {
                 interpolatedFile.getParentFile().mkdirs();
-
                 writer.write(xml);
             }
         } catch (IOException e) {
@@ -2334,10 +2400,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         invokerProperties.setDefaultGoals(goals);
         invokerProperties.setDefaultProfiles(profiles);
         invokerProperties.setDefaultMavenExecutable(mavenExecutable);
-        invokerProperties.setDefaultMavenOpts(mavenOpts);
+        invokerProperties.setDefaultMavenOpts(interpolatorUtils.interpolateAtPattern(mavenOpts));
         invokerProperties.setDefaultTimeoutInSeconds(timeoutInSeconds);
         invokerProperties.setDefaultEnvironmentVariables(environmentVariables);
         invokerProperties.setDefaultUpdateSnapshots(updateSnapshots);
+        invokerProperties.setDefaultUserPropertiesFiles(testPropertiesFile);
 
         return invokerProperties;
     }

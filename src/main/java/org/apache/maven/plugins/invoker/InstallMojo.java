@@ -52,6 +52,7 @@ import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.installation.InstallRequest;
@@ -59,7 +60,6 @@ import org.eclipse.aether.installation.InstallationException;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
@@ -172,10 +172,7 @@ public class InstallMojo extends AbstractMojo {
             resolveExtraArtifacts(resolvedArtifacts);
             installArtifacts(resolvedArtifacts);
 
-        } catch (DependencyResolutionException
-                | InstallationException
-                | ArtifactDescriptorException
-                | ArtifactResolutionException e) {
+        } catch (DependencyResolutionException | InstallationException | ArtifactResolutionException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
     }
@@ -227,6 +224,7 @@ public class InstallMojo extends AbstractMojo {
 
         List<Dependency> dependencies = project.getDependencies().stream()
                 .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
+                .filter(d -> classpathFilter.accept(new DefaultDependencyNode(d), null))
                 .collect(Collectors.toList());
 
         CollectRequest collectRequest = new CollectRequest();
@@ -251,12 +249,9 @@ public class InstallMojo extends AbstractMojo {
 
     /**
      * Resolve extra artifacts.
-     *
-     * @return
      */
     private void resolveExtraArtifacts(Map<String, Artifact> resolvedArtifacts)
-            throws MojoExecutionException, DependencyResolutionException, ArtifactDescriptorException,
-                    ArtifactResolutionException {
+            throws MojoExecutionException, DependencyResolutionException, ArtifactResolutionException {
 
         if (extraArtifacts == null) {
             return;

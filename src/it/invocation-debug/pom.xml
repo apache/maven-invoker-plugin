@@ -33,7 +33,7 @@ under the License.
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <enforcerPluginVersion>@enforcerPluginVersion@</enforcerPluginVersion>
+    <version.maven-enforcer-plugin>@version.maven-enforcer-plugin@</version.maven-enforcer-plugin>
   </properties>
 
   <build>
@@ -41,7 +41,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
         <configuration>
           <goals>
             <goal>validate</goal>

@@ -20,7 +20,7 @@
 import java.io.*;
 import java.util.*;
 
-File reportFile = new File( basedir, "target/site/invoker-report.html");
+File reportFile = new File( basedir, "target/site/invoker.html");
 
 passed = true;
 

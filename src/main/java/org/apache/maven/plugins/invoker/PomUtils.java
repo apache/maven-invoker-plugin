@@ -25,7 +25,7 @@ import java.io.Reader;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -43,7 +43,7 @@ class PomUtils {
      * @throws MojoExecutionException If the POM file could not be loaded.
      */
     public static Model loadPom(File pomFile) throws MojoExecutionException {
-        try (Reader reader = ReaderFactory.newXmlReader(pomFile)) {
+        try (Reader reader = new XmlStreamReader(pomFile)) {
             return new MavenXpp3Reader().read(reader, false);
         } catch (XmlPullParserException e) {
             throw new MojoExecutionException("Failed to parse POM: " + pomFile, e);

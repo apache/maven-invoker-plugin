@@ -43,7 +43,7 @@ under the License.
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy</artifactId>
-      <version>@groovy-version@</version>
+      <version>@groovyVersion@</version>
       <type>pom</type>
       <scope>test</scope>
     </dependency>
@@ -54,7 +54,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
         <configuration>
           <addTestClassPath>true</addTestClassPath>
           <debug>true</debug>
