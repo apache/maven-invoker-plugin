@@ -71,7 +71,7 @@ class InterpolationTest extends AbstractTestUtil {
     @Test
     void testPomInterpolation() throws Exception {
         File interpolatedPomFile;
-        InvokerMojo invokerMojo = new InvokerMojo();
+        InvokerMojo invokerMojo = new InvokerMojo(null, null, null, null);
         setVariableValueToObject(invokerMojo, "project", buildMavenProjectStub());
         setVariableValueToObject(invokerMojo, "settings", new Settings());
         Properties properties = new Properties();

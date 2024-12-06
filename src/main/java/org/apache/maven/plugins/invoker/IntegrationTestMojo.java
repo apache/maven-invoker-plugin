@@ -46,8 +46,11 @@ public class IntegrationTestMojo extends AbstractInvokerMojo {
 
     @Inject
     public IntegrationTestMojo(
-            Invoker invoker, SettingsBuilder settingsBuilder, ToolchainManagerPrivate toolchainManagerPrivate) {
-        super(invoker, settingsBuilder, toolchainManagerPrivate);
+            Invoker invoker,
+            SettingsBuilder settingsBuilder,
+            ToolchainManagerPrivate toolchainManagerPrivate,
+            InterpolatorUtils interpolatorUtils) {
+        super(invoker, settingsBuilder, toolchainManagerPrivate, interpolatorUtils);
     }
 
     void processResults(InvokerSession invokerSession) throws MojoFailureException {

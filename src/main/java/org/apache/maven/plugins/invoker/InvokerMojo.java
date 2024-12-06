@@ -73,8 +73,11 @@ public class InvokerMojo extends AbstractInvokerMojo {
 
     @Inject
     public InvokerMojo(
-            Invoker invoker, SettingsBuilder settingsBuilder, ToolchainManagerPrivate toolchainManagerPrivate) {
-        super(invoker, settingsBuilder, toolchainManagerPrivate);
+            Invoker invoker,
+            SettingsBuilder settingsBuilder,
+            ToolchainManagerPrivate toolchainManagerPrivate,
+            InterpolatorUtils interpolaterUtils) {
+        super(invoker, settingsBuilder, toolchainManagerPrivate, interpolaterUtils);
     }
 
     void processResults(InvokerSession invokerSession) throws MojoFailureException {

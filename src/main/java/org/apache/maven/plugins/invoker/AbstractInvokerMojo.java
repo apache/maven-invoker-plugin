@@ -751,15 +751,18 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     private final ToolchainManagerPrivate toolchainManagerPrivate;
 
+    private final InterpolatorUtils interpolatorUtils;
+
     public AbstractInvokerMojo(
-            Invoker invoker, SettingsBuilder settingsBuilder, ToolchainManagerPrivate toolchainManagerPrivate) {
+            Invoker invoker,
+            SettingsBuilder settingsBuilder,
+            ToolchainManagerPrivate toolchainManagerPrivate,
+            InterpolatorUtils interpolatorUtils) {
         this.invoker = invoker;
         this.settingsBuilder = settingsBuilder;
         this.toolchainManagerPrivate = toolchainManagerPrivate;
+        this.interpolatorUtils = interpolatorUtils;
     }
-
-    @Component
-    private InterpolatorUtils interpolatorUtils;
 
     /**
      * Invokes Maven on the configured test projects.

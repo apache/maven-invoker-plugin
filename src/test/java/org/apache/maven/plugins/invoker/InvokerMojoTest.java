@@ -40,7 +40,7 @@ class InvokerMojoTest extends AbstractTestUtil {
     private static final String INTERPOLATION_PROJECT = "interpolation" + File.separator + "pom.xml";
     private static final String WITHOUT_POM_PROJECT = "without-pom-project-dir";
 
-    private final InvokerMojo invokerMojo = new InvokerMojo(null, null, null);
+    private final InvokerMojo invokerMojo = new InvokerMojo(null, null, null, null);
 
     private MavenProject getMavenProject() {
         MavenProject mavenProject = new MavenProject();
@@ -52,7 +52,6 @@ class InvokerMojoTest extends AbstractTestUtil {
     void testSingleInvokerTest() throws Exception {
         // given
         MavenProject mavenProject = getMavenProject();
-        InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
@@ -72,7 +71,6 @@ class InvokerMojoTest extends AbstractTestUtil {
     void testMultiInvokerTest() throws Exception {
         // given
         MavenProject mavenProject = getMavenProject();
-        InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
@@ -92,7 +90,6 @@ class InvokerMojoTest extends AbstractTestUtil {
     void testFullPatternInvokerTest() throws Exception {
         // given
         MavenProject mavenProject = getMavenProject();
-        InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
@@ -115,7 +112,6 @@ class InvokerMojoTest extends AbstractTestUtil {
     void testSetupInProjectList() throws Exception {
         // given
         MavenProject mavenProject = getMavenProject();
-        InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
@@ -147,6 +143,7 @@ class InvokerMojoTest extends AbstractTestUtil {
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
+        MavenProject mavenProject = getMavenProject();
         setVariableValueToObject(invokerMojo, "project", mavenProject);
         setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "settings", new Settings());
