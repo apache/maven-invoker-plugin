@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.codehaus.plexus.util.ReflectionUtils;
 
+// TODO this should be a static utility class that does not require inheritance
 abstract class AbstractTestUtil {
 
     protected String getBasedir() {
@@ -29,7 +30,7 @@ abstract class AbstractTestUtil {
         return path != null ? path : new File("").getAbsolutePath();
     }
 
-    protected void setVariableValueToObject(Object object, String filed, Object value) throws IllegalAccessException {
-        ReflectionUtils.setVariableValueInObject(object, filed, value);
+    protected void setVariableValueToObject(Object object, String field, Object value) throws IllegalAccessException {
+        ReflectionUtils.setVariableValueInObject(object, field, value);
     }
 }
