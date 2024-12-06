@@ -18,13 +18,14 @@
  */
 package org.apache.maven.plugins.invoker;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.invoker.model.BuildJob;
@@ -56,8 +57,12 @@ public class InvokerReport extends AbstractMavenReport {
     /**
      * Internationalization component
      */
-    @Component
-    protected I18N i18n;
+    protected final I18N i18n;
+
+    @Inject
+    public InvokerReport(I18N i18n) {
+        this.i18n = i18n;
+    }
 
     protected void executeReport(Locale locale) throws MavenReportException {
         File[] reportFiles = getReportFiles();

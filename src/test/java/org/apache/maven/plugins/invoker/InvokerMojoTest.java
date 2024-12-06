@@ -40,6 +40,8 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
     private static final String INTERPOLATION_PROJECT = "interpolation" + File.separator + "pom.xml";
     private static final String WITHOUT_POM_PROJECT = "without-pom-project-dir";
 
+    private final InvokerMojo invokerMojo = new InvokerMojo(null, null, null);
+
     private MavenProject getMavenProject() {
         MavenProject mavenProject = new MavenProject();
         mavenProject.setFile(new File("target/foo.txt"));
@@ -47,8 +49,6 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
     }
 
     public void testSingleInvokerTest() throws Exception {
-        // given
-        InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
@@ -64,8 +64,6 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
     }
 
     public void testMultiInvokerTest() throws Exception {
-        // given
-        InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
@@ -82,7 +80,6 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
 
     public void testFullPatternInvokerTest() throws Exception {
         // given
-        InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
@@ -101,8 +98,6 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
     }
 
     public void testSetupInProjectList() throws Exception {
-        // given
-        InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
@@ -129,7 +124,6 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
 
     public void testSetupProjectIsFiltered() throws Exception {
         // given
-        InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
@@ -165,8 +159,6 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
             {"1C", Runtime.getRuntime().availableProcessors()},
             {"2.5C", (int) (Double.parseDouble("2.5") * Runtime.getRuntime().availableProcessors())}
         };
-
-        InvokerMojo invokerMojo = new InvokerMojo();
 
         for (Object[] testValue : testValues) {
             String parallelThreads = (String) testValue[0];

@@ -67,7 +67,7 @@ public class InterpolationTest extends AbstractMojoTestCase {
         Reader reader = null;
         File interpolatedPomFile;
         try {
-            InvokerMojo invokerMojo = new InvokerMojo();
+            InvokerMojo invokerMojo = new InvokerMojo(null, null, null);
             setVariableValueToObject(invokerMojo, "project", buildMavenProjectStub());
             setVariableValueToObject(invokerMojo, "settings", new Settings());
             Properties properties = new Properties();
@@ -84,7 +84,6 @@ public class InterpolationTest extends AbstractMojoTestCase {
             String content = IOUtil.toString(reader);
             assertTrue(content.indexOf("<interpolateValue>bar</interpolateValue>") > 0);
             reader.close();
-            reader = null;
             // recreate it to test delete if exists before creation
             invokerMojo.buildInterpolatedFile(new File(dirPath, "pom.xml"), interpolatedPomFile);
             reader = ReaderFactory.newXmlReader(interpolatedPomFile);

@@ -18,10 +18,15 @@
  */
 package org.apache.maven.plugins.invoker;
 
+import javax.inject.Inject;
+
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.settings.building.SettingsBuilder;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.toolchain.ToolchainManagerPrivate;
 
 /**
  * Searches for integration test Maven projects, and executes each, collecting a log in the project directory, will
@@ -36,10 +41,16 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
         defaultPhase = LifecyclePhase.INTEGRATION_TEST,
         requiresDependencyResolution = ResolutionScope.TEST,
         threadSafe = true)
+// CHECKSTYLE_ON: LineLength
 public class IntegrationTestMojo extends AbstractInvokerMojo {
+
+    @Inject
+    public IntegrationTestMojo(
+            Invoker invoker, SettingsBuilder settingsBuilder, ToolchainManagerPrivate toolchainManagerPrivate) {
+        super(invoker, settingsBuilder, toolchainManagerPrivate);
+    }
 
     void processResults(InvokerSession invokerSession) throws MojoFailureException {
         // do nothing
     }
 }
-// CHECKSTYLE_ON: LineLength
