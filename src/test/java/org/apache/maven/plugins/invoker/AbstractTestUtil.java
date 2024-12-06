@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,26 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.invoker;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+import java.io.File;
 
-try
-{
-    // make sure the Invoker Plugin was indeed run and the build didn't fail somewhere else
-    File touchFile = new File( basedir, "target/it/project/target/touch.txt" );
-    System.out.println( "Checking for existence of touch file: " + touchFile );
-    if ( !touchFile.exists() )
-    {
-        System.out.println( "FAILED! no touchFile " + touchFile.toString() );
-        return false;
+import org.codehaus.plexus.util.ReflectionUtils;
+
+abstract class AbstractTestUtil {
+
+    protected String getBasedir() {
+        String path = System.getProperty("basedir");
+        return path != null ? path : new File("").getAbsolutePath();
+    }
+
+    protected void setVariableValueToObject(Object object, String filed, Object value) throws IllegalAccessException {
+        ReflectionUtils.setVariableValueInObject(object, filed, value);
     }
 }
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
-
-return true;

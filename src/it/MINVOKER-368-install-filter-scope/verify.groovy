@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
+ * 
  *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,35 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.plugins.invoker;
 
-import java.util.Properties;
 
-import org.apache.maven.model.Scm;
-import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
+def expected = [
+    'org/apache/maven/shared/maven-shared-utils/3.4.2/maven-shared-utils-3.4.2.pom',
+    'org/apache/maven/shared/maven-shared-utils/3.4.2/maven-shared-utils-3.4.2.jar',
+    'commons-io/commons-io/2.11.0/commons-io-2.11.0.pom',
+    'commons-io/commons-io/2.11.0/commons-io-2.11.0.jar'
+]
 
-/**
- * @author Olivier Lamy
- * @since 22 nov. 07
- */
-public class ExtendedMavenProjectStub extends MavenProjectStub {
-    private Scm scm;
+def localRepo = new File(basedir, 'target/it-repo')
 
-    private Properties properties;
+def missingFiles = expected.findAll { !new File(localRepo, it).isFile() }
 
-    public Scm getScm() {
-        return scm;
-    }
-
-    public void setScm(Scm scm) {
-        this.scm = scm;
-    }
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
-    }
-}
+assert missingFiles == []

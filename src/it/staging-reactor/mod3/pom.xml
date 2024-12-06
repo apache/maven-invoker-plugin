@@ -44,7 +44,7 @@ under the License.
     <plugins>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
-        <version>@sourcePluginVersion@</version>
+        <version>@version.maven-source-plugin@</version>
         <executions>
           <execution>
             <id>attach-resources</id>

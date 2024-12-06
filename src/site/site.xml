@@ -19,8 +19,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd">
+<site xmlns="http://maven.apache.org/SITE/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd">
 
   <body>
     <menu name="Overview">
@@ -48,7 +48,7 @@ under the License.
       <item name="Inspect logs for failed tests" href="examples/logs-for-failed-tests.html"/>
       <item name="Selector Conditions" href="examples/selector-conditions.html"/>
       <item name="Selector Scripts" href="examples/selector-scripts.html"/>
-      <item name="Using a Post Build Script" href="examples/post-build-script.html"/>
+      <item name="Using Pre and Post Build Script" href="examples/pre-post-build-script.html"/>
       <item name="Parallel projects execution" href="examples/parallel-projects-execution.html"/>
       <item name="Preparing the Build Environment" href="examples/prepare-build-env.html"/>
       <item name="Skipping Invocations" href="examples/skipping.html"/>
@@ -56,4 +56,4 @@ under the License.
     </menu>
 
   </body>
-</project>
+</site>

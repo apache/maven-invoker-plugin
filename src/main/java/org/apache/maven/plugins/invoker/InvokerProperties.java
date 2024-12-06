@@ -31,8 +31,9 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.shared.invoker.InvocationRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a convenient facade around the <code>invoker.properties</code>.
@@ -40,10 +41,13 @@ import org.apache.maven.shared.invoker.InvocationRequest;
  * @author Benjamin Bentmann
  */
 class InvokerProperties {
+
+    private final Logger logger = LoggerFactory.getLogger(InvokerProperties.class);
+
     private static final String SELECTOR_PREFIX = "selector.";
 
     private static final Pattern ENVIRONMENT_VARIABLES_PATTERN =
-            Pattern.compile("invoker\\.environmentVariables\\.([A-Za-z][^.]+)(\\.([0-9]+))?");
+            Pattern.compile("invoker\\.environmentVariables\\.([A-Za-z][^.]+)(\\.(\\d+))?");
 
     // default values from Mojo configuration
     private Boolean defaultDebug;
@@ -55,6 +59,7 @@ class InvokerProperties {
     private Map<String, String> defaultEnvironmentVariables;
     private File defaultMavenExecutable;
     private Boolean defaultUpdateSnapshots;
+    private String defaultUserPropertiesFiles;
 
     private enum InvocationProperty {
         PROJECT("invoker.project"),
@@ -67,6 +72,7 @@ class InvokerProperties {
         NON_RECURSIVE("invoker.nonRecursive"),
         OFFLINE("invoker.offline"),
         SYSTEM_PROPERTIES_FILE("invoker.systemPropertiesFile"),
+        USER_PROPERTIES_FILE("invoker.userPropertiesFile"),
         DEBUG("invoker.debug"),
         QUIET("invoker.quiet"),
         SETTINGS_FILE("invoker.settingsFile"),
@@ -88,7 +94,7 @@ class InvokerProperties {
     private enum SelectorProperty {
         JAVA_VERSION(".java.version"),
         MAVEN_VERSION(".maven.version"),
-        OS_FAMLY(".os.family");
+        OS_FAMILY(".os.family");
 
         private final String suffix;
 
@@ -154,7 +160,7 @@ class InvokerProperties {
      * @param defaultMavenExecutable a default value
      */
     public void setDefaultMavenExecutable(String defaultMavenExecutable) {
-        if (StringUtils.isNotBlank(defaultMavenExecutable)) {
+        if (Objects.nonNull(defaultMavenExecutable) && !defaultMavenExecutable.isEmpty()) {
             this.defaultMavenExecutable = new File(defaultMavenExecutable);
         }
     }
@@ -189,6 +195,14 @@ class InvokerProperties {
      */
     public void setDefaultUpdateSnapshots(boolean defaultUpdateSnapshots) {
         this.defaultUpdateSnapshots = defaultUpdateSnapshots;
+    }
+
+    /**
+     * Default value for userPropertiesFile
+     * @param defaultUserPropertiesFiles a default value
+     */
+    public void setDefaultUserPropertiesFiles(String defaultUserPropertiesFiles) {
+        this.defaultUserPropertiesFiles = defaultUserPropertiesFiles;
     }
 
     /**
@@ -281,7 +295,7 @@ class InvokerProperties {
      * @since 3.0.0
      */
     public String getOsFamily(int index) {
-        return this.properties.getProperty(SELECTOR_PREFIX + index + SelectorProperty.OS_FAMLY, getOsFamily());
+        return this.properties.getProperty(SELECTOR_PREFIX + index + SelectorProperty.OS_FAMILY, getOsFamily());
     }
 
     public Collection<InvokerToolchain> getToolchains() {
@@ -397,7 +411,7 @@ class InvokerProperties {
         setIfNotNull(
                 request::setGoals,
                 get(InvocationProperty.GOALS, index)
-                        .map(s -> StringUtils.split(s, ", \t\n\r\f"))
+                        .map(s -> s.trim().split("\\s*[ ,]+\\s*"))
                         .map(Arrays::asList)
                         .filter(l -> !l.isEmpty())
                         .orElse(defaultGoals));
@@ -405,7 +419,7 @@ class InvokerProperties {
         setIfNotNull(
                 request::setProfiles,
                 get(InvocationProperty.PROFILES, index)
-                        .map(s -> StringUtils.split(s, ", \t\n\r\f"))
+                        .map(s -> s.trim().split("\\s*[ ,]+\\s*"))
                         .map(Arrays::asList)
                         .filter(l -> !l.isEmpty())
                         .orElse(defaultProfiles));
@@ -468,13 +482,33 @@ class InvokerProperties {
     }
 
     /**
-     * Gets the path to the properties file used to set the system properties for the specified invocation.
+     * Gets the path to the properties file used to set the user properties for the specified invocation.
      *
      * @param index The index of the invocation, must not be negative.
      * @return The path to the properties file or <code>null</code> if not set.
      */
-    public String getSystemPropertiesFile(int index) {
-        return get(InvocationProperty.SYSTEM_PROPERTIES_FILE, index).orElse(null);
+    public String getUserPropertiesFile(int index) {
+        Optional<String> userProperties = get(InvocationProperty.USER_PROPERTIES_FILE, index);
+        Optional<String> systemProperties = get(InvocationProperty.SYSTEM_PROPERTIES_FILE, index);
+
+        if (userProperties.isPresent() && systemProperties.isPresent()) {
+            throw new IllegalArgumentException("only one property '" + InvocationProperty.USER_PROPERTIES_FILE
+                    + "' or '" + InvocationProperty.SYSTEM_PROPERTIES_FILE + "' can be used");
+        }
+
+        if (userProperties.isPresent()) {
+            return userProperties.get();
+        }
+
+        if (systemProperties.isPresent()) {
+            logger.warn(
+                    "property {} is deprecated - please use {}",
+                    InvocationProperty.SYSTEM_PROPERTIES_FILE,
+                    InvocationProperty.USER_PROPERTIES_FILE);
+            return systemProperties.get();
+        }
+
+        return defaultUserPropertiesFiles;
     }
 
     /**

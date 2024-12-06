@@ -20,47 +20,51 @@ package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.model.Scm;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Olivier Lamy
  * @since 22 nov. 07
  */
-public class InterpolationTest extends AbstractMojoTestCase {
+class InterpolationTest extends AbstractTestUtil {
 
     private MavenProjectStub buildMavenProjectStub() {
         ExtendedMavenProjectStub project = new ExtendedMavenProjectStub();
         project.setVersion("1.0-SNAPSHOT");
         project.setArtifactId("foo");
         project.setGroupId("bar");
+        project.setFile(new File(getBasedir(), "pom.xml"));
         Properties properties = new Properties();
         properties.put("fooOnProject", "barOnProject");
-        project.setProperties(properties);
+        project.getModel().setProperties(properties);
         Scm scm = new Scm();
         scm.setConnection("http://blabla");
         project.setScm(scm);
         return project;
     }
 
-    public void testCompositeMap() {
-
-        Properties properties = new Properties();
+    @Test
+    void testCompositeMap() {
+        Map<String, Object> properties = new HashMap<>();
         properties.put("foo", "bar");
         properties.put("version", "2.0-SNAPSHOT");
-        CompositeMap compositeMap = new CompositeMap(buildMavenProjectStub(), (Map) properties, false);
-        assertEquals("1.0-SNAPSHOT", compositeMap.get("pom.version"));
-        assertEquals("bar", compositeMap.get("foo"));
-        assertEquals("bar", compositeMap.get("pom.groupId"));
-        assertEquals("http://blabla", compositeMap.get("pom.scm.connection"));
-        assertEquals("barOnProject", compositeMap.get("fooOnProject"));
+        CompositeMap compositeMap = new CompositeMap(buildMavenProjectStub(), properties, false);
+        assertThat(compositeMap).containsEntry("pom.version", "1.0-SNAPSHOT");
+        assertThat(compositeMap).containsEntry("foo", "bar");
+        assertThat(compositeMap).containsEntry("pom.groupId", "bar");
+        assertThat(compositeMap).containsEntry("pom.scm.connection", "http://blabla");
+        assertThat(compositeMap).containsEntry("fooOnProject", "barOnProject");
     }
 
     public void testPomInterpolation() throws Exception {
@@ -76,17 +80,17 @@ public class InterpolationTest extends AbstractMojoTestCase {
 
         File interpolatedPomFile = new File(getBasedir(), "target/interpolated-pom.xml");
         invokerMojo.buildInterpolatedFile(new File(dirPath, "pom.xml"), interpolatedPomFile);
-
-        try (Reader reader = ReaderFactory.newXmlReader(interpolatedPomFile)) {
+        try (Reader reader = new XmlStreamReader(interpolatedPomFile)) {
             String content = IOUtil.toString(reader);
-            assertTrue(content.indexOf("<interpolateValue>bar</interpolateValue>") > 0);
+            assertThat(content.indexOf("<interpolateValue>bar</interpolateValue>"))
+                    .isPositive();
         }
-
         // recreate it to test delete if exists before creation
         invokerMojo.buildInterpolatedFile(new File(dirPath, "pom.xml"), interpolatedPomFile);
-        try (Reader reader = ReaderFactory.newXmlReader(interpolatedPomFile)) {
+        try (Reader reader = new XmlStreamReader(interpolatedPomFile)) {
             String content = IOUtil.toString(reader);
-            assertTrue(content.indexOf("<interpolateValue>bar</interpolateValue>") > 0);
+            assertThat(content.indexOf("<interpolateValue>bar</interpolateValue>"))
+                    .isPositive();
         }
     }
 }

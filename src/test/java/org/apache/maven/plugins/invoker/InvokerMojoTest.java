@@ -22,10 +22,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Olivier Lamy
  * @since 18 nov. 07
  */
-public class InvokerMojoTest extends AbstractMojoTestCase {
+class InvokerMojoTest extends AbstractTestUtil {
 
     private static final String DUMMY_PROJECT = "dummy" + File.separator + "pom.xml";
     private static final String WITH_POM_DIR_PROJECT = "with-pom-project-dir" + File.separator + "pom.xml";
@@ -46,13 +46,16 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
         return mavenProject;
     }
 
-    public void testSingleInvokerTest() throws Exception {
+    @Test
+    void testSingleInvokerTest() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "invokerTest", "*dummy*");
         setVariableValueToObject(invokerMojo, "settings", new Settings());
 
@@ -63,13 +66,16 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
         assertThat(jobs).map(BuildJob::getProject).containsExactlyInAnyOrder(DUMMY_PROJECT);
     }
 
-    public void testMultiInvokerTest() throws Exception {
+    @Test
+    void testMultiInvokerTest() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "invokerTest", "*dummy*,*terpolatio*");
         setVariableValueToObject(invokerMojo, "settings", new Settings());
 
@@ -80,13 +86,16 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
         assertThat(jobs).map(BuildJob::getProject).containsExactlyInAnyOrder(DUMMY_PROJECT, INTERPOLATION_PROJECT);
     }
 
-    public void testFullPatternInvokerTest() throws Exception {
+    @Test
+    void testFullPatternInvokerTest() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "invokerTest", "*");
         setVariableValueToObject(invokerMojo, "settings", new Settings());
 
@@ -100,13 +109,16 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
                         DUMMY_PROJECT, WITH_POM_DIR_PROJECT, WITHOUT_POM_PROJECT, INTERPOLATION_PROJECT);
     }
 
-    public void testSetupInProjectList() throws Exception {
+    @Test
+    void testSetupInProjectList() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "settings", new Settings());
         setVariableValueToObject(invokerMojo, "setupIncludes", Collections.singletonList("dum*/pom.xml"));
 
@@ -127,13 +139,16 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
                 .containsExactlyInAnyOrder(DUMMY_PROJECT);
     }
 
-    public void testSetupProjectIsFiltered() throws Exception {
+    @Test
+    void testSetupProjectIsFiltered() throws Exception {
         // given
+        MavenProject mavenProject = getMavenProject();
         InvokerMojo invokerMojo = new InvokerMojo();
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
         setVariableValueToObject(invokerMojo, "invokerPropertiesFile", "invoker.properties");
-        setVariableValueToObject(invokerMojo, "project", getMavenProject());
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "interpolatorUtils", new InterpolatorUtils(mavenProject));
         setVariableValueToObject(invokerMojo, "settings", new Settings());
         setVariableValueToObject(invokerMojo, "setupIncludes", Collections.singletonList("dum*/pom.xml"));
         setVariableValueToObject(invokerMojo, "invokerTest", "*project-dir*");
@@ -152,14 +167,20 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
                 .isEmpty();
     }
 
-    public void testAlreadyCloned() {
-        assertFalse(AbstractInvokerMojo.alreadyCloned("dir", Collections.emptyList()));
-        assertTrue(AbstractInvokerMojo.alreadyCloned("dir", Collections.singletonList("dir")));
-        assertTrue(AbstractInvokerMojo.alreadyCloned("dir" + File.separator + "sub", Collections.singletonList("dir")));
-        assertFalse(AbstractInvokerMojo.alreadyCloned("dirs", Collections.singletonList("dir")));
+    @Test
+    void testAlreadyCloned() {
+        assertThat(AbstractInvokerMojo.alreadyCloned("dir", Collections.emptyList()))
+                .isFalse();
+        assertThat(AbstractInvokerMojo.alreadyCloned("dir", Collections.singletonList("dir")))
+                .isTrue();
+        assertThat(AbstractInvokerMojo.alreadyCloned("dir" + File.separator + "sub", Collections.singletonList("dir")))
+                .isTrue();
+        assertThat(AbstractInvokerMojo.alreadyCloned("dirs", Collections.singletonList("dir")))
+                .isFalse();
     }
 
-    public void testParallelThreadsSettings() throws IllegalAccessException {
+    @Test
+    void testParallelThreadsSettings() throws Exception {
         Object[][] testValues = {
             {"4", 4},
             {"1C", Runtime.getRuntime().availableProcessors()},
@@ -174,7 +195,7 @@ public class InvokerMojoTest extends AbstractMojoTestCase {
 
             setVariableValueToObject(invokerMojo, "parallelThreads", parallelThreads);
 
-            assertEquals(expectedParallelThreads, invokerMojo.getParallelThreadsCount());
+            assertThat(expectedParallelThreads).isEqualTo(invokerMojo.getParallelThreadsCount());
         }
     }
 }
