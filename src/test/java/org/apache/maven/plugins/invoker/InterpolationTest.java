@@ -39,8 +39,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class InterpolationTest extends AbstractTestUtil {
 
-    private MavenProjectStub buildMavenProjectStub() {
-        ExtendedMavenProjectStub project = new ExtendedMavenProjectStub();
+    private MavenProject buildMavenProjectStub() {
+        MavenProject project = new MavenProject();
         project.setVersion("1.0-SNAPSHOT");
         project.setArtifactId("foo");
         project.setGroupId("bar");
@@ -67,6 +67,7 @@ class InterpolationTest extends AbstractTestUtil {
         assertThat(compositeMap).containsEntry("fooOnProject", "barOnProject");
     }
 
+    @Test
     public void testPomInterpolation() throws Exception {
         InvokerMojo invokerMojo = new InvokerMojo();
         setVariableValueToObject(invokerMojo, "project", buildMavenProjectStub());
@@ -80,6 +81,7 @@ class InterpolationTest extends AbstractTestUtil {
 
         File interpolatedPomFile = new File(getBasedir(), "target/interpolated-pom.xml");
         invokerMojo.buildInterpolatedFile(new File(dirPath, "pom.xml"), interpolatedPomFile);
+        // TODO should parse the XML and use that to look for the interpolateValue element
         try (Reader reader = new XmlStreamReader(interpolatedPomFile)) {
             String content = IOUtil.toString(reader);
             assertThat(content.indexOf("<interpolateValue>bar</interpolateValue>"))
