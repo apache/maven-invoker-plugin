@@ -21,7 +21,6 @@ package org.apache.maven.plugins.invoker;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -212,8 +211,7 @@ class InvokerSession {
                     buildLogMessage.append(System.lineSeparator());
                     buildLogMessage.append("*** begin build.log for: " + buildJob.getProject() + " ***");
                     buildLogMessage.append(System.lineSeparator());
-                    try (Reader buildLogReader =
-                            Files.newBufferedReader(buildLogFile.toPath(), StandardCharsets.UTF_8)) {
+                    try (Reader buildLogReader = Files.newBufferedReader(buildLogFile.toPath())) {
                         buildLogMessage.append(IOUtil.toString(buildLogReader));
                     }
                     buildLogMessage.append("*** end build.log for: " + buildJob.getProject() + " ***");
