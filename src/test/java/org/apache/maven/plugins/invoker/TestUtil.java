@@ -22,14 +22,16 @@ import java.io.File;
 
 import org.codehaus.plexus.util.ReflectionUtils;
 
-abstract class AbstractTestUtil {
+class TestUtil {
 
-    protected String getBasedir() {
+    private TestUtil() {}
+
+    static String getBasedir() {
         String path = System.getProperty("basedir");
         return path != null ? path : new File("").getAbsolutePath();
     }
 
-    protected void setVariableValueToObject(Object object, String filed, Object value) throws IllegalAccessException {
-        ReflectionUtils.setVariableValueInObject(object, filed, value);
+    static void setVariableValueToObject(Object object, String field, Object value) throws IllegalAccessException {
+        ReflectionUtils.setVariableValueInObject(object, field, value);
     }
 }

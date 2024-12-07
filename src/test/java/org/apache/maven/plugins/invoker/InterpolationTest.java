@@ -37,14 +37,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Olivier Lamy
  * @since 22 nov. 07
  */
-class InterpolationTest extends AbstractTestUtil {
+class InterpolationTest {
 
     private MavenProject buildMavenProjectStub() {
         MavenProject project = new MavenProject();
         project.setVersion("1.0-SNAPSHOT");
         project.setArtifactId("foo");
         project.setGroupId("bar");
-        project.setFile(new File(getBasedir(), "pom.xml"));
+        project.setFile(new File(TestUtil.getBasedir(), "pom.xml"));
         Properties properties = new Properties();
         properties.put("fooOnProject", "barOnProject");
         project.getModel().setProperties(properties);
@@ -56,7 +56,6 @@ class InterpolationTest extends AbstractTestUtil {
 
     @Test
     void testCompositeMap() {
-
         Map<String, Object> properties = new HashMap<>();
         properties.put("foo", "bar");
         properties.put("version", "2.0-SNAPSHOT");
@@ -70,17 +69,17 @@ class InterpolationTest extends AbstractTestUtil {
 
     @Test
     void testPomInterpolation() throws Exception {
-        File interpolatedPomFile;
         InvokerMojo invokerMojo = new InvokerMojo(null, null, null, null);
-        setVariableValueToObject(invokerMojo, "project", buildMavenProjectStub());
-        setVariableValueToObject(invokerMojo, "settings", new Settings());
+        TestUtil.setVariableValueToObject(invokerMojo, "project", buildMavenProjectStub());
+        TestUtil.setVariableValueToObject(invokerMojo, "settings", new Settings());
         Properties properties = new Properties();
         properties.put("foo", "bar");
         properties.put("version", "2.0-SNAPSHOT");
-        setVariableValueToObject(invokerMojo, "filterProperties", properties);
-        String dirPath = getBasedir() + File.separatorChar + "src" + File.separatorChar + "test" + File.separatorChar
-                + "resources" + File.separatorChar + "unit" + File.separatorChar + "interpolation";
-        interpolatedPomFile = new File(getBasedir(), "target/interpolated-pom.xml");
+        TestUtil.setVariableValueToObject(invokerMojo, "filterProperties", properties);
+        String dirPath = TestUtil.getBasedir() + File.separatorChar + "src" + File.separatorChar + "test"
+                + File.separatorChar + "resources" + File.separatorChar + "unit" + File.separatorChar + "interpolation";
+
+        File interpolatedPomFile = new File(TestUtil.getBasedir(), "target/interpolated-pom.xml");
         invokerMojo.buildInterpolatedFile(new File(dirPath, "pom.xml"), interpolatedPomFile);
         try (Reader reader = new XmlStreamReader(interpolatedPomFile)) {
             String content = IOUtil.toString(reader);
