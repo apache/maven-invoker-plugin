@@ -56,7 +56,6 @@ class InterpolationTest {
 
     @Test
     void testCompositeMap() {
-
         Map<String, Object> properties = new HashMap<>();
         properties.put("foo", "bar");
         properties.put("version", "2.0-SNAPSHOT");
@@ -70,8 +69,7 @@ class InterpolationTest {
 
     @Test
     void testPomInterpolation() throws Exception {
-        File interpolatedPomFile;
-        InvokerMojo invokerMojo = new InvokerMojo();
+        InvokerMojo invokerMojo = new InvokerMojo(null, null, null, null);
         TestUtil.setVariableValueToObject(invokerMojo, "project", buildMavenProjectStub());
         TestUtil.setVariableValueToObject(invokerMojo, "settings", new Settings());
         Properties properties = new Properties();
@@ -81,7 +79,7 @@ class InterpolationTest {
         String dirPath = TestUtil.getBasedir() + File.separatorChar + "src" + File.separatorChar + "test"
                 + File.separatorChar + "resources" + File.separatorChar + "unit" + File.separatorChar + "interpolation";
 
-        interpolatedPomFile = new File(TestUtil.getBasedir(), "target/interpolated-pom.xml");
+        File interpolatedPomFile = new File(TestUtil.getBasedir(), "target/interpolated-pom.xml");
         invokerMojo.buildInterpolatedFile(new File(dirPath, "pom.xml"), interpolatedPomFile);
         try (Reader reader = new XmlStreamReader(interpolatedPomFile)) {
             String content = IOUtil.toString(reader);

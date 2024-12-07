@@ -57,7 +57,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Writer;
@@ -746,23 +745,30 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     @Parameter(defaultValue = "${settings}", readonly = true, required = true)
     private Settings settings;
 
-    @Component
-    private Invoker invoker;
+    private final Invoker invoker;
 
-    @Component
-    private SettingsBuilder settingsBuilder;
+    private final SettingsBuilder settingsBuilder;
 
-    @Component
-    private ToolchainManagerPrivate toolchainManagerPrivate;
+    private final ToolchainManagerPrivate toolchainManagerPrivate;
 
-    @Component
-    private InterpolatorUtils interpolatorUtils;
+    private final InterpolatorUtils interpolatorUtils;
+
+    public AbstractInvokerMojo(
+            Invoker invoker,
+            SettingsBuilder settingsBuilder,
+            ToolchainManagerPrivate toolchainManagerPrivate,
+            InterpolatorUtils interpolatorUtils) {
+        this.invoker = invoker;
+        this.settingsBuilder = settingsBuilder;
+        this.toolchainManagerPrivate = toolchainManagerPrivate;
+        this.interpolatorUtils = interpolatorUtils;
+    }
 
     /**
      * Invokes Maven on the configured test projects.
      *
-     * @throws org.apache.maven.plugin.MojoExecutionException If the goal encountered severe errors.
-     * @throws org.apache.maven.plugin.MojoFailureException If any of the Maven builds failed.
+     * @throws org.apache.maven.plugin.MojoExecutionException if the goal encountered severe errors
+     * @throws org.apache.maven.plugin.MojoFailureException if any of the Maven builds failed
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (skipInvocation) {
