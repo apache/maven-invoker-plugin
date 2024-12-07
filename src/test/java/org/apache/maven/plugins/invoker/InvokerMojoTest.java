@@ -27,13 +27,15 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.maven.plugins.invoker.TestUtil.getBasedir;
+import static org.apache.maven.plugins.invoker.TestUtil.setVariableValueToObject;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Olivier Lamy
  * @since 18 nov. 07
  */
-class InvokerMojoTest extends AbstractTestUtil {
+class InvokerMojoTest {
 
     private static final String DUMMY_PROJECT = "dummy" + File.separator + "pom.xml";
     private static final String WITH_POM_DIR_PROJECT = "with-pom-project-dir" + File.separator + "pom.xml";
