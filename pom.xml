@@ -68,7 +68,7 @@ under the License.
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
     <project.build.outputTimestamp>2024-12-06T14:53:30Z</project.build.outputTimestamp>
-    <groovyVersion>4.0.24</groovyVersion>
+    <groovyVersion>4.0.26</groovyVersion>
     <!-- Doxia 2.0 -->
     <version.maven-site-plugin>3.21.0</version.maven-site-plugin>
     <version.maven-fluido-skin>2.0.0</version.maven-fluido-skin>
