@@ -41,6 +41,8 @@ Filtering Files
   * The invoker properties, the goals file and the profiles file. Tokens in these files must use the usual Maven syntax
     <<<$\{...\}>>>.
 
+  Note: for filtering to work, the <<<cloneProjectsTo>>> property of the <<<invoker:run>>> goal must be set.
+
   []
 
   The following example directory structure highlights the files which are filtered by the Invoker Plugin:
