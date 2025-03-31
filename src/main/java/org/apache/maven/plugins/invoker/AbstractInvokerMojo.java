@@ -188,6 +188,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * (<b>Exception</b> when project using invoker plugin is of <i>maven-plugin</i> packaging:
      * In such case IT projects will be cloned to and executed in <code>target/its</code> by default.)
      *
+     * Note: cloning needs to be enabled for properties filtering to work.
      * @since 1.1
      */
     @Parameter(property = "invoker.cloneProjectsTo")
