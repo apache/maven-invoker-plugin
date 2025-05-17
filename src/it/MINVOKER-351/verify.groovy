@@ -21,11 +21,5 @@
 def buildLog = new File(basedir, 'target/it/minvoker-351/build.log').text
 buildLog.contains('Special chars \tcharName=BEL: \u0007')
 
-def surefireReport = new File(basedir, 'target/site/surefire-report.html').text
+def surefireReport = new File(basedir, 'target/site/surefire.html').text
 assert surefireReport.contains('maven.invoker.it.minvoker-351')
-
-// TODO remove after next release
-// Due to error parsing junit-reports by Jenkins with forbidden chars
-new File(basedir, 'build.log').delete()
-
-return true
