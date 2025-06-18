@@ -38,7 +38,7 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <!-- NOTE: Deliberately used very old version to detect accidental shadowing by the plugin's newer version -->
-      <version>1.1</version>
+      <version>3.0.24</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
