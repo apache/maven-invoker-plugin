@@ -19,16 +19,13 @@ package org.apache.maven.plugins.invoker.it.post_executed_only_once;
  * under the License.
  */
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class AppTest
-    extends TestCase
-{
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class AppTest {
     @Test
-    public void testApp()
-        throws Exception
-    {
+    public void testApp() throws Exception {
         new App().createFile();
         assertTrue( true );
     }
