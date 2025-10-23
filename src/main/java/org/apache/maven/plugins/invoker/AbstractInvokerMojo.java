@@ -430,8 +430,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private File mavenHome;
 
     /**
-     * mavenExecutable can either be a file relative to <code>${maven.home}/bin/</code>, test project workspace
-     * or an absolute file.
+     * The path to the Maven executable to use. This can either be a file relative to 
+     * <code>${maven.home}/bin/</code>, a file relative to the test project workspace, or an
+     * absolute file path.
      *
      * @since 1.8
      */
@@ -456,11 +457,12 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private String encoding;
 
     /**
-     * A flag whether the test class path of the project under test should be included in the class path of the
-     * pre-/post-build scripts. If set to <code>false</code>, the class path of script interpreter consists only of the
-     * <a href="dependencies.html">runtime dependencies</a> of the Maven Invoker Plugin. If set the <code>true</code>,
-     * the project's test class path will be prepended to the interpreter class path. Among others, this feature allows
-     * the scripts to access utility classes from the test sources of your project.
+     * A flag to configure whether the test class path of the project under test should be included
+     * in the class path of the pre/post-build scripts. If set to <code>false</code>, the class
+     * path of script interpreter consists only of the <a href="dependencies.html">runtime
+     * dependencies</a> of the Maven Invoker Plugin. If set the <code>true</code>, the project's 
+     * test class path will be prepended to the interpreter class path. Among others, this feature
+     * allows the scripts to access utility classes from the test sources of your project.
      *
      * @since 1.2
      */
@@ -612,7 +614,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private String invokerPropertiesFile;
 
     /**
-     * flag to enable show mvn version used for running its (cli option : -V,--show-version )
+     * A flag to instruct Maven to print the current version details prior to running integration
+     * tests.
      *
      * @since 1.4
      */
@@ -620,7 +623,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private boolean showVersion;
 
     /**
-     * <p>Number of threads for running tests in parallel. This will be the number of maven forked process in parallel.
+     * Number of threads for running tests in parallel. This will be the number of maven forked process in parallel.
      * When terminated with "C", the number part is multiplied by the number of processors (cores) available
      * to the Java virtual machine. Floating point value are only accepted together with "C".</p>
      *
@@ -632,8 +635,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private String parallelThreads;
 
     /**
-     * If enable and if you have a settings file configured for the execution, it will be merged with your user
-     * settings.
+     * If enablef and if you have a settings file configured for the execution, it will be merged
+     * with your user settings.
      *
      * @since 1.6
      */
@@ -657,6 +660,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private Map<String, String> scriptVariables;
 
     /**
+     * The timeout to apply to tests. Any tests taking longer than this time will be aborted and
+     * the test will be flagged as having failed.
+     *
+     * <p>If set to <code>0</code>, then no timeout is applied.
      *
      * @since 3.0.2
      */
@@ -664,22 +671,24 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private int timeoutInSeconds;
 
     /**
-     * Write test result in junit format.
+     * Produce a test report in the JUnit XML format.
+     *
      * @since 3.1.2
      */
     @Parameter(defaultValue = "false", property = "invoker.writeJunitReport")
     private boolean writeJunitReport;
 
     /**
-     * The package name use in junit report
+     * The package name to use within any JUnit XML reports produced by this plugin.
+     *
      * @since 3.1.2
      */
     @Parameter(defaultValue = "maven.invoker.it", property = "invoker.junitPackageName")
     private String junitPackageName = "maven.invoker.it";
 
     /**
-     * Only invoke maven projects if their sources have been modified since
-     * they were last built. Only works in conjunction with <code>cloneProjectsTo</code>.
+     * A flag congiguring whether to invoke Maven projects if their sources have been modified
+     * since they were last built. Only works in conjunction with <code>cloneProjectsTo</code>.
      *
      * @since 3.2.2
      */

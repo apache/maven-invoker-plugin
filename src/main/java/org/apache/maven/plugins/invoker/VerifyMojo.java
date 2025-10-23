@@ -83,7 +83,8 @@ public class VerifyMojo extends AbstractMojo {
     private Boolean failIfNoProjects;
 
     /**
-     * Set to <code>true</code> to output build.log to mojo log in case of failed jobs.
+     * Set this to <code>true</code> to output the contents of the build.log to the console in
+     * the event a test case fails.
      *
      * @since 3.2.2
      */
