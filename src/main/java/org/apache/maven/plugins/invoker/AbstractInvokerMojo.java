@@ -430,7 +430,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private File mavenHome;
 
     /**
-     * The path to the Maven executable to use. This can either be a file relative to 
+     * The path to the Maven executable to use. This can either be a file relative to
      * <code>${maven.home}/bin/</code>, a file relative to the test project workspace, or an
      * absolute file path.
      *
@@ -460,7 +460,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * A flag to configure whether the test class path of the project under test should be included
      * in the class path of the pre/post-build scripts. If set to <code>false</code>, the class
      * path of script interpreter consists only of the <a href="dependencies.html">runtime
-     * dependencies</a> of the Maven Invoker Plugin. If set the <code>true</code>, the project's 
+     * dependencies</a> of the Maven Invoker Plugin. If set the <code>true</code>, the project's
      * test class path will be prepended to the interpreter class path. Among others, this feature
      * allows the scripts to access utility classes from the test sources of your project.
      *
