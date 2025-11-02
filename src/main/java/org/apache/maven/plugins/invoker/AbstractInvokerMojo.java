@@ -951,7 +951,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         // If it exists from previous run...
         if (reportsDirectory.exists()) {
             try {
-                FileUtils.deleteDirectory(reportsDirectory);
+                org.apache.commons.io.FileUtils.deleteDirectory(reportsDirectory);
             } catch (IOException e) {
                 throw new MojoExecutionException(
                         "Failure while trying to delete " + reportsDirectory.getAbsolutePath(), e);
@@ -1157,7 +1157,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
                             copyDirectoryStructure(projectsDirectory, temp);
 
-                            FileUtils.deleteDirectory(new File(temp, cloneSubdir));
+                            org.apache.commons.io.FileUtils.deleteDirectory(new File(temp, cloneSubdir));
 
                             copyDirectoryStructure(temp, cloneProjectsTo);
                         } else {
