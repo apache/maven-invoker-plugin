@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class SelectorTest {
     @Test
-    void testGlobalMatch() {
+    void globalMatch() {
         Selector selector = new Selector("3.2.5", "1.7", null);
 
         Properties props = new Properties();
@@ -39,7 +39,7 @@ class SelectorTest {
     }
 
     @Test
-    void testSelectorMatch() {
+    void selectorMatch() {
         Selector selector = new Selector("3.2.5", "1.7", null);
 
         Properties props = new Properties();
@@ -52,7 +52,7 @@ class SelectorTest {
     }
 
     @Test
-    void testSelectorWithGlobalMatch() {
+    void selectorWithGlobalMatch() {
         Selector selector = new Selector("3.2.5", "1.7", null);
 
         Properties props = new Properties();

@@ -51,7 +51,7 @@ class InvokerMojoTest {
     }
 
     @Test
-    void testSingleInvokerTest() throws Exception {
+    void singleInvokerTest() throws Exception {
         // given
         MavenProject mavenProject = getMavenProject();
         String dirPath = getBasedir() + "/src/test/resources/unit";
@@ -70,7 +70,7 @@ class InvokerMojoTest {
     }
 
     @Test
-    void testMultiInvokerTest() throws Exception {
+    void multiInvokerTest() throws Exception {
         // given
         MavenProject mavenProject = getMavenProject();
         String dirPath = getBasedir() + "/src/test/resources/unit";
@@ -89,7 +89,7 @@ class InvokerMojoTest {
     }
 
     @Test
-    void testFullPatternInvokerTest() throws Exception {
+    void fullPatternInvokerTest() throws Exception {
         // given
         MavenProject mavenProject = getMavenProject();
         String dirPath = getBasedir() + "/src/test/resources/unit";
@@ -111,7 +111,7 @@ class InvokerMojoTest {
     }
 
     @Test
-    void testSetupInProjectList() throws Exception {
+    void setupInProjectList() throws Exception {
         // given
         MavenProject mavenProject = getMavenProject();
         String dirPath = getBasedir() + "/src/test/resources/unit";
@@ -140,7 +140,7 @@ class InvokerMojoTest {
     }
 
     @Test
-    void testSetupProjectIsFiltered() throws Exception {
+    void setupProjectIsFiltered() throws Exception {
         // given
         String dirPath = getBasedir() + "/src/test/resources/unit";
         setVariableValueToObject(invokerMojo, "projectsDirectory", new File(dirPath));
@@ -167,7 +167,7 @@ class InvokerMojoTest {
     }
 
     @Test
-    void testAlreadyCloned() {
+    void alreadyCloned() {
         assertThat(AbstractInvokerMojo.alreadyCloned("dir", Collections.emptyList()))
                 .isFalse();
         assertThat(AbstractInvokerMojo.alreadyCloned("dir", Collections.singletonList("dir")))
@@ -179,7 +179,7 @@ class InvokerMojoTest {
     }
 
     @Test
-    void testParallelThreadsSettings() throws Exception {
+    void parallelThreadsSettings() throws Exception {
         Object[][] testValues = {
             {"4", 4},
             {"1C", Runtime.getRuntime().availableProcessors()},
