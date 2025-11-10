@@ -55,7 +55,7 @@ class InterpolationTest {
     }
 
     @Test
-    void testCompositeMap() {
+    void compositeMap() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("foo", "bar");
         properties.put("version", "2.0-SNAPSHOT");
@@ -68,7 +68,7 @@ class InterpolationTest {
     }
 
     @Test
-    void testPomInterpolation() throws Exception {
+    void pomInterpolation() throws Exception {
         InvokerMojo invokerMojo = new InvokerMojo(null, null, null, null);
         TestUtil.setVariableValueToObject(invokerMojo, "project", buildMavenProjectStub());
         TestUtil.setVariableValueToObject(invokerMojo, "settings", new Settings());

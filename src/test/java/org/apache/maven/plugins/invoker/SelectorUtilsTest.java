@@ -19,7 +19,6 @@
 package org.apache.maven.plugins.invoker;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,7 +42,7 @@ import static org.mockito.Mockito.when;
 class SelectorUtilsTest {
 
     @Test
-    void testParseList() {
+    void parseList() {
         List<String> includes = new ArrayList<>();
         List<String> excludes = new ArrayList<>();
 
@@ -55,14 +54,14 @@ class SelectorUtilsTest {
     }
 
     @Test
-    void testParseVersion() {
+    void parseVersion() {
         assertThat(SelectorUtils.parseVersion("1.6.0_12")).containsExactly(1, 6, 0, 12);
         assertThat(SelectorUtils.parseVersion("1.6.0_12+")).containsExactly(1, 6, 0, 12);
         assertThat(SelectorUtils.parseVersion("1.6.0_12-")).containsExactly(1, 6, 0, 12);
     }
 
     @Test
-    void testCompareVersions() {
+    void compareVersions() {
         assertThat(SelectorUtils.compareVersions(Arrays.asList(1, 6), Arrays.asList(1, 6)))
                 .isZero();
 
@@ -78,7 +77,7 @@ class SelectorUtilsTest {
     }
 
     @Test
-    void testIsMatchingJre() {
+    void isMatchingJre() {
 
         assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 4, 2, 8), "1.5")).isFalse();
         assertThat(SelectorUtils.isJreVersion(Arrays.asList(1, 5), "1.5")).isTrue();
@@ -102,7 +101,7 @@ class SelectorUtilsTest {
     }
 
     @Test
-    void testIsMatchingToolchain() throws Exception {
+    void isMatchingToolchain() throws Exception {
         InvokerToolchain openJdk9 = new InvokerToolchain("jdk");
         openJdk9.addProvides("version", "9");
         openJdk9.addProvides("vendor", "openJDK");
@@ -151,7 +150,7 @@ class SelectorUtilsTest {
     }
 
     @Test
-    void mavenVersionFromMavenHome() throws IOException {
+    void mavenVersionFromMavenHome() throws Exception {
         File mavenHome = new File(System.getProperty("maven.home"));
 
         String mavenVersion = SelectorUtils.getMavenVersion(mavenHome);

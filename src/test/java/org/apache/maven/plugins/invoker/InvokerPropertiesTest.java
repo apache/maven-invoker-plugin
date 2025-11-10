@@ -55,13 +55,13 @@ class InvokerPropertiesTest {
     private InvocationRequest request;
 
     @Test
-    void testConstructorNullSafe() {
+    void constructorNullSafe() {
         InvokerProperties facade = new InvokerProperties(null);
         assertThat(facade.getProperties()).isNotNull();
     }
 
     @Test
-    void testGetInvokerProperty() {
+    void getInvokerProperty() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -76,7 +76,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testGetJobName() {
+    void getJobName() {
         Properties props = new Properties();
         final String jobName = "Build Job name";
         props.put("invoker.name", jobName);
@@ -86,7 +86,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testIsExpectedResult() {
+    void isExpectedResult() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -103,7 +103,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestEmptyProperties() {
+    void configureRequestEmptyProperties() {
 
         InvokerProperties facade = new InvokerProperties(null);
 
@@ -112,7 +112,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestGoals() {
+    void configureRequestGoals() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -149,7 +149,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestProfiles() {
+    void configureRequestProfiles() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -185,7 +185,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestProject() throws Exception {
+    void configureRequestProject() throws Exception {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -211,7 +211,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestMavenExecutable() {
+    void configureRequestMavenExecutable() {
         Properties props = new Properties();
 
         InvokerProperties facade = new InvokerProperties(props);
@@ -232,7 +232,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestMavenOpts() {
+    void configureRequestMavenOpts() {
         Properties props = new Properties();
 
         InvokerProperties facade = new InvokerProperties(props);
@@ -252,7 +252,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestFailureBehavior() {
+    void configureRequestFailureBehavior() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -264,7 +264,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestFailureBehaviorUnKnownName() {
+    void configureRequestFailureBehaviorUnKnownName() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -278,7 +278,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestRecursion() {
+    void configureRequestRecursion() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -295,7 +295,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestOffline() {
+    void configureRequestOffline() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -312,7 +312,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestDebug() {
+    void configureRequestDebug() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -343,7 +343,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestQuiet() {
+    void configureRequestQuiet() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -374,7 +374,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureRequestTimeoutInSeconds() {
+    void configureRequestTimeoutInSeconds() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -393,7 +393,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureEnvironmentVariables() {
+    void configureEnvironmentVariables() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -411,7 +411,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureEnvironmentVariablesWithIndex() {
+    void configureEnvironmentVariablesWithIndex() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -429,7 +429,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureUpdateSnapshots() {
+    void configureUpdateSnapshots() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -447,7 +447,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testConfigureUpdateSnapshotsDefault() {
+    void configureUpdateSnapshotsDefault() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -464,7 +464,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testIsInvocationDefined() {
+    void isInvocationDefined() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -486,7 +486,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testIsSelectedDefined() {
+    void isSelectedDefined() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
 
@@ -508,7 +508,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testGetToolchainsForEmptyProperties() {
+    void getToolchainsForEmptyProperties() {
 
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
@@ -521,7 +521,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testGetToolchains() {
+    void getToolchains() {
         Properties props = new Properties();
         props.put("invoker.toolchain.jdk.version", "11");
         InvokerProperties facade = new InvokerProperties(props);
@@ -534,7 +534,7 @@ class InvokerPropertiesTest {
     }
 
     @Test
-    void testGetToolchainsWithIndex() {
+    void getToolchainsWithIndex() {
         Properties props = new Properties();
         props.put("selector.1.invoker.toolchain.jdk.version", "11");
         InvokerProperties facade = new InvokerProperties(props);
