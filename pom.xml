@@ -69,6 +69,7 @@ under the License.
     <beanshell-version>2.0b6</beanshell-version>
     <project.build.outputTimestamp>2025-06-23T21:45:38Z</project.build.outputTimestamp>
     <groovyVersion>4.0.28</groovyVersion>
+    <version.maven-invoker-plugin>3.9.1</version.maven-invoker-plugin>
   </properties>
 
   <dependencyManagement>
