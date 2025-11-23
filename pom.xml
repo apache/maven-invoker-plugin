@@ -86,9 +86,9 @@ under the License.
         <version>1.20.0</version>
       </dependency>
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>3.2.2</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
+        <version>4.5.0</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -233,7 +233,6 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
       <!-- TODO check with next parent -->
-      <version>3.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
