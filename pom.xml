@@ -62,7 +62,7 @@ under the License.
 
   <properties>
     <javaVersion>8</javaVersion>
-    <mavenVersion>3.9.11</mavenVersion>
+    <mavenVersion>3.9.12</mavenVersion>
     <resolverVersion>1.4.1</resolverVersion>
     <beanshell-groupId>org.apache-extras.beanshell</beanshell-groupId>
     <beanshell-artifactId>bsh</beanshell-artifactId>
