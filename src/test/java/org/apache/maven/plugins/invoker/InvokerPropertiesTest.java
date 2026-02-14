@@ -35,7 +35,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -258,7 +257,7 @@ class InvokerPropertiesTest {
 
         props.setProperty("invoker.failureBehavior", ReactorFailureBehavior.FailNever.getLongOption());
         facade.configureInvocation(request, 0);
-        verify(request).setReactorFailureBehavior(eq(ReactorFailureBehavior.FailNever));
+        verify(request).setReactorFailureBehavior(ReactorFailureBehavior.FailNever);
 
         verifyNoMoreInteractions(request);
     }
