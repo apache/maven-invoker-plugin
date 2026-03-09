@@ -559,7 +559,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * # A mapping for toolchain to ensure it exists
      * # Since plugin version 3.2.0
      * invoker.toolchain.&lt;type&gt;.&lt;provides&gt; = value
+     * # Exact match
      * invoker.toolchain.jdk.version = 11
+     * # Range match
+     * invoker.toolchain.jdk.version = [11,12)
      *
      * # For java.version, maven.version, os.family and toolchain it is possible to define multiple selectors.
      * # If one of the indexed selectors matches, the test is executed.
