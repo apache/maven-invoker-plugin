@@ -80,9 +80,7 @@ import org.apache.maven.shared.scriptinterpreter.ScriptException;
 import org.apache.maven.shared.scriptinterpreter.ScriptReturnException;
 import org.apache.maven.shared.scriptinterpreter.ScriptRunner;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
-import org.apache.maven.toolchain.MisconfiguredToolchainException;
-import org.apache.maven.toolchain.ToolchainManagerPrivate;
-import org.apache.maven.toolchain.ToolchainPrivate;
+import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -762,18 +760,18 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     private final SettingsBuilder settingsBuilder;
 
-    private final ToolchainManagerPrivate toolchainManagerPrivate;
+    private final ToolchainManager toolchainManager;
 
     private final InterpolatorUtils interpolatorUtils;
 
     public AbstractInvokerMojo(
             Invoker invoker,
             SettingsBuilder settingsBuilder,
-            ToolchainManagerPrivate toolchainManagerPrivate,
+            ToolchainManager toolchainManagerPrivate,
             InterpolatorUtils interpolatorUtils) {
         this.invoker = invoker;
         this.settingsBuilder = settingsBuilder;
-        this.toolchainManagerPrivate = toolchainManagerPrivate;
+        this.toolchainManager = toolchainManagerPrivate;
         this.interpolatorUtils = interpolatorUtils;
     }
 
@@ -1732,7 +1730,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     }
 
     private ToolchainPrivateManager getToolchainPrivateManager() {
-        return new ToolchainPrivateManager(toolchainManagerPrivate, session);
+        return new ToolchainPrivateManager(toolchainManager, session);
     }
 
     /**
@@ -2426,17 +2424,16 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     }
 
     static class ToolchainPrivateManager {
-        private ToolchainManagerPrivate manager;
+        private final ToolchainManager manager;
+        private final MavenSession session;
 
-        private MavenSession session;
-
-        ToolchainPrivateManager(ToolchainManagerPrivate manager, MavenSession session) {
+        ToolchainPrivateManager(ToolchainManager manager, MavenSession session) {
             this.manager = manager;
             this.session = session;
         }
 
-        ToolchainPrivate[] getToolchainPrivates(String type) throws MisconfiguredToolchainException {
-            return manager.getToolchainsForType(type, session);
+        boolean isToolchains(String type, Map<String, String> requirements) {
+            return !manager.getToolchains(session, type, requirements).isEmpty();
         }
     }
 }

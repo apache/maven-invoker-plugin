@@ -25,6 +25,7 @@ assert new File(basedir, 'target/its/maven-version-match/build.log').exists()
 assert !(new File(basedir, 'target/its/maven-version-mismatch/build.log').exists())
 assert new File(basedir, 'target/its/os-family-match/build.log').exists()
 assert !(new File(basedir, 'target/its/os-family-mismatch/build.log').exists())
+assert new File(basedir, 'target/its/toolchain-match/build.log').exists()
 assert !(new File(basedir, 'target/its/toolchain-mismatch/build.log').exists())
 
 def log = new File( basedir, 'build.log').text
@@ -35,4 +36,5 @@ assert log.contains("maven-version-match${FS}pom.xml ...................... SUCC
 assert log.contains("maven-version-mismatch${FS}pom.xml ................... SKIPPED due to Maven version")
 assert log.contains("os-family-match${FS}pom.xml .......................... SUCCESS")
 assert log.contains("os-family-mismatch${FS}pom.xml ....................... SKIPPED due to OS")
+assert log.contains("toolchain-match${FS}pom.xml .......................... SUCCESS")
 assert log.contains("toolchain-mismatch${FS}pom.xml ....................... SKIPPED due to Toolchain")
