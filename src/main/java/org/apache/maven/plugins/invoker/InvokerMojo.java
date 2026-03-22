@@ -27,7 +27,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.shared.invoker.Invoker;
-import org.apache.maven.toolchain.ToolchainManagerPrivate;
+import org.apache.maven.toolchain.ToolchainManager;
 
 /**
  * Searches for integration test Maven projects, and executes each, collecting a log in the project directory, and
@@ -75,9 +75,9 @@ public class InvokerMojo extends AbstractInvokerMojo {
     public InvokerMojo(
             Invoker invoker,
             SettingsBuilder settingsBuilder,
-            ToolchainManagerPrivate toolchainManagerPrivate,
+            ToolchainManager toolchainManager,
             InterpolatorUtils interpolaterUtils) {
-        super(invoker, settingsBuilder, toolchainManagerPrivate, interpolaterUtils);
+        super(invoker, settingsBuilder, toolchainManager, interpolaterUtils);
     }
 
     void processResults(InvokerSession invokerSession) throws MojoFailureException {

@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.toolchain.MisconfiguredToolchainException;
-import org.apache.maven.toolchain.ToolchainPrivate;
 import org.codehaus.plexus.util.Os;
 
 /**
@@ -218,24 +216,7 @@ class SelectorUtils {
     static boolean isToolchain(
             ToolchainPrivateManager toolchainPrivateManager, Collection<InvokerToolchain> invokerToolchains) {
         for (InvokerToolchain invokerToolchain : invokerToolchains) {
-            boolean found = false;
-            try {
-                for (ToolchainPrivate tc : toolchainPrivateManager.getToolchainPrivates(invokerToolchain.getType())) {
-                    if (!invokerToolchain.getType().equals(tc.getType())) {
-                        // useful because of MNG-5716
-                        continue;
-                    }
-
-                    if (tc.matchesRequirements(invokerToolchain.getProvides())) {
-                        found = true;
-                        continue;
-                    }
-                }
-            } catch (MisconfiguredToolchainException e) {
-                return false;
-            }
-
-            if (!found) {
+            if (!toolchainPrivateManager.isToolchains(invokerToolchain.getType(), invokerToolchain.getProvides())) {
                 return false;
             }
         }

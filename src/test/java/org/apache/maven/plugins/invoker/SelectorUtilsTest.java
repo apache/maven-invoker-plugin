@@ -25,12 +25,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
-import org.apache.maven.toolchain.ToolchainPrivate;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -101,42 +101,17 @@ class SelectorUtilsTest {
     }
 
     @Test
-    void isMatchingToolchain() throws Exception {
+    void isMatchingToolchain() {
         InvokerToolchain openJdk9 = new InvokerToolchain("jdk");
-        openJdk9.addProvides("version", "9");
-        openJdk9.addProvides("vendor", "openJDK");
-
-        InvokerToolchain maven360 = new InvokerToolchain("maven");
-        openJdk9.addProvides("version", "3.6.0");
 
         ToolchainPrivateManager toolchainPrivateManager = mock(ToolchainPrivateManager.class);
-        ToolchainPrivate jdkMatching = mock(ToolchainPrivate.class);
-        when(jdkMatching.matchesRequirements(anyMap())).thenReturn(true);
-        when(jdkMatching.getType()).thenReturn("jdk");
 
-        ToolchainPrivate jdkMismatch = mock(ToolchainPrivate.class);
-        when(jdkMismatch.getType()).thenReturn("jdk");
-
-        when(toolchainPrivateManager.getToolchainPrivates("jdk")).thenReturn(new ToolchainPrivate[] {jdkMatching});
+        when(toolchainPrivateManager.isToolchains(eq("jdk"), any())).thenReturn(true);
         assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)))
                 .isTrue();
 
-        when(toolchainPrivateManager.getToolchainPrivates("jdk")).thenReturn(new ToolchainPrivate[] {jdkMismatch});
+        when(toolchainPrivateManager.isToolchains(eq("jdk"), any())).thenReturn(false);
         assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)))
-                .isFalse();
-
-        when(toolchainPrivateManager.getToolchainPrivates("jdk"))
-                .thenReturn(new ToolchainPrivate[] {jdkMatching, jdkMismatch, jdkMatching});
-        assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)))
-                .isTrue();
-
-        when(toolchainPrivateManager.getToolchainPrivates("jdk")).thenReturn(new ToolchainPrivate[0]);
-        assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Collections.singleton(openJdk9)))
-                .isFalse();
-
-        when(toolchainPrivateManager.getToolchainPrivates("jdk")).thenReturn(new ToolchainPrivate[] {jdkMatching});
-        when(toolchainPrivateManager.getToolchainPrivates("maven")).thenReturn(new ToolchainPrivate[0]);
-        assertThat(SelectorUtils.isToolchain(toolchainPrivateManager, Arrays.asList(openJdk9, maven360)))
                 .isFalse();
     }
 
