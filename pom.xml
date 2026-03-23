@@ -309,6 +309,18 @@ under the License.
           </configuration>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <configuration>
+            <ignoredUnusedDeclaredDependencies>
+              <!-- used in runtime for script execution, but not directly in the code -->
+              <ignoredUnusedDeclaredDependency>org.apache-extras.beanshell:bsh</ignoredUnusedDeclaredDependency>
+              <ignoredUnusedDeclaredDependency>org.apache.groovy</ignoredUnusedDeclaredDependency>
+            </ignoredUnusedDeclaredDependencies>
+            <failOnWarning>true</failOnWarning>
+          </configuration>
+        </plugin>
+        <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <systemPropertyVariables>

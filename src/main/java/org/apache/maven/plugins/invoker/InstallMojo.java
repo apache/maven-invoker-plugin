@@ -18,6 +18,8 @@
  */
 package org.apache.maven.plugins.invoker;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -36,7 +38,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -88,15 +89,11 @@ import org.eclipse.aether.util.filter.DependencyFilterUtils;
 public class InstallMojo extends AbstractMojo {
 
     // components used in Mojo
+    private final RepositorySystem repositorySystem;
 
-    @Component
-    private RepositorySystem repositorySystem;
+    private final MavenSession session;
 
-    @Parameter(defaultValue = "${session}", readonly = true, required = true)
-    private MavenSession session;
-
-    @Parameter(defaultValue = "${project}", readonly = true, required = true)
-    private MavenProject project;
+    private final MavenProject project;
 
     /**
      * The path to the local repository into which the project artifacts should be installed for the integration tests.
@@ -150,6 +147,13 @@ public class InstallMojo extends AbstractMojo {
      */
     @Parameter(property = "invoker.install.scope", defaultValue = "runtime")
     private String scope;
+
+    @Inject
+    public InstallMojo(RepositorySystem repositorySystem, MavenSession session, MavenProject project) {
+        this.repositorySystem = repositorySystem;
+        this.session = session;
+        this.project = project;
+    }
 
     /**
      * Performs this mojo's tasks.
