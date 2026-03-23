@@ -1884,12 +1884,14 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         try {
-            runPreBuildHook(basedir, context, logger);
+            runPreBuildHook(basedir, context, logger, 0);
 
             for (int invocationIndex = 1; ; invocationIndex++) {
                 if (invocationIndex > 1 && !invokerProperties.isInvocationDefined(invocationIndex)) {
                     break;
                 }
+
+                runPreBuildHook(basedir, context, logger, invocationIndex);
 
                 final InvocationRequest request = new DefaultInvocationRequest();
 
@@ -1940,9 +1942,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     throw new RunFailureException(
                             "Maven invocation failed. " + e.getMessage(), BuildJob.Result.FAILURE_BUILD);
                 }
+                runPostBuildHook(basedir, context, logger, invocationIndex);
             }
         } finally {
-            runPostBuildHook(basedir, context, logger);
+            runPostBuildHook(basedir, context, logger, 0);
         }
         return true;
     }
@@ -1971,10 +1974,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         return true;
     }
 
-    private void runPreBuildHook(File basedir, Map<String, Object> context, FileLogger logger)
+    private void runPreBuildHook(File basedir, Map<String, Object> context, FileLogger logger, int invocationIndex)
             throws MojoExecutionException, RunFailureException {
         try {
-            scriptRunner.run("pre-build script", basedir, preBuildHookScript, context, logger);
+            String hookName = invocationIndex > 0 ? preBuildHookScript + "." + invocationIndex : preBuildHookScript;
+            scriptRunner.run("pre-build script", basedir, hookName, context, logger);
         } catch (ScriptException e) {
             throw new RunFailureException(BuildJob.Result.FAILURE_PRE_HOOK, e);
         } catch (IOException e) {
@@ -1982,10 +1986,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
     }
 
-    private void runPostBuildHook(File basedir, Map<String, Object> context, FileLogger logger)
+    private void runPostBuildHook(File basedir, Map<String, Object> context, FileLogger logger, int invocationIndex)
             throws MojoExecutionException, RunFailureException {
         try {
-            scriptRunner.run("post-build script", basedir, postBuildHookScript, context, logger);
+            String hookName = invocationIndex > 0 ? postBuildHookScript + "." + invocationIndex : postBuildHookScript;
+            scriptRunner.run("post-build script", basedir, hookName, context, logger);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         } catch (ScriptException e) {
