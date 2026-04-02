@@ -128,6 +128,29 @@ def file = new File( basedir, "target/my-test-project-1.0-SNAPSHOT.jar" )
 assert file.isFile()
 +------------------
 
+Pre and Post Build Script for multiple project executions
+
+  You can run multiple project executions in a single test by defining several <<<invoker.goals.N>>> in the <<<invoker.properties>>> file.
+
+  In this case, the pre and post build hook scripts can be executed for each invocation by adding the index to the script name.
+  For example, if you have two executions, you can have the following scripts:
+
+  * <<<prebuild.groovy>>> - preprocess before all executions
+
+  * <<<prebuild.1.groovy>>> - preprocess before the first execution
+
+  * <<<postbuild.1.groovy>>> - verify the first execution
+
+  * <<<prebuild.2.groovy>>>  - preprocess before the second execution
+
+  * <<<postbuild.2.groovy>>> - verify the second execution
+
+  * <<<postbuild.groovy>>> - verify all executions
+
+  []
+
+  Missing script files will be ignored.
+
 Predefined global variables
 
   To allow the scripts to access some useful data about the test project, the following global variables will be
