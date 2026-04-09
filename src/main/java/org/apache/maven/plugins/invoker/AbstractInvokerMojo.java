@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -778,7 +779,14 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     }
 
     public void setCloneProjectsTo(File cloneProjectsTo) {
-        if (cloneProjectsTo != null && cloneProjectsTo.getName().equalsIgnoreCase("none")) {
+
+        Boolean isNoneValue = Optional.ofNullable(cloneProjectsTo)
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .map(name -> name.equalsIgnoreCase("none"))
+                .orElse(false);
+
+        if (isNoneValue) {
             this.cloneProjectsTo = null;
         } else {
             this.cloneProjectsTo = cloneProjectsTo;
