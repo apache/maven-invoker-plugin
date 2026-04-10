@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -180,13 +181,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private boolean disableReports;
 
     /**
-     * Directory to which projects should be cloned prior to execution. If set to {@code null}, each integration test
-     * will be run in the directory in which the corresponding IT POM was found. In this case, you most likely want to
+     * <p>Directory to which projects should be cloned prior to execution. If not set or set to special value {@code none},
+     * each integration test will be run in the directory in which the corresponding IT POM was found. In this case, you most likely want to
      * configure your SCM to ignore <code>target</code> and <code>build.log</code> in the test's base directory.
-     * (<b>Exception</b> when project using invoker plugin is of <i>maven-plugin</i> packaging:
-     * In such case IT projects will be cloned to and executed in <code>target/its</code> by default.)
      *
-     * Note: cloning needs to be enabled for properties filtering to work.
+     * <p><b>Exception</b>: when a project using invoker plugin is of <i>maven-plugin</i> packaging:
+     * In such a case IT projects will be cloned to and executed in <code>target/its</code> by default.
+     *
+     * <p><b>Note</b>: cloning needs to be enabled for properties filtering to work.
+     *
      * @since 1.1
      */
     @Parameter(property = "invoker.cloneProjectsTo")
@@ -773,6 +776,21 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         this.settingsBuilder = settingsBuilder;
         this.toolchainManager = toolchainManagerPrivate;
         this.interpolatorUtils = interpolatorUtils;
+    }
+
+    public void setCloneProjectsTo(File cloneProjectsTo) {
+
+        Boolean isNoneValue = Optional.ofNullable(cloneProjectsTo)
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .map(name -> name.equalsIgnoreCase("none"))
+                .orElse(false);
+
+        if (isNoneValue) {
+            this.cloneProjectsTo = null;
+        } else {
+            this.cloneProjectsTo = cloneProjectsTo;
+        }
     }
 
     /**
