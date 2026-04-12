@@ -62,22 +62,19 @@ under the License.
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.gmaven</groupId>
-        <artifactId>gmaven-plugin</artifactId>
-        <version>1.4</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-help-plugin</artifactId>
+        <version>@version.maven-help-plugin@</version>
         <executions>
           <execution>
-            <id>verify-server</id>
+            <id>effective-settings</id>
             <phase>validate</phase>
             <goals>
-              <goal>execute</goal>
+              <goal>effective-settings</goal>
             </goals>
             <configuration>
-              <source>
-                def server = settings.servers.find{ it.id.equals('dummy-it-settings-merge') }
-                if( !server.password.equals('overridden') )
-                  throw new org.apache.maven.plugin.MojoExecutionException("Incorrect server password - specified settings.xml not merged/dominant")
-              </source>
+              <output>effective-settings.xml</output>
+              <showPasswords>true</showPasswords>
             </configuration>
           </execution>
         </executions>
