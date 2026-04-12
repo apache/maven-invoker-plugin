@@ -33,6 +33,7 @@ under the License.
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven-enforcer-plugin>@version.maven-enforcer-plugin@</version.maven-enforcer-plugin>
+    <version.maven-help-plugin>@version.maven-help-plugin@</version.maven-help-plugin>
   </properties>
 
   <build>
