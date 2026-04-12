@@ -717,6 +717,14 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     @Parameter
     private List<String> collectedProjects;
 
+    /**
+     * Specifies the number of times a failed execution should be retried.
+     *
+     * @since 3.10.0
+     */
+    @Parameter(defaultValue = "0", property = "invoker.rerunFailingTestsCount")
+    private int rerunFailingTestsCount;
+
     // internal state variables
 
     /**
@@ -873,7 +881,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             // Jobs are ordered according to ordinal value from invoker.properties
             getLog().info("Running " + setupBuildJobs.size() + " setup job" + ((setupBuildJobs.size() < 2) ? "" : "s")
                     + ":");
-            runBuilds(projectsDir, setupBuildJobs, 1);
+            runBuildsWithRetry(projectsDir, setupBuildJobs, 1);
             getLog().info("Setup done.");
         }
 
@@ -882,7 +890,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         if (setupBuildJobs.isEmpty() || setupBuildJobs.stream().allMatch(BuildJob::isNotError)) {
             // We will run the non setup jobs with the configured
             // parallelThreads number.
-            runBuilds(projectsDir, nonSetupBuildJobs, getParallelThreadsCount());
+            runBuildsWithRetry(projectsDir, nonSetupBuildJobs, getParallelThreadsCount());
         } else {
             for (BuildJob buildJob : nonSetupBuildJobs) {
                 buildJob.setResult(BuildJob.Result.SKIPPED);
@@ -893,6 +901,25 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
         writeSummaryFile(buildJobs);
         processResults(new InvokerSession(buildJobs));
+    }
+
+    void runBuildsWithRetry(File projectsDir, List<BuildJob> buildJobs, int runWithParallelThreads)
+            throws MojoExecutionException {
+        List<BuildJob> jobToExecute = buildJobs;
+        int executionCount = 0;
+        do {
+            if (executionCount > 0) {
+                getLog().warn("Rerunning " + jobToExecute.size() + " failed job"
+                        + ((jobToExecute.size() < 2) ? "" : "s"));
+            }
+            runBuilds(projectsDir, jobToExecute, runWithParallelThreads);
+            executionCount++;
+            jobToExecute = getFailedJobs(jobToExecute);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("Execution count: " + executionCount + ", failed jobs: "
+                        + jobToExecute.stream().map(BuildJob::getProject).collect(Collectors.joining(", ", "[", "]")));
+            }
+        } while (executionCount <= rerunFailingTestsCount && !jobToExecute.isEmpty());
     }
 
     /**
@@ -982,6 +1009,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         return buildJobs.stream()
                 .filter(buildJob -> !buildJob.getType().equals(BuildJob.Type.SETUP))
                 .collect(Collectors.toList());
+    }
+
+    private List<BuildJob> getFailedJobs(List<BuildJob> buildJobs) {
+        return buildJobs.stream().filter(buildJob -> !buildJob.isNotError()).collect(Collectors.toList());
     }
 
     private void handleScriptRunnerWithScriptClassPath() {
@@ -1353,7 +1384,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             }
 
             if (Files.isRegularFile(currentInvokerProperties)) {
-                try (InputStream in = new FileInputStream(currentInvokerProperties.toFile())) {
+                try (InputStream in = Files.newInputStream(currentInvokerProperties)) {
                     currentProperties.load(in);
                 } catch (IOException e) {
                     throw new MojoExecutionException("Failed to read invoker properties: " + currentInvokerProperties);
@@ -1625,6 +1656,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
                 if (executed) {
                     buildJob.setResult(BuildJob.Result.SUCCESS);
+                    buildJob.setFailureMessage(null);
 
                     if (!suppressSummaries) {
                         getLog().info(pad(buildJob).success("SUCCESS").a(' ') + "("
