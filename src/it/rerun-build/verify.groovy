@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,9 +25,11 @@ assert new File(basedir, 'target/it/project/touch.txt' ).exists()
 
 def buildLog = new File(basedir, 'build.log').text
 
-assert buildLog.count('setup/pom.xml .................................... FAILED') == 1
-assert buildLog.count('setup/pom.xml .................................... SUCCESS') == 1
+def fs = File.separator
 
-assert buildLog.count('project/pom.xml .................................. FAILED') == 1
-assert buildLog.count('project/pom.xml .................................. SUCCESS') == 1
+assert buildLog.count("setup${fs}pom.xml .................................... FAILED") == 1
+assert buildLog.count("setup${fs}pom.xml .................................... SUCCESS") == 1
+
+assert buildLog.count("project${fs}pom.xml .................................. FAILED") == 1
+assert buildLog.count("project${fs}pom.xml .................................. SUCCESS") == 1
 
