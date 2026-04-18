@@ -923,21 +923,28 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     void runBuildsWithRetry(File projectsDir, List<BuildJob> buildJobs, int runWithParallelThreads)
             throws MojoExecutionException {
-        List<BuildJob> jobToExecute = buildJobs;
+        List<BuildJob> jobsToExecute = buildJobs;
         int executionCount = 0;
         do {
             if (executionCount > 0) {
-                getLog().warn("Rerunning " + jobToExecute.size() + " failed job"
-                        + ((jobToExecute.size() < 2) ? "" : "s"));
+                getLog().warn("Rerunning " + jobsToExecute.size() + " failed job"
+                        + ((jobsToExecute.size() < 2) ? "" : "s"));
             }
-            runBuilds(projectsDir, jobToExecute, runWithParallelThreads);
+
             executionCount++;
-            jobToExecute = getFailedJobs(jobToExecute);
+
+            // set current execution count for jobs
+            for (BuildJob buildJob : jobsToExecute) {
+                buildJob.setExecutionCount(executionCount);
+            }
+
+            runBuilds(projectsDir, jobsToExecute, runWithParallelThreads);
+            jobsToExecute = getFailedJobs(jobsToExecute);
             if (getLog().isDebugEnabled()) {
                 getLog().debug("Execution count: " + executionCount + ", failed jobs: "
-                        + jobToExecute.stream().map(BuildJob::getProject).collect(Collectors.joining(", ", "[", "]")));
+                        + jobsToExecute.stream().map(BuildJob::getProject).collect(Collectors.joining(", ", "[", "]")));
             }
-        } while (executionCount <= rerunFailingTestsCount && !jobToExecute.isEmpty());
+        } while (executionCount <= rerunFailingTestsCount && !jobsToExecute.isEmpty());
     }
 
     /**
