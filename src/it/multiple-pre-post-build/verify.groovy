@@ -33,13 +33,13 @@ assert missingFiles == []
 
 def log = new File(basedir, 'build.log').text
 
-assert log.contains('[INFO] run pre-build script prebuild.groovy')
-assert log.contains('[INFO] run pre-build script prebuild.1.groovy')
-assert log.contains('[INFO] run pre-build script prebuild.2.groovy')
+assert log.contains("[DEBUG] Running script with GroovyScriptInterpreter :" + new File(basedir, 'target/it/project/prebuild.groovy').getAbsolutePath())
+assert log.contains("[DEBUG] Running script with GroovyScriptInterpreter :" + new File(basedir, 'target/it/project/prebuild.1.groovy').getAbsolutePath())
+assert log.contains("[DEBUG] Running script with GroovyScriptInterpreter :" + new File(basedir, 'target/it/project/prebuild.2.groovy').getAbsolutePath())
 
-assert log.contains('[INFO] run post-build script postbuild.groovy')
-assert log.contains('[INFO] run post-build script postbuild.1.groovy')
-assert log.contains('[INFO] run post-build script postbuild.2.groovy')
+assert log.contains("[DEBUG] Running script with GroovyScriptInterpreter :" + new File(basedir, 'target/it/project/postbuild.groovy').getAbsolutePath())
+assert log.contains("[DEBUG] Running script with GroovyScriptInterpreter :" + new File(basedir, 'target/it/project/postbuild.1.groovy').getAbsolutePath())
+assert log.contains("[DEBUG] Running script with GroovyScriptInterpreter :" + new File(basedir, 'target/it/project/postbuild.2.groovy').getAbsolutePath())
 
 assert log.contains('prebuild=1')
 assert log.contains('prebuild=2')
