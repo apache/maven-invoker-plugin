@@ -16,5 +16,5 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-File buildLog = new File( basedir, 'build.log' )
-assert buildLog.text.contains( '[INFO] run post-build script postbuild.groovy' ) 
+File buildLog = new File(basedir, 'build.log')
+assert buildLog.text.contains("[DEBUG] Running script with GroovyScriptInterpreter :" + new File(basedir, 'src/it/project/postbuild.groovy').getAbsolutePath())
