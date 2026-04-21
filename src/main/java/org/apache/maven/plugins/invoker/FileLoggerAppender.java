@@ -20,23 +20,31 @@ package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.shared.invoker.InvocationOutputHandler;
 
 /**
  *
  */
-class FileLogger extends org.apache.maven.shared.scriptinterpreter.FileLogger implements InvocationOutputHandler {
+class FileLoggerAppender extends FileLogger {
 
     /**
-     * Creates a new logger that writes to the specified file and optionally mirrors messages to the given mojo logger.
+     * Creates a new logger that appends to the specified file and optionally mirrors messages to the given mojo logger.
      *
      * @param outputFile The path to the output file, must not be <code>null</code>.
      * @param log The mojo logger to additionally output messages to, may be <code>null</code> if not used.
      * @throws IOException If the output file could not be created.
      */
-    FileLogger(File outputFile, final Log log) throws IOException {
-        super(outputFile, log != null ? log::info : null);
+    FileLoggerAppender(File outputFile, final Log log) throws IOException {
+        super(outputFile, log);
+    }
+
+    @Override
+    protected OutputStream createOutputStream(Path outputPath) throws IOException {
+        return Files.newOutputStream(outputPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
     }
 }

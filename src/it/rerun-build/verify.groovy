@@ -33,3 +33,12 @@ assert buildLog.count("setup${fs}pom.xml .................................... SU
 assert buildLog.count("project${fs}pom.xml .................................. FAILED") == 1
 assert buildLog.count("project${fs}pom.xml .................................. SUCCESS") == 1
 
+def setupBuildLog = new File(basedir, 'target/it/setup/build.log').text
+
+// The project should be built twice, once for the first run and once for the rerun.
+assert setupBuildLog.count("[INFO] BUILD SUCCESS") == 2
+
+def projectBuildLog = new File(basedir, 'target/it/project/build.log').text
+
+// The project should be built twice, once for the first run and once for the rerun.
+assert projectBuildLog.count("[INFO] BUILD SUCCESS") == 2
