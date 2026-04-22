@@ -58,6 +58,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.plugins.invoker.model.io.xpp3.BuildJobXpp3Writer;
@@ -720,6 +721,14 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     @Parameter
     private List<String> collectedProjects;
 
+    /**
+     * Specifies the number of times a failed execution should be retried.
+     *
+     * @since 3.10.0
+     */
+    @Parameter(defaultValue = "0", property = "invoker.rerunFailingTestsCount")
+    private int rerunFailingTestsCount;
+
     // internal state variables
 
     /**
@@ -891,7 +900,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             // Jobs are ordered according to ordinal value from invoker.properties
             getLog().info("Running " + setupBuildJobs.size() + " setup job" + ((setupBuildJobs.size() < 2) ? "" : "s")
                     + ":");
-            runBuilds(projectsDir, setupBuildJobs, 1);
+            runBuildsWithRetry(projectsDir, setupBuildJobs, 1);
             getLog().info("Setup done.");
         }
 
@@ -900,7 +909,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         if (setupBuildJobs.isEmpty() || setupBuildJobs.stream().allMatch(BuildJob::isNotError)) {
             // We will run the non setup jobs with the configured
             // parallelThreads number.
-            runBuilds(projectsDir, nonSetupBuildJobs, getParallelThreadsCount());
+            runBuildsWithRetry(projectsDir, nonSetupBuildJobs, getParallelThreadsCount());
         } else {
             for (BuildJob buildJob : nonSetupBuildJobs) {
                 buildJob.setResult(BuildJob.Result.SKIPPED);
@@ -911,6 +920,32 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
         writeSummaryFile(buildJobs);
         processResults(new InvokerSession(buildJobs));
+    }
+
+    void runBuildsWithRetry(File projectsDir, List<BuildJob> buildJobs, int runWithParallelThreads)
+            throws MojoExecutionException {
+        List<BuildJob> jobsToExecute = buildJobs;
+        int executionCount = 0;
+        do {
+            if (executionCount > 0) {
+                getLog().warn("Rerunning " + jobsToExecute.size() + " failed job"
+                        + ((jobsToExecute.size() < 2) ? "" : "s"));
+            }
+
+            executionCount++;
+
+            // set current execution count for jobs
+            for (BuildJob buildJob : jobsToExecute) {
+                buildJob.setExecutionCount(executionCount);
+            }
+
+            runBuilds(projectsDir, jobsToExecute, runWithParallelThreads);
+            jobsToExecute = getFailedJobs(jobsToExecute);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("Execution count: " + executionCount + ", failed jobs: "
+                        + jobsToExecute.stream().map(BuildJob::getProject).collect(Collectors.joining(", ", "[", "]")));
+            }
+        } while (executionCount <= rerunFailingTestsCount && !jobsToExecute.isEmpty());
     }
 
     /**
@@ -1000,6 +1035,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         return buildJobs.stream()
                 .filter(buildJob -> !buildJob.getType().equals(BuildJob.Type.SETUP))
                 .collect(Collectors.toList());
+    }
+
+    private List<BuildJob> getFailedJobs(List<BuildJob> buildJobs) {
+        return buildJobs.stream().filter(buildJob -> !buildJob.isNotError()).collect(Collectors.toList());
     }
 
     private void handleScriptRunnerWithScriptClassPath() {
@@ -1371,7 +1410,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             }
 
             if (Files.isRegularFile(currentInvokerProperties)) {
-                try (InputStream in = new FileInputStream(currentInvokerProperties.toFile())) {
+                try (InputStream in = Files.newInputStream(currentInvokerProperties)) {
                     currentProperties.load(in);
                 } catch (IOException e) {
                     throw new MojoExecutionException("Failed to read invoker properties: " + currentInvokerProperties);
@@ -1624,7 +1663,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                 long startTime = System.currentTimeMillis();
                 boolean executed;
 
-                FileLogger buildLogger = setupBuildLogFile(basedir);
+                FileLogger buildLogger = setupBuildLogFile(basedir, buildJob.getExecutionCount());
                 if (buildLogger != null) {
                     buildJob.setBuildlog(buildLogger.getOutputFile().getAbsolutePath());
                 }
@@ -1643,6 +1682,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
                 if (executed) {
                     buildJob.setResult(BuildJob.Result.SUCCESS);
+                    buildJob.setFailureMessage(null);
 
                     if (!suppressSummaries) {
                         getLog().info(pad(buildJob).success("SUCCESS").a(' ') + "("
@@ -1985,6 +2025,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         } catch (ScriptReturnException e) {
             return false;
         } catch (ScriptException e) {
+            if (logger != null) {
+                logger.consumeLine("Error executing selector script: " + e.getMessage());
+            }
             throw new RunFailureException(BuildJob.Result.ERROR, e);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
@@ -1998,6 +2041,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             String hookName = invocationIndex > 0 ? preBuildHookScript + "." + invocationIndex : preBuildHookScript;
             scriptRunner.run("pre-build script", basedir, hookName, context, logger);
         } catch (ScriptException e) {
+            if (logger != null) {
+                logger.consumeLine("Error executing pre-build hook: " + e.getMessage());
+            }
             throw new RunFailureException(BuildJob.Result.FAILURE_PRE_HOOK, e);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
@@ -2012,6 +2058,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         } catch (ScriptException e) {
+            if (logger != null) {
+                logger.consumeLine("Error executing post-build hook: " + e.getMessage());
+            }
             throw new RunFailureException(e.getMessage(), BuildJob.Result.FAILURE_POST_HOOK, e);
         }
     }
@@ -2028,10 +2077,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * {@code build.log}.
      *
      * @param basedir The base directory of the project, must not be <code>null</code>.
+     * @param executionCount current execution count of the build job, used to determine whether to append to or create a new log file
      * @return The build logger or <code>null</code> if logging has been disabled.
      * @throws org.apache.maven.plugin.MojoExecutionException If the log file could not be created.
      */
-    private FileLogger setupBuildLogFile(File basedir) throws MojoExecutionException {
+    private FileLogger setupBuildLogFile(File basedir, int executionCount) throws MojoExecutionException {
         FileLogger logger = null;
 
         if (!noLog) {
@@ -2046,16 +2096,16 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                         logDirectory.toPath().resolve(projectsDirectory.toPath().relativize(basedir.toPath()));
             }
 
+            Log streamLogger = streamLogs ? getLog() : null;
+            File logFile = projectLogDirectory.resolve("build.log").toFile();
             try {
-                if (streamLogs) {
-                    logger = new FileLogger(
-                            projectLogDirectory.resolve("build.log").toFile(), getLog());
+                if (executionCount > 1) {
+                    logger = new FileLoggerAppender(logFile, streamLogger);
+                    getLog().debug("Append to build log: " + logFile);
                 } else {
-                    logger = new FileLogger(
-                            projectLogDirectory.resolve("build.log").toFile());
+                    logger = new FileLogger(logFile, streamLogger);
+                    getLog().debug("New build log initialized: " + logFile);
                 }
-
-                getLog().debug("Build log initialized in: " + projectLogDirectory);
             } catch (IOException e) {
                 throw new MojoExecutionException("Error initializing build logfile in: " + projectLogDirectory, e);
             }

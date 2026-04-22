@@ -105,6 +105,13 @@ under the License.
           <description>BuildJobs will be sorted in the descending order of the ordinal. In other words, the BuildJobs with the highest numbers will be executed first</description>
         </field>
         <field xml.attribute="true">
+          <name>executionCount</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <type>int</type>
+          <description>The execution count of the build job</description>
+        </field>
+        <field xml.attribute="true">
           <name>buildlog</name>
           <version>1.0.0</version>
           <required>false</required>
