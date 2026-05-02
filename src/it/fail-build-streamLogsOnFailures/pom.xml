@@ -47,6 +47,7 @@ under the License.
             <pomInclude>*/pom.xml</pomInclude>
           </pomIncludes>
           <streamLogsOnFailures>true</streamLogsOnFailures>
+          <rerunFailingTestsCount>1</rerunFailingTestsCount>
         </configuration>
         <executions>
           <execution>
