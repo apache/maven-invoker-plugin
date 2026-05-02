@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -201,21 +202,51 @@ class InvokerSession {
         jobToLogs.addAll(errorJobs);
 
         for (BuildJob buildJob : jobToLogs) {
-            File buildLogFile = buildJob.getBuildlog() != null ? new File(buildJob.getBuildlog()) : null;
-            if (buildLogFile != null && buildLogFile.exists()) {
+            Path buildLogPath = buildJob.getBuildlog() != null ? new File(buildJob.getBuildlog()).toPath() : null;
+            if (buildLogPath != null && Files.exists(buildLogPath)) {
                 try {
                     // prepare message with build.log in one string to omit begin [ERROR], [WARN]
                     // so whole log will be displayed without decoration
                     StringBuilder buildLogMessage = new StringBuilder();
                     buildLogMessage.append(System.lineSeparator());
                     buildLogMessage.append(System.lineSeparator());
-                    buildLogMessage.append("*** begin build.log for: " + buildJob.getProject() + " ***");
-                    buildLogMessage.append(System.lineSeparator());
-                    try (Reader buildLogReader = Files.newBufferedReader(buildLogFile.toPath())) {
-                        buildLogMessage.append(IOUtil.toString(buildLogReader));
+                    buildLogMessage
+                            .append("*** begin build.log for: ")
+                            .append(buildJob.getProject())
+                            .append(" ***")
+                            .append(System.lineSeparator());
+
+                    if (buildJob.getExecutionCount() > 1) {
+                        // try to read build log from each execution
+                        for (int executionCount = 1;
+                                executionCount <= buildJob.getExecutionCount() - 1;
+                                executionCount++) {
+                            // log file name is hardcoded in whole project
+                            buildLogMessage
+                                    .append("*** build.log for execution: ")
+                                    .append(executionCount)
+                                    .append(" ***")
+                                    .append(System.lineSeparator());
+                            Path path = buildLogPath
+                                    .getParent()
+                                    .resolve(buildLogPath.getFileName().toString() + "." + executionCount);
+                            appendLogToMessage(path, buildLogMessage);
+                        }
+
+                        buildLogMessage
+                                .append("*** build.log for execution: ")
+                                .append(buildJob.getExecutionCount())
+                                .append(" ***")
+                                .append(System.lineSeparator());
                     }
-                    buildLogMessage.append("*** end build.log for: " + buildJob.getProject() + " ***");
-                    buildLogMessage.append(System.lineSeparator());
+
+                    appendLogToMessage(buildLogPath, buildLogMessage);
+
+                    buildLogMessage
+                            .append("*** end build.log for: ")
+                            .append(buildJob.getProject())
+                            .append(" ***")
+                            .append(System.lineSeparator());
 
                     logWithLevel(logger, ignoreFailures, SEPARATOR);
                     logWithLevel(logger, ignoreFailures, buildLogMessage.toString());
@@ -225,6 +256,14 @@ class InvokerSession {
                 } catch (IOException e) {
                     throw new MojoFailureException(e.getMessage(), e);
                 }
+            }
+        }
+    }
+
+    private void appendLogToMessage(Path logPath, StringBuilder buildLogMessage) throws IOException {
+        if (logPath != null && Files.exists(logPath)) {
+            try (Reader buildLogReader = Files.newBufferedReader(logPath)) {
+                buildLogMessage.append(IOUtil.toString(buildLogReader));
             }
         }
     }

@@ -32,6 +32,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2097,15 +2098,22 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             }
 
             Log streamLogger = streamLogs ? getLog() : null;
-            File logFile = projectLogDirectory.resolve("build.log").toFile();
+            Path logPath = projectLogDirectory.resolve("build.log");
+
             try {
-                if (executionCount > 1) {
-                    logger = new FileLoggerAppender(logFile, streamLogger);
-                    getLog().debug("Append to build log: " + logFile);
-                } else {
-                    logger = new FileLogger(logFile, streamLogger);
-                    getLog().debug("New build log initialized: " + logFile);
+                if (executionCount > 1 && Files.exists(logPath)) {
+                    // next execution, rename log file from build.log to build-<executionCount -1 >.log
+                    // we preserve log from previous execution, and start with new log file for current execution
+                    // each execution should have new log file as many assertions check string presence in log file, a
+                    // nd if we keep appending to same log file, it will be hard to determine which log entry belongs to
+                    // which execution
+                    Path logFileBackup =
+                            logPath.getParent().resolve(logPath.getFileName().toString() + "." + (executionCount - 1));
+                    getLog().debug("Renaming existing log file " + logPath + " to " + logFileBackup);
+                    Files.move(logPath, logFileBackup, StandardCopyOption.REPLACE_EXISTING);
                 }
+                logger = new FileLogger(logPath.toFile(), streamLogger);
+                getLog().debug("New build log initialized: " + logPath);
             } catch (IOException e) {
                 throw new MojoExecutionException("Error initializing build logfile in: " + projectLogDirectory, e);
             }

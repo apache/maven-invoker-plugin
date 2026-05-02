@@ -18,12 +18,19 @@
  */
 
 def FS = File.separator
-def buildLogOfProject = new File( basedir, 'target/it/project/build.log' ).text
+def buildLogOfProject1 = new File(basedir, 'target/it/project/build.log.1').text
+def buildLogOfProject = new File(basedir, 'target/it/project/build.log').text
 
-def buildLog = new File( basedir, 'build.log' ).text
+def buildLog = new File(basedir, 'build.log').text
 
-assert buildLog.contains( '*** begin build.log for: project' + FS + 'pom.xml ***' )
-assert buildLog.contains( buildLogOfProject )
-assert buildLog.contains( '*** end build.log for: project' + FS + 'pom.xml ***' )
+assert buildLog.contains('*** begin build.log for: project' + FS + 'pom.xml ***')
+assert buildLog.contains('*** build.log for execution: 1 ***')
+assert buildLog.contains(buildLogOfProject1)
+assert buildLog.contains('*** build.log for execution: 2 ***')
+assert buildLog.contains(buildLogOfProject)
+assert buildLog.contains('*** end build.log for: project' + FS + 'pom.xml ***')
 
-assert buildLog.contains( 'ERROR] Failed to execute goal org.apache.maven.plugins:maven-invoker-plugin:' + projectVersion + ':run' )
+// the build was re-run so the error is logged twice, once for each run
+assert buildLog.count("[FATAL] 'modelVersion' of '99.0.0'") == 2
+
+assert buildLog.contains('ERROR] Failed to execute goal org.apache.maven.plugins:maven-invoker-plugin:' + projectVersion + ':run')

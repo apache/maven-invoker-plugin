@@ -20,8 +20,8 @@ import java.nio.file.Files
  */
 
 
-assert new File(basedir, 'target/it/setup/touch.txt' ).exists()
-assert new File(basedir, 'target/it/project/touch.txt' ).exists()
+assert new File(basedir, 'target/it/setup/touch.txt').exists()
+assert new File(basedir, 'target/it/project/touch.txt').exists()
 
 def buildLog = new File(basedir, 'build.log').text
 
@@ -33,12 +33,14 @@ assert buildLog.count("setup${fs}pom.xml .................................... SU
 assert buildLog.count("project${fs}pom.xml .................................. FAILED") == 1
 assert buildLog.count("project${fs}pom.xml .................................. SUCCESS") == 1
 
-def setupBuildLog = new File(basedir, 'target/it/setup/build.log').text
+def setupBuildLog1 = new File(basedir, 'target/it/setup/build.log.1').text
+assert setupBuildLog1.count("[INFO] BUILD SUCCESS") == 1
 
-// The project should be built twice, once for the first run and once for the rerun.
-assert setupBuildLog.count("[INFO] BUILD SUCCESS") == 2
+def setupBuildLog = new File(basedir, 'target/it/setup/build.log').text
+assert setupBuildLog.count("[INFO] BUILD SUCCESS") == 1
+
+def projectBuildLog1 = new File(basedir, 'target/it/project/build.log.1').text
+assert projectBuildLog1.count("[INFO] BUILD SUCCESS") == 1
 
 def projectBuildLog = new File(basedir, 'target/it/project/build.log').text
-
-// The project should be built twice, once for the first run and once for the rerun.
-assert projectBuildLog.count("[INFO] BUILD SUCCESS") == 2
+assert projectBuildLog.count("[INFO] BUILD SUCCESS") == 1
