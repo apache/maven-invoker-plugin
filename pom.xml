@@ -68,7 +68,7 @@ under the License.
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
     <project.build.outputTimestamp>2026-05-02T20:49:38Z</project.build.outputTimestamp>
-    <groovyVersion>4.0.31</groovyVersion>
+    <groovyVersion>4.0.32</groovyVersion>
     <!-- TODO check with next parent -->
     <version.plexus-utils>4.0.3</version.plexus-utils>
   </properties>
