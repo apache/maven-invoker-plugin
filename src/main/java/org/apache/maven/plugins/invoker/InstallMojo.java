@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,7 +54,6 @@ import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
-import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.installation.InstallRequest;
@@ -67,6 +67,7 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.scope.DependencyScope;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.artifact.SubArtifact;
@@ -214,7 +215,19 @@ public class InstallMojo extends AbstractMojo {
     private void resolveProjectDependencies(Map<String, Artifact> resolvedArtifacts)
             throws ArtifactResolutionException, MojoExecutionException, DependencyResolutionException {
 
-        DependencyFilter classpathFilter = DependencyFilterUtils.classpathFilter(scope);
+        // log for testing
+        // defined in org.apache.maven.repository.internal.scopes.Maven3ScopeManagerConfiguration
+        Collection<DependencyScope> dependencyScopeUniverse =
+                session.getRepositorySession().getScopeManager().getDependencyScopeUniverse();
+        getLog().info("Dependency scopes: " + dependencyScopeUniverse);
+
+        Collection<org.eclipse.aether.scope.ResolutionScope> resolutionScopeUniverse =
+                session.getRepositorySession().getScopeManager().getResolutionScopeUniverse();
+        getLog().info("Resolution scopes: " + resolutionScopeUniverse);
+
+        // try to replace it ... by resolution scop
+        // how to translate scope to resolution scope ???
+        // DependencyFilter classpathFilter = DependencyFilterUtils.classpathFilter(scope);
 
         ArtifactTypeRegistry artifactTypeRegistry =
                 session.getRepositorySession().getArtifactTypeRegistry();
@@ -228,17 +241,22 @@ public class InstallMojo extends AbstractMojo {
 
         List<Dependency> dependencies = project.getDependencies().stream()
                 .map(d -> RepositoryUtils.toDependency(d, artifactTypeRegistry))
-                .filter(d -> classpathFilter.accept(new DefaultDependencyNode(d), null))
+                //                .filter(d -> classpathFilter.accept(new DefaultDependencyNode(d), null))
+                // how to filter by resolution - scope
                 .collect(Collectors.toList());
 
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRootArtifact(RepositoryUtils.toArtifact(project.getArtifact()));
         collectRequest.setDependencies(dependencies);
         collectRequest.setManagedDependencies(managedDependencies);
+        collectRequest.setResolutionScope(session.getRepositorySession()
+                .getScopeManager()
+                .getResolutionScope("main-runtime")
+                .orElseThrow(() -> new MojoExecutionException("Resolution scope 'main-runtime' not found")));
 
         collectRequest.setRepositories(project.getRemoteProjectRepositories());
 
-        DependencyRequest request = new DependencyRequest(collectRequest, classpathFilter);
+        DependencyRequest request = new DependencyRequest(collectRequest, null);
 
         DependencyResult dependencyResult =
                 repositorySystem.resolveDependencies(session.getRepositorySession(), request);

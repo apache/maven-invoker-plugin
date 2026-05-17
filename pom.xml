@@ -62,8 +62,8 @@ under the License.
 
   <properties>
     <javaVersion>8</javaVersion>
-    <mavenVersion>3.9.15</mavenVersion>
-    <resolverVersion>1.9.27</resolverVersion>
+    <mavenVersion>3.10.0-SNAPSHOT</mavenVersion>
+    <resolverVersion>2.0.16</resolverVersion>
     <beanshell-groupId>org.apache-extras.beanshell</beanshell-groupId>
     <beanshell-artifactId>bsh</beanshell-artifactId>
     <beanshell-version>2.0b6</beanshell-version>
