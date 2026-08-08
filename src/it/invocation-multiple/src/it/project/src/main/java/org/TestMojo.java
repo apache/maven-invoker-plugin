@@ -24,15 +24,13 @@ import java.io.*;
 import java.util.*;
 
 import org.apache.maven.plugin.*;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
-/**
- * @goal test
- */
+@Mojo(name = "test")
 public class TestMojo extends AbstractMojo {
 
-    /**
-     * @parameter default-value="${project.build.directory}/test.txt"
-     */
+    @Parameter(defaultValue = "${project.build.directory}/test.txt")
     private File outputFile;
 
     /**
