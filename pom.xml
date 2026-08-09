@@ -69,8 +69,6 @@ under the License.
     <beanshell-version>2.0b6</beanshell-version>
     <project.build.outputTimestamp>2026-05-02T20:49:38Z</project.build.outputTimestamp>
     <groovyVersion>4.0.33</groovyVersion>
-    <!-- TODO check with next parent -->
-    <version.plexus-utils>4.0.3</version.plexus-utils>
   </properties>
 
   <dependencyManagement>
