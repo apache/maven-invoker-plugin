@@ -30,7 +30,9 @@ assert buildLog.contains('*** build.log for execution: 2 ***')
 assert buildLog.contains(buildLogOfProject)
 assert buildLog.contains('*** end build.log for: project' + FS + 'pom.xml ***')
 
-// the build was re-run so the error is logged twice, once for each run
-assert buildLog.count("[FATAL] 'modelVersion' of '99.0.0'") == 2
+// the build was re-run so the error must be present in each execution log
+def fatalModelVersionMessage = "[FATAL] 'modelVersion' of '99.0.0'"
+assert buildLogOfProject1.contains(fatalModelVersionMessage)
+assert buildLogOfProject.contains(fatalModelVersionMessage)
 
 assert buildLog.contains('ERROR] Failed to execute goal org.apache.maven.plugins:maven-invoker-plugin:' + projectVersion + ':run')
