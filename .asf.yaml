@@ -26,7 +26,6 @@ github:
     - maven
   protected_branches:
     master: { }
-    maven-invoker-plugin-3.7.x: { }
   pull_requests:
     del_branch_on_merge: true
   enabled_merge_buttons:
