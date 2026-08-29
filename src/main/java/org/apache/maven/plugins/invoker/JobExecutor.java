@@ -28,6 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.apache.maven.plugins.invoker.model.BuildJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Execute build jobs with parallel.
@@ -35,6 +37,9 @@ import org.apache.maven.plugins.invoker.model.BuildJob;
  * @author Slawomir Jaranowski
  */
 class JobExecutor {
+
+    private final Logger logger = LoggerFactory.getLogger(JobExecutor.class);
+
     interface ThrowableJobConsumer {
         void accept(BuildJob t) throws Throwable;
     }
@@ -64,6 +69,11 @@ class JobExecutor {
                         } catch (Throwable e) {
                             buildJob.setResult(BuildJob.Result.ERROR);
                             buildJob.setFailureMessage(String.valueOf(e));
+                            // should not happen here
+                            // it can be an error in process job result on preparing job for executing
+                            // after execution job, job reports is already write to file,
+                            // so changing job state can be missed
+                            logger.error("Error executing job: {}", buildJob, e);
                         }
                         return null;
                     })
