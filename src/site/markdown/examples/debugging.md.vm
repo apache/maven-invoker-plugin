@@ -1,0 +1,50 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+# Debugging Tests
+
+Sometimes you need to debug an integration test exactly as the Invoker Plugin ran it. Here's how.
+
+# Using mvnDebug
+
+Each IT runs in a forked Maven process. To attach a JVM debugger to one IT, set the [`mavenExecutable`](../run-mojo.html#mavenExecutable) parameter to `mvnDebug` and select that project with [`invoker.test`](../run-mojo.html#invokerTest). Maven ships this script next to `mvn`; it listens for a remote debugger on port 8000 and waits until one attaches.
+
+```shell
+mvn verify -Dinvoker.mavenExecutable=mvnDebug -Dinvoker.test=my-it
+```
+
+You can also set it for a single project in `invoker.properties`:
+
+```properties
+invoker.mavenExecutable = mvnDebug
+```
+
+Then attach a remote debugger (for example Eclipse "Remote Java Application" via Run &gt; Open Debug Dialog...) to `localhost:8000`.
+
+# Using mavenOpts
+
+If you need a different listen address or port, leave the default Maven executable and pass a JDWP agent through [`mavenOpts`](../run-mojo.html#mavenOpts) (`MAVEN_OPTS` of the forked Maven):
+
+```shell
+mvn verify -Dinvoker.test=my-it -Dinvoker.mavenOpts="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:5005"
+```
+
+# The debug parameter
+
+The [`debug`](../run-mojo.html#debug) parameter (`invoker.debug`) only enables Maven debug logging (`-X`) for the forked builds. It does not start a JVM debugger.
