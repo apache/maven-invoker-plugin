@@ -23,31 +23,10 @@ Sometimes you need to debug an integration test exactly as the Invoker Plugin ra
 
 # Using mvnDebug
 
-Each IT runs in a forked Maven process. The easiest way to attach a JVM debugger to that process is to set the [`mavenExecutable`](../run-mojo.html#mavenExecutable) parameter to `mvnDebug`. Maven ships this script next to `mvn`; it listens for a remote debugger on port 8000 and waits until one attaches.
+Each IT runs in a forked Maven process. To attach a JVM debugger to one IT, set the [`mavenExecutable`](../run-mojo.html#mavenExecutable) parameter to `mvnDebug` and select that project with [`invoker.test`](../run-mojo.html#invokerTest). Maven ships this script next to `mvn`; it listens for a remote debugger on port 8000 and waits until one attaches.
 
 ```shell
-mvn verify -Dinvoker.mavenExecutable=mvnDebug
-```
-
-Or in the plugin configuration:
-
-```xml
-<project>
-  ...
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <version>${project.version}</version>
-        <configuration>
-          <mavenExecutable>mvnDebug</mavenExecutable>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  ...
-</project>
+mvn verify -Dinvoker.mavenExecutable=mvnDebug -Dinvoker.test=my-it
 ```
 
 You can also set it for a single project in `invoker.properties`:
@@ -58,18 +37,12 @@ invoker.mavenExecutable = mvnDebug
 
 Then attach a remote debugger (for example Eclipse "Remote Java Application" via Run &gt; Open Debug Dialog...) to `localhost:8000`.
 
-To debug only one IT, combine this with [`invoker.test`](../run-mojo.html#invokerTest):
-
-```shell
-mvn verify -Dinvoker.mavenExecutable=mvnDebug -Dinvoker.test=my-it
-```
-
 # Using mavenOpts
 
 If you need a different listen address or port, leave the default Maven executable and pass a JDWP agent through [`mavenOpts`](../run-mojo.html#mavenOpts) (`MAVEN_OPTS` of the forked Maven):
 
 ```shell
-mvn verify -Dinvoker.mavenOpts="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:5005"
+mvn verify -Dinvoker.test=my-it -Dinvoker.mavenOpts="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:5005"
 ```
 
 # The debug parameter
