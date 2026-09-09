@@ -99,7 +99,20 @@ public class InvokerReport extends AbstractMavenReport {
         return getI18nString(locale, "description");
     }
 
+    /**
+     * @deprecated use {@link #getOutputPath()} instead
+     */
+    @Override
+    @Deprecated
     public String getOutputName() {
+        return getOutputPath();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getOutputPath() {
         return "invoker";
     }
 
