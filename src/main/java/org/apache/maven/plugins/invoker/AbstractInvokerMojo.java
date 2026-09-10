@@ -480,139 +480,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * {@link #filterProperties}.<p/>
      *
      * <p>
-     * As of 3.2.0 it is possible to put this folder in any of the ancestor folders, where properties will be inherited.
+     * As of 3.2.0 it is possible to put this file in any of the ancestor folders, where properties will be inherited.
      * This way you can provide a single properties file for a group of projects
      * </p>
      *
-     * The snippet below describes the supported properties:
-     * <pre>
-     * # A comma or space separated list of goals/phases to execute, may
-     * # specify an empty list to execute the default goal of the IT project.
-     * # Environment variables used by maven plugins can be added here
-     * invoker.goals = clean install -Dplugin.variable=value
-     *
-     * # Or you can give things like this if you need.
-     * invoker.goals = -T2 clean verify
-     *
-     * # Optionally, a list of goals to run during further invocations of Maven
-     * invoker.goals.2 = ${project.groupId}:${project.artifactId}:${project.version}:run
-     *
-     * # A comma or space separated list of profiles to activate
-     * # can be indexed
-     * invoker.profiles = its,jdk15
-     *
-     * # The path to an alternative POM or base directory to invoke Maven on, defaults to the
-     * # project that was originally specified in the plugin configuration
-     * # Since plugin version 1.4
-     * # can be indexed
-     * invoker.project = sub-module
-     *
-     * # The maven executable can either be a file relative to <code>${maven.home}/bin/</code>, test project workspace
-     * # or an absolute file.
-     * # Since plugin version 3.3.0
-     * # can be indexed
-     * invoker.mavenExecutable = mvnw
-     *
-     * # The value for the environment variable MAVEN_OPTS
-     * # can be indexed
-     * invoker.mavenOpts = -Dfile.encoding=UTF-16 -Xms32m -Xmx256m
-     *
-     * # Possible values are &quot;fail-fast&quot; (default), &quot;fail-at-end&quot; and &quot;fail-never&quot;
-     * # can be indexed
-     * invoker.failureBehavior = fail-never
-     *
-     * # The expected result of the build, possible values are &quot;success&quot; (default) and &quot;failure&quot;
-     * # can be indexed
-     * invoker.buildResult = failure
-     *
-     * # A boolean value controlling the aggregator mode of Maven, defaults to &quot;false&quot;
-     *
-     * # can be indexed
-     * invoker.nonRecursive = true
-     *
-     * # A boolean value controlling the network behavior of Maven, defaults to &quot;false&quot;
-     * # Since plugin version 1.4
-     * # can be indexed
-     * invoker.offline = true
-     *
-     * # The path to the properties file from which to load user properties, defaults to the
-     * # filename given by the plugin parameter testPropertiesFile
-     * # Since plugin version 1.4
-     * # can be indexed
-     * invoker.userPropertiesFile = test.properties
-     *
-     * # An optional human friendly name and description for this build job.
-     * # Both name and description have to be set to be included in the build reports.
-     * # Since plugin version 1.4
-     * invoker.name = Test Build 01
-     * invoker.description = Checks the support for build reports.
-     *
-     * # A comma separated list of JRE versions on which this build job should be run.
-     * # Since plugin version 1.4
-     * invoker.java.version = 1.4+, !1.4.1, 1.7-
-     *
-     * # A comma separated list of OS families on which this build job should be run.
-     * # Since plugin version 1.4
-     * invoker.os.family = !windows, unix, mac
-     *
-     * # A comma separated list of Maven versions on which this build should be run.
-     * # Since plugin version 1.5
-     * invoker.maven.version = 2.0.10+, !2.1.0, !2.2.0
-     *
-     * # A mapping for toolchain to ensure it exists
-     * # Since plugin version 3.2.0
-     * invoker.toolchain.&lt;type&gt;.&lt;provides&gt; = value
-     * # Exact match
-     * invoker.toolchain.jdk.version = 11
-     * # Range match
-     * invoker.toolchain.jdk.version = [11,12)
-     *
-     * # For java.version, maven.version, os.family and toolchain it is possible to define multiple selectors.
-     * # If one of the indexed selectors matches, the test is executed.
-     * # With the invoker.x.y equivalents you can specify global matchers.
-     * selector.1.java.version = 1.8+
-     * selector.1.maven.version = 3.2.5+
-     * selector.1.os.family = !windows
-     * selector.2.maven.version = 3.0+
-     * selector.3.java.version = 9+
-     *
-     * # A boolean value controlling the debug logging level of Maven, , defaults to &quot;false&quot;
-     * # Since plugin version 1.8
-     * # can be indexed
-     * invoker.debug = true
-     *
-     * # Whether to execute Maven in quiet mode
-     * # Since plugin version 3.3.0
-     * # can be indexed
-     * invoker.quiet = true
-     *
-     * The execution timeout in seconds.
-     * # Since plugin version 3.0.2
-     * # can be indexed
-     * invoker.timeoutInSeconds = 5
-     *
-     * # Path to an alternate settings.xml to use for Maven invocation with this IT.
-     * # Since plugin version 3.0.1
-     * # can be indexed
-     * invoker.settingsFile = ../
-     *
-     * # An integer value to control run order of projects. sorted in the descending order of the ordinal.
-     * # In other words, the BuildJobs with the highest numbers will be executed first
-     * # Default value is 0 (zero)
-     * # Since plugin version 3.2.1
-     * invoker.ordinal = 3
-     *
-     * # The additional value for the environment variable.
-     * # Since plugin version 3.2.2
-     * invoker.environmentVariables.&lt;variableName&gt; = variableValue
-     * invoker.environmentVariables.MY_ENV_NAME = myEnvValue
-     *
-     * # A boolean value indicating a check for missing releases and updated snapshots on remote repositories to be done
-     * # Passed to the invoker. Same as passing -U, --update-snapshots flag on the command line
-     * # Since plugin version 3.4.0
-     * invoker.updateSnapshots = true
-     *
-     * </pre>
+     * <p>
+     * For a complete overview of supported properties, see the
+     * <a href="./examples/invoker-properties.html#available-properties">
+     * Invoker Properties</a> documentation page.
+     * </p>
      *
      * @since 1.2
      */
