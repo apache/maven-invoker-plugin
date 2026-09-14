@@ -28,7 +28,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>PASSED</name>
-  <description>Test to check for proper filtering of IT POMs</description>
+  <description>Test to check for proper filtering of .mvn/extensions.xml, also for a project without a POM</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -45,6 +45,7 @@ under the License.
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
           <pomIncludes>
             <pomInclude>*/pom.xml</pomInclude>
+            <pomInclude>no-pom-project</pomInclude>
           </pomIncludes>
           <goals>
             <goal>validate</goal>
