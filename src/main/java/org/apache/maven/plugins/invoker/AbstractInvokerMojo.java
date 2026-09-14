@@ -115,6 +115,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private static final float ONE_SECOND = 1000.0f;
 
     /**
+     * The name of the user property used to select projects to run.
+     */
+    private static final String INVOKER_TEST_PROPERTY = "invoker.test";
+
+    /**
      * The zero-based column index where to print the invoker result.
      */
     private static final int RESULT_COLUMN = 60;
@@ -397,7 +402,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      *
      * @since 1.1 (exclusion since 1.8)
      */
-    @Parameter(property = "invoker.test")
+    @Parameter(property = INVOKER_TEST_PROPERTY)
     private String invokerTest;
 
     /**
@@ -600,6 +605,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     /**
      * Specifies the number of times a failed execution should be retried.
+     * <p>
+     * Rerunning is disabled when a specific project has been selected on the command line by the
+     * <code>invoker.test</code> user property, e.g. <code>-Dinvoker.test=SimpleTest</code>. In such a case the plain
+     * result of the selected build is expected instead of a retry of an already known failure.
      *
      * @since 3.10.0
      */
@@ -799,10 +808,26 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         processResults(new InvokerSession(buildJobs));
     }
 
+    /**
+     * Determines how many times a failed job should be rerun, rerunning is disabled for projects
+     * selected on the command line.
+     *
+     * @return the number of reruns of a failed job
+     */
+    int getRerunFailingTestsCount() {
+        if (rerunFailingTestsCount > 0 && session.getUserProperties().containsKey(INVOKER_TEST_PROPERTY)) {
+            getLog().debug("Rerunning of failed jobs is disabled when the " + INVOKER_TEST_PROPERTY
+                    + " user property is used");
+            return 0;
+        }
+        return rerunFailingTestsCount;
+    }
+
     void runBuildsWithRetry(File projectsDir, List<BuildJob> buildJobs, int runWithParallelThreads)
             throws MojoExecutionException {
         List<BuildJob> jobsToExecute = buildJobs;
         int executionCount = 0;
+        int rerunCount = getRerunFailingTestsCount();
         do {
             if (executionCount > 0) {
                 getLog().warn("Rerunning " + jobsToExecute.size() + " failed job"
@@ -822,7 +847,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                 getLog().debug("Execution count: " + executionCount + ", failed jobs: "
                         + jobsToExecute.stream().map(BuildJob::getProject).collect(Collectors.joining(", ", "[", "]")));
             }
-        } while (executionCount <= rerunFailingTestsCount && !jobsToExecute.isEmpty());
+        } while (executionCount <= rerunCount && !jobsToExecute.isEmpty());
     }
 
     /**
