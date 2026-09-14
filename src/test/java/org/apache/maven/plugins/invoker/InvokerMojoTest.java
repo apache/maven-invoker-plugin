@@ -21,7 +21,9 @@ package org.apache.maven.plugins.invoker;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
@@ -30,6 +32,8 @@ import org.junit.jupiter.api.Test;
 import static org.apache.maven.plugins.invoker.TestUtil.getBasedir;
 import static org.apache.maven.plugins.invoker.TestUtil.setVariableValueToObject;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Olivier Lamy
@@ -176,6 +180,47 @@ class InvokerMojoTest {
                 .isTrue();
         assertThat(AbstractInvokerMojo.alreadyCloned("dirs", Collections.singletonList("dir")))
                 .isFalse();
+    }
+
+    @Test
+    void rerunFailingTestsCountShouldBeUsedForWholeRun() throws Exception {
+        // given
+        setVariableValueToObject(invokerMojo, "rerunFailingTestsCount", 2);
+        setVariableValueToObject(invokerMojo, "session", sessionWithUserProperties(new Properties()));
+
+        // when & then
+        assertThat(invokerMojo.getRerunFailingTestsCount()).isEqualTo(2);
+    }
+
+    @Test
+    void rerunFailingTestsCountShouldBeUsedForTestSelectedInConfiguration() throws Exception {
+        // given
+        setVariableValueToObject(invokerMojo, "rerunFailingTestsCount", 2);
+        setVariableValueToObject(invokerMojo, "invokerTest", "*dummy*");
+        setVariableValueToObject(invokerMojo, "session", sessionWithUserProperties(new Properties()));
+
+        // when & then
+        assertThat(invokerMojo.getRerunFailingTestsCount()).isEqualTo(2);
+    }
+
+    @Test
+    void rerunFailingTestsCountShouldBeDisabledForTestSelectedOnCommandLine() throws Exception {
+        // given
+        Properties userProperties = new Properties();
+        userProperties.setProperty("invoker.test", "*dummy*");
+
+        setVariableValueToObject(invokerMojo, "rerunFailingTestsCount", 2);
+        setVariableValueToObject(invokerMojo, "invokerTest", "*dummy*");
+        setVariableValueToObject(invokerMojo, "session", sessionWithUserProperties(userProperties));
+
+        // when & then
+        assertThat(invokerMojo.getRerunFailingTestsCount()).isZero();
+    }
+
+    private MavenSession sessionWithUserProperties(Properties userProperties) {
+        MavenSession session = mock(MavenSession.class);
+        when(session.getUserProperties()).thenReturn(userProperties);
+        return session;
     }
 
     @Test
