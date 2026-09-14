@@ -1126,21 +1126,19 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         // filter cloned POMs
         if (filter) {
             for (String projectPath : projectPaths) {
-                File pomFile = new File(cloneProjectsTo, projectPath);
-                if (pomFile.isFile()) {
-                    buildInterpolatedFile(pomFile, pomFile);
+                // a project is denoted either by a path to its POM file or merely by a path to its base directory
+                File projectFile = new File(cloneProjectsTo, projectPath);
+                if (projectFile.isFile()) {
+                    buildInterpolatedFile(projectFile, projectFile);
                 }
+                File baseDir = projectFile.isDirectory() ? projectFile : projectFile.getParentFile();
 
                 // MINVOKER-186
                 // The following is a temporary solution to support Maven 3.3.1 (.mvn/extensions.xml) filtering
                 // Will be replaced by MINVOKER-117 with general filtering mechanism
-                File baseDir = pomFile.getParentFile();
-                File mvnDir = new File(baseDir, ".mvn");
-                if (mvnDir.isDirectory()) {
-                    File extensionsFile = new File(mvnDir, "extensions.xml");
-                    if (extensionsFile.isFile()) {
-                        buildInterpolatedFile(extensionsFile, extensionsFile);
-                    }
+                File extensionsFile = new File(new File(baseDir, ".mvn"), "extensions.xml");
+                if (extensionsFile.isFile()) {
+                    buildInterpolatedFile(extensionsFile, extensionsFile);
                 }
                 // END MINVOKER-186
             }
