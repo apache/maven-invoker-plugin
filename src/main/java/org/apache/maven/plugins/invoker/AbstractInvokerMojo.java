@@ -1367,7 +1367,10 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      */
     private File mergeSettings(File interpolatedSettingsFile) throws MojoExecutionException {
         File mergedSettingsFile;
-        Settings mergedSettings = this.settings;
+        // MINVOKER-293: always start from the filtered clone, not the raw settings of the invoking
+        // process, so a profile activated on the outer command line (-P) never leaks into the
+        // settings.xml written for the IT builds unless that settings.xml declares it itself.
+        Settings mergedSettings = cloneSettings();
         if (mergeUserSettings) {
             if (interpolatedSettingsFile != null) {
                 // Have to merge the specified settings file (dominant) and the one of the invoking Maven process
@@ -1376,8 +1379,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     request.setGlobalSettingsFile(interpolatedSettingsFile);
 
                     Settings dominantSettings = settingsBuilder.build(request).getEffectiveSettings();
-                    Settings recessiveSettings = cloneSettings();
-                    SettingsUtils.merge(dominantSettings, recessiveSettings, TrackableBase.USER_LEVEL);
+                    SettingsUtils.merge(dominantSettings, mergedSettings, TrackableBase.USER_LEVEL);
 
                     mergedSettings = dominantSettings;
                     getLog().debug("Merged specified settings file with settings of invoking process");
@@ -1432,6 +1434,24 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         for (org.apache.maven.settings.Profile profile : recessiveSettings.getProfiles()) {
             resetSourceLevelSet(profile);
         }
+
+        // MINVOKER-293: a settings.xml may only activate a profile that it declares itself, so drop any
+        // active profile id (e.g. one activated with -P on the outer command line) that is not among the
+        // profiles copied into this settings instance. Otherwise it would unintentionally activate a
+        // same-named profile in an IT project.
+        Set<String> declaredProfileIds = recessiveSettings.getProfiles().stream()
+                .map(org.apache.maven.settings.Profile::getId)
+                .collect(Collectors.toSet());
+        List<String> retainedActiveProfiles = new ArrayList<>();
+        for (String activeProfile : recessiveSettings.getActiveProfiles()) {
+            if (declaredProfileIds.contains(activeProfile)) {
+                retainedActiveProfiles.add(activeProfile);
+            } else {
+                getLog().debug("Dropping active profile '" + activeProfile
+                        + "' from settings.xml written for IT builds: not declared in the copied settings");
+            }
+        }
+        recessiveSettings.setActiveProfiles(retainedActiveProfiles);
 
         return recessiveSettings;
     }
