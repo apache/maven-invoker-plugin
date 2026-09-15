@@ -126,6 +126,13 @@ In this case, the pre and post build hook scripts can be executed for each invoc
 
 Missing script files will be ignored.
 
+# Script bytecode level
+
+By default, the pre-/post-build Groovy scripts are compiled to the bytecode level of the JDK running Maven. Set the
+[`scriptTargetBytecode`](../run-mojo.html#scriptTargetBytecode) parameter (or the `maven.compiler.release` /
+`maven.compiler.target` project properties, which it defaults to) if the hook scripts need to target the same
+bytecode level as the project under test.
+
 # Predefined global variables
 
 To allow the scripts to access some useful data about the test project, the following global variables will be defined by the Invoker Plugin before running the script:
