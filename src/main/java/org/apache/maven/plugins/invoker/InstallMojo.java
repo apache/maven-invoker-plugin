@@ -415,6 +415,16 @@ public class InstallMojo extends AbstractMojo {
             if ("enhanced".equals(contentType)) {
                 contentType = "default";
             }
+            // Forked IT builds are invoked with -Dmaven.repo.local pointing at localRepositoryPath and no split
+            // configuration, so they always read it as a flat repository. If the outer build enabled the split
+            // layout (aether.enhancedLocalRepository.split, see the protected
+            // org.eclipse.aether.internal.impl.LocalPathPrefixComposerFactorySupport.CONF_PROP_SPLIT constant,
+            // which is not accessible here), that config would otherwise leak into this cloned session and make
+            // the enhanced local repository manager install artifacts under "installed/..." where the IT build
+            // can never find them (MINVOKER-377).
+            newSession.setConfigProperty("aether.enhancedLocalRepository.split", Boolean.FALSE);
+            getLog().debug("Ignoring any split local repository configuration for the IT local repository");
+
             LocalRepositoryManager localRepositoryManager = repositorySystem.newLocalRepositoryManager(
                     newSession, new LocalRepository(localRepositoryPath, contentType));
 
