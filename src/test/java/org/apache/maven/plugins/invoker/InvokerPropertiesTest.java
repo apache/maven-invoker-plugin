@@ -102,6 +102,29 @@ class InvokerPropertiesTest {
     }
 
     @Test
+    void getFailedGoal() {
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties(props);
+
+        assertThat(facade.getFailedGoal(0)).isEmpty();
+
+        props.setProperty("invoker.failedGoal", "maven-enforcer-plugin:enforce");
+        assertThat(facade.getFailedGoal(1)).contains("maven-enforcer-plugin:enforce");
+
+        props.setProperty("invoker.failedGoal.2", "maven-compiler-plugin:compile (default-compile)");
+        assertThat(facade.getFailedGoal(1)).contains("maven-enforcer-plugin:enforce");
+        assertThat(facade.getFailedGoal(2)).contains("maven-compiler-plugin:compile (default-compile)");
+    }
+
+    @Test
+    void isInvocationDefinedForFailedGoal() {
+        Properties props = new Properties();
+        props.setProperty("invoker.failedGoal.2", "maven-enforcer-plugin:enforce");
+
+        assertThat(new InvokerProperties(props).isInvocationDefined(2)).isTrue();
+    }
+
+    @Test
     void configureRequestEmptyProperties() {
 
         InvokerProperties facade = new InvokerProperties(null);

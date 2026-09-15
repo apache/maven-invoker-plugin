@@ -80,6 +80,15 @@ invoker.failureBehavior = fail-never
 # can be indexed
 invoker.buildResult = failure
 
+# The goal the build is expected to fail on, only allowed together with
+# invoker.buildResult = failure. The value is a colon separated list of fragments of the
+# groupId:artifactId:version:goal coordinates Maven logs for the failed goal, optionally
+# followed by the execution id in parentheses. The fragments have to occur in the given
+# order, so naming the plugin and the goal is usually enough.
+# Since plugin version 3.11.0
+# can be indexed
+invoker.failedGoal = maven-enforcer-plugin:enforce (enforce-rules)
+
 # A boolean value controlling the aggregator mode of Maven, defaults to "false"
 # can be indexed
 invoker.nonRecursive = true
