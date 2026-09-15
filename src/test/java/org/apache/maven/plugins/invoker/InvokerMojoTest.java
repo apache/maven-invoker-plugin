@@ -19,12 +19,15 @@
 package org.apache.maven.plugins.invoker;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.util.ReflectionUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.maven.plugins.invoker.TestUtil.getBasedir;
@@ -176,6 +179,59 @@ class InvokerMojoTest {
                 .isTrue();
         assertThat(AbstractInvokerMojo.alreadyCloned("dirs", Collections.singletonList("dir")))
                 .isFalse();
+    }
+
+    @Test
+    void scriptTargetBytecodeParameterIsAppliedToScriptRunner() throws Exception {
+        // given
+        MavenProject mavenProject = getMavenProject();
+        mavenProject.getProperties().setProperty("maven.compiler.target", "11");
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "scriptTargetBytecode", "8");
+
+        // when
+        String targetBytecode = invokeHandleScriptRunnerAndGetGroovyTargetBytecode();
+
+        // then: the explicit parameter wins over the project property
+        assertThat(targetBytecode).isEqualTo("8");
+    }
+
+    @Test
+    void scriptTargetBytecodeFallsBackToMavenCompilerTargetProperty() throws Exception {
+        // given
+        MavenProject mavenProject = getMavenProject();
+        mavenProject.getProperties().setProperty("maven.compiler.target", "11");
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+
+        // when
+        String targetBytecode = invokeHandleScriptRunnerAndGetGroovyTargetBytecode();
+
+        // then
+        assertThat(targetBytecode).isEqualTo("11");
+    }
+
+    @Test
+    void scriptTargetBytecodeIsUnsetWhenNeitherParameterNorPropertyIsPresent() throws Exception {
+        // given
+        MavenProject mavenProject = getMavenProject();
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+
+        // when
+        String targetBytecode = invokeHandleScriptRunnerAndGetGroovyTargetBytecode();
+
+        // then
+        assertThat(targetBytecode).isNull();
+    }
+
+    private String invokeHandleScriptRunnerAndGetGroovyTargetBytecode() throws Exception {
+        Method method = AbstractInvokerMojo.class.getDeclaredMethod("handleScriptRunnerWithScriptClassPath");
+        method.setAccessible(true);
+        method.invoke(invokerMojo);
+
+        Object scriptRunner = ReflectionUtils.getValueIncludingSuperclasses("scriptRunner", invokerMojo);
+        Object scriptInterpreters = ReflectionUtils.getValueIncludingSuperclasses("scriptInterpreters", scriptRunner);
+        Object groovyInterpreter = ((Map<?, ?>) scriptInterpreters).get("groovy");
+        return (String) ReflectionUtils.getValueIncludingSuperclasses("targetBytecode", groovyInterpreter);
     }
 
     @Test
