@@ -460,6 +460,17 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private String encoding;
 
     /**
+     * The bytecode level the pre-/post-build hook scripts (e.g. <code>verify.groovy</code>) are compiled to.
+     * Defaults to <code>maven.compiler.release</code>. When that is unset, the plugin falls back to
+     * <code>maven.compiler.target</code> from the project properties. When neither is set, the hook scripts
+     * are compiled to the bytecode level of the JDK running Maven.
+     *
+     * @since 3.11.0
+     */
+    @Parameter(property = "invoker.scriptTargetBytecode", defaultValue = "${maven.compiler.release}")
+    private String scriptTargetBytecode;
+
+    /**
      * A flag to configure whether the test class path of the project under test should be included
      * in the class path of the pre/post-build scripts. If set to <code>false</code>, the class
      * path of script interpreter consists only of the <a href="dependencies.html">runtime
@@ -936,6 +947,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             scriptVariables.forEach((key, value) -> scriptRunner.setGlobalVariable(key, value));
         }
         scriptRunner.setClassPath(scriptClassPath);
+
+        String targetBytecode = scriptTargetBytecode;
+        if (targetBytecode == null || targetBytecode.isEmpty()) {
+            targetBytecode = project.getProperties().getProperty("maven.compiler.target");
+        }
+        if (targetBytecode != null && !targetBytecode.isEmpty()) {
+            getLog().debug("Compiling hook scripts to bytecode level " + targetBytecode);
+            scriptRunner.setTargetBytecode(targetBytecode);
+        }
     }
 
     private void writeSummaryFile(List<BuildJob> buildJobs) throws MojoExecutionException {
