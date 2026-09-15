@@ -24,11 +24,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -44,6 +46,11 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.Interpolator;
+import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
+import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -172,6 +179,7 @@ public class InstallMojo extends AbstractMojo {
 
             resolveProjectArtifacts(resolvedArtifacts);
             resolveProjectPoms(project, resolvedArtifacts);
+            resolveImportedBoms(resolvedArtifacts);
             resolveProjectDependencies(resolvedArtifacts);
             resolveExtraArtifacts(resolvedArtifacts);
             installArtifacts(resolvedArtifacts);
@@ -209,6 +217,121 @@ public class InstallMojo extends AbstractMojo {
             resolvedArtifacts.put(ArtifactIdUtils.toId(artifact), artifact);
         }
         resolveProjectPoms(project.getParent(), resolvedArtifacts);
+    }
+
+    /**
+     * Resolve the BOMs imported by the project and its parents.
+     * <p>
+     * Imported BOMs are flattened into the effective model, so they are invisible to the dependency resolution and
+     * would be missing from the local repository used by the integration tests. Only the original models still carry
+     * the import declarations, hence the walk over the original models of the project and of its parents.
+     */
+    private void resolveImportedBoms(Map<String, Artifact> resolvedArtifacts)
+            throws ArtifactResolutionException, MojoExecutionException {
+
+        Set<String> visitedBoms = new HashSet<>();
+        for (MavenProject currentProject = project;
+                currentProject != null;
+                currentProject = currentProject.getParent()) {
+            Model originalModel = currentProject.getOriginalModel();
+            if (originalModel == null) {
+                continue;
+            }
+            resolveImportedBoms(
+                    originalModel.getDependencyManagement(),
+                    createInterpolator(currentProject.getModel()),
+                    currentProject.getRemoteProjectRepositories(),
+                    resolvedArtifacts,
+                    visitedBoms);
+        }
+    }
+
+    private void resolveImportedBoms(
+            DependencyManagement dependencyManagement,
+            Interpolator interpolator,
+            List<RemoteRepository> remoteRepositories,
+            Map<String, Artifact> resolvedArtifacts,
+            Set<String> visitedBoms)
+            throws ArtifactResolutionException, MojoExecutionException {
+
+        if (dependencyManagement == null) {
+            return;
+        }
+
+        for (org.apache.maven.model.Dependency dependency : dependencyManagement.getDependencies()) {
+            if (!"pom".equals(dependency.getType()) || !"import".equals(dependency.getScope())) {
+                continue;
+            }
+
+            String groupId = interpolate(interpolator, dependency.getGroupId());
+            String artifactId = interpolate(interpolator, dependency.getArtifactId());
+            String version = interpolate(interpolator, dependency.getVersion());
+            String bomId = groupId + ":" + artifactId + ":" + version;
+
+            if (bomId.contains("${")) {
+                getLog().warn("Skipping imported BOM with unresolvable coordinates: " + bomId);
+                continue;
+            }
+
+            if (!visitedBoms.add(bomId)) {
+                continue;
+            }
+
+            Artifact bomArtifact;
+            try {
+                bomArtifact = resolveArtifact(
+                        new DefaultArtifact(groupId, artifactId, "", "pom", version), remoteRepositories);
+            } catch (ArtifactResolutionException e) {
+                throw new MojoExecutionException("Failed to resolve imported BOM: " + bomId, e);
+            }
+
+            getLog().debug("Resolved imported BOM " + bomId + " to " + bomArtifact.getFile());
+            resolvePomWithParents(bomArtifact, resolvedArtifacts, remoteRepositories);
+
+            // a BOM can import other BOMs in turn
+            Model bomModel = PomUtils.loadPom(bomArtifact.getFile());
+            resolveImportedBoms(
+                    bomModel.getDependencyManagement(),
+                    createInterpolator(inheritCoordinates(bomModel)),
+                    remoteRepositories,
+                    resolvedArtifacts,
+                    visitedBoms);
+        }
+    }
+
+    /**
+     * Complete the coordinates a raw model inherits from its parent, so that <code>${project.version}</code> and
+     * <code>${project.groupId}</code> can be interpolated.
+     */
+    private Model inheritCoordinates(Model model) {
+        Parent parent = model.getParent();
+        if (parent != null) {
+            if (model.getGroupId() == null) {
+                model.setGroupId(parent.getGroupId());
+            }
+            if (model.getVersion() == null) {
+                model.setVersion(parent.getVersion());
+            }
+        }
+        return model;
+    }
+
+    private Interpolator createInterpolator(Model model) {
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+        interpolator.addValueSource(new PrefixedObjectValueSource("project.", model));
+        interpolator.addValueSource(new PropertiesBasedValueSource(model.getProperties()));
+        return interpolator;
+    }
+
+    private String interpolate(Interpolator interpolator, String value) throws MojoExecutionException {
+        if (value == null || !value.contains("${")) {
+            return value;
+        }
+        try {
+            return interpolator.interpolate(value);
+        } catch (InterpolationException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
     }
 
     private void resolveProjectDependencies(Map<String, Artifact> resolvedArtifacts)
