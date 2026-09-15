@@ -417,6 +417,12 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * Since the version <b>3.7.0</b> using an alternate syntax for mavenOpts, <code>@{...}</code>
      * allows late replacement of properties when the plugin is executed,
      * so properties that have been modified by other plugins will be picked up correctly.
+     * <br>
+     * Since version <b>3.10.2</b>, forked builds also get <code>MAVEN_SKIP_RC</code> set to <code>1</code> so that
+     * <code>~/.mavenrc</code> and <code>/etc/mavenrc</code> cannot silently override this value, and
+     * <code>MAVEN_ARGS</code> is cleared for the same reason (see {@link #environmentVariables}). An IT can still
+     * override <code>MAVEN_SKIP_RC</code> through {@link #environmentVariables} or
+     * <code>invoker.environmentVariables.MAVEN_SKIP_RC</code>.
      *
      * @since 1.2
      */
@@ -527,6 +533,13 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
     /**
      * Additional environment variables to set on the command line.
+     * <br>
+     * Since version <b>3.10.2</b>, each forked IT build is isolated from the environment that invoked this plugin:
+     * <code>MAVEN_ARGS</code> is cleared (so the outer run's <code>-pl</code>, <code>-P</code> and <code>-D</code>
+     * flags are not appended to every IT) and <code>MAVEN_SKIP_RC</code> is set to <code>1</code> (so
+     * <code>~/.mavenrc</code>/<code>/etc/mavenrc</code> cannot override <code>MAVEN_OPTS</code>). Define
+     * <code>MAVEN_ARGS</code> and/or <code>MAVEN_SKIP_RC</code> here, or per invocation through
+     * <code>invoker.environmentVariables.*</code> in the invoker properties, to opt back out.
      *
      * @since 1.8
      */
@@ -1857,6 +1870,14 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                         getUserProperties(basedir, invokerProperties.getUserPropertiesFile(invocationIndex));
                 userProperties.putAll(scriptUserProperties);
                 request.setProperties(userProperties);
+
+                // Isolate the forked build from the environment that is invoking this plugin: clear
+                // MAVEN_ARGS so the outer run's -pl/-P/-D flags are not appended to the IT's command
+                // line, and set MAVEN_SKIP_RC so ~/.mavenrc and /etc/mavenrc cannot override the
+                // MAVEN_OPTS set below from invoker.mavenOpts. An IT can still opt out through the
+                // environmentVariables mojo parameter or invoker.environmentVariables.*, applied next.
+                request.addShellEnvironment("MAVEN_ARGS", "");
+                request.addShellEnvironment("MAVEN_SKIP_RC", "1");
 
                 invokerProperties.configureInvocation(request, invocationIndex);
 
