@@ -1300,7 +1300,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         try {
-            if (runWithParallelThreads > 1) {
+            boolean parallelRun = runWithParallelThreads > 1;
+            if (parallelRun) {
                 getLog().info("use parallelThreads " + runWithParallelThreads);
             }
 
@@ -1314,7 +1315,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                         mergedSettingsFile,
                         javaHome,
                         actualJreVersion,
-                        globalInvokerProperties.get(ancestorFolder));
+                        globalInvokerProperties.get(ancestorFolder),
+                        parallelRun);
             });
         } finally {
             if (interpolatedSettingsFile != null && cloneProjectsTo == null) {
@@ -1506,7 +1508,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             File settingsFile,
             File actualJavaHome,
             CharSequence actualJreVersion,
-            Properties globalInvokerProperties)
+            Properties globalInvokerProperties,
+            boolean parallelRun)
             throws MojoExecutionException {
         // FIXME: Think about the following code part -- START
         File pomFile = new File(projectsDir, buildJob.getProject());
@@ -1526,7 +1529,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         File interpolatedPomFile = interpolatePomFile(pomFile, basedir);
         // FIXME: Think about the following code part -- ^^^^^^^ END
 
-        getLog().info(buffer().a("Building: ").strong(buildJob.getProject()).build());
+        // when several jobs run in parallel, their console output interleaves; prefix every line emitted on
+        // behalf of this job with its project path so it stays attributable (MINVOKER-684). Lines that already
+        // carry the project name via pad(buildJob) are left alone to avoid a duplicate copy.
+        String logPrefix = parallelRun ? "[" + buildJob.getProject() + "] " : "";
+
+        getLog().info(buffer().a(logPrefix)
+                .a("Building: ")
+                .strong(buildJob.getProject())
+                .build());
 
         InvokerProperties invokerProperties = getInvokerProperties(basedir, globalInvokerProperties);
 
@@ -1540,7 +1551,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                 long startTime = System.currentTimeMillis();
                 boolean executed;
 
-                FileLogger buildLogger = setupBuildLogFile(basedir, buildJob.getExecutionCount());
+                FileLogger buildLogger = setupBuildLogFile(basedir, buildJob.getExecutionCount(), logPrefix);
                 if (buildLogger != null) {
                     buildJob.setBuildlog(buildLogger.getOutputFile().getAbsolutePath());
                 }
@@ -1609,7 +1620,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             buildJob.setFailureMessage(e.getMessage());
 
             if (!suppressSummaries) {
-                getLog().info("  " + e.getMessage());
+                getLog().info(logPrefix + "  " + e.getMessage());
                 getLog().info(pad(buildJob).failure("FAILED").a(' ') + "(" + formatElapsedTime(buildJob.getTime())
                         + ")");
             }
@@ -1955,10 +1966,13 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      *
      * @param basedir The base directory of the project, must not be <code>null</code>.
      * @param executionCount current execution count of the build job, used to determine whether to append to or create a new log file
+     * @param logPrefix prefix prepended to every line mirrored to the mojo logger (empty when not running in
+     *            parallel), never affects the content written to {@code build.log}.
      * @return The build logger or <code>null</code> if logging has been disabled.
      * @throws org.apache.maven.plugin.MojoExecutionException If the log file could not be created.
      */
-    private FileLogger setupBuildLogFile(File basedir, int executionCount) throws MojoExecutionException {
+    private FileLogger setupBuildLogFile(File basedir, int executionCount, String logPrefix)
+            throws MojoExecutionException {
         FileLogger logger = null;
 
         if (!noLog) {
@@ -1988,7 +2002,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     getLog().debug("Renaming existing log file " + logPath + " to " + logFileBackup);
                     Files.move(logPath, logFileBackup, StandardCopyOption.REPLACE_EXISTING);
                 }
-                logger = new FileLogger(logPath.toFile(), streamLogger);
+                logger = new FileLogger(logPath.toFile(), streamLogger, logPrefix);
                 getLog().debug("New build log initialized: " + logPath);
             } catch (IOException e) {
                 throw new MojoExecutionException("Error initializing build logfile in: " + projectLogDirectory, e);
