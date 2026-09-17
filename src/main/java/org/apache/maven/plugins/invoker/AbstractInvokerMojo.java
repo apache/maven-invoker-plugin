@@ -2087,6 +2087,72 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                 buffer.append("See console output for details.");
             }
             throw new RunFailureException(buffer.toString(), BuildJob.Result.FAILURE_BUILD);
+        } else {
+            verifyFailedGoal(invocationIndex, invokerProperties, logger);
+        }
+    }
+
+    /**
+     * Verifies that the build failed on the goal named by <code>invoker.failedGoal</code>, if that property is set. The
+     * exit code alone only tells that the build failed, not which goal failed, so the goal is read back from the
+     * <code>Failed to execute goal ...</code> line the forked Maven wrote to the build log.
+     *
+     * @param invocationIndex The index of the invocation to check, must not be negative.
+     * @param invokerProperties The invoker properties of the build job, must not be <code>null</code>.
+     * @param logger The build logger, may be <code>null</code> if logging is disabled.
+     */
+    private void verifyFailedGoal(int invocationIndex, InvokerProperties invokerProperties, FileLogger logger)
+            throws RunFailureException {
+        Optional<String> expectedGoal = invokerProperties.getFailedGoal(invocationIndex);
+        if (!expectedGoal.isPresent()) {
+            return;
+        }
+
+        if (!invokerProperties.isExpectedFailure(invocationIndex)) {
+            throw new RunFailureException(
+                    "The property invoker.failedGoal requires invoker.buildResult = failure.", BuildJob.Result.ERROR);
+        }
+
+        if (logger == null) {
+            throw new RunFailureException(
+                    "The property invoker.failedGoal needs the build log, which is disabled by the noLog parameter.",
+                    BuildJob.Result.ERROR);
+        }
+
+        logger.getPrintStream().flush();
+        File logFile = logger.getOutputFile();
+        List<String> failedGoals;
+        try {
+            failedGoals = FailedGoalMatcher.findFailedGoals(logFile);
+        } catch (IOException e) {
+            throw new RunFailureException(
+                    "The property invoker.failedGoal could not be checked, " + logFile.getAbsolutePath()
+                            + " is not readable. " + e.getMessage(),
+                    BuildJob.Result.ERROR,
+                    e);
+        }
+
+        FailedGoalMatcher matcher;
+        try {
+            matcher = new FailedGoalMatcher(expectedGoal.get());
+        } catch (IllegalArgumentException e) {
+            throw new RunFailureException(
+                    "The property invoker.failedGoal is set to an invalid value: " + e.getMessage(),
+                    BuildJob.Result.ERROR);
+        }
+
+        if (failedGoals.isEmpty()) {
+            throw new RunFailureException(
+                    "The build was expected to fail on goal " + matcher + ", but " + logFile.getAbsolutePath()
+                            + " reports no failed goal.",
+                    BuildJob.Result.FAILURE_BUILD);
+        }
+
+        if (!matcher.matchesAny(failedGoals)) {
+            throw new RunFailureException(
+                    "The build was expected to fail on goal " + matcher + ", but it failed on "
+                            + String.join(", ", failedGoals) + ".",
+                    BuildJob.Result.FAILURE_BUILD);
         }
     }
 
