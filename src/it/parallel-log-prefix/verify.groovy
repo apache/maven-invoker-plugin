@@ -25,15 +25,20 @@ def betaProject = 'beta' + FS + 'pom.xml'
 assert new File(basedir, 'target/its/alpha/touch.txt').exists()
 assert new File(basedir, 'target/its/beta/touch.txt').exists()
 
-def buildLog = new File(basedir, 'build.log').text
-def lines = buildLog.readLines()
+def lines = new File(basedir, 'build.log').readLines()
 
-// MINVOKER-684: with parallelThreads > 1, every console line emitted on behalf of a job is prefixed with
-// the job's project path, so interleaved output from several jobs stays attributable.
+// MINVOKER-684: every console line emitted on behalf of a job is prefixed with the job's project path, so
+// output from several jobs stays attributable when it interleaves. The format does not depend on
+// parallelThreads.
 
-// the "Building: <project>" line is prefixed
-assert lines.any { it.contains('[' + alphaProject + '] Building: ' + alphaProject) }
-assert lines.any { it.contains('[' + betaProject + '] Building: ' + betaProject) }
+// start and result lines
+assert lines.any { it.contains('[' + alphaProject + '] starting') }
+assert lines.any { it.contains('[' + betaProject + '] starting') }
+assert lines.any { it.contains('[' + alphaProject + '] SUCCESS (') }
+assert lines.any { it.contains('[' + betaProject + '] SUCCESS (') }
+
+// the project name appears once per line, as the prefix
+assert lines.findAll { it.contains('] starting') }.every { it.count(alphaProject) + it.count(betaProject) == 1 }
 
 // script-run lines reaching the console via streamLogs are prefixed
 assert lines.any { it.contains('[' + alphaProject + '] Running pre-build script') }
@@ -42,17 +47,6 @@ assert lines.any { it.contains('[' + betaProject + '] Running pre-build script')
 // streamed script output lines are prefixed
 assert lines.any { it.contains('[' + alphaProject + '] Output from setup script for alpha') }
 assert lines.any { it.contains('[' + betaProject + '] Output from setup script for beta') }
-
-// the result summary line already carries the project name via the padded column, so it must not get a
-// second, bracketed copy of it; "SUCCESS (" is unique to that summary line (as opposed to the streamed
-// "BUILD SUCCESS" output of the nested Maven invocation, which has no trailing elapsed time)
-def alphaResultLine = lines.find { it.contains(alphaProject) && it.contains('SUCCESS (') }
-assert alphaResultLine != null
-assert !alphaResultLine.contains('[' + alphaProject + ']')
-
-def betaResultLine = lines.find { it.contains(betaProject) && it.contains('SUCCESS (') }
-assert betaResultLine != null
-assert !betaResultLine.contains('[' + betaProject + ']')
 
 // the prefix is a console-only concern: the per-job build.log file content must stay untouched
 def alphaLog = new File(basedir, 'target/its/alpha/build.log').text

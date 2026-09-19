@@ -33,7 +33,7 @@ under the License.
 
   <!--
     MINVOKER-684: when several jobs run in parallel their console lines interleave. Every mojo-log line
-    emitted on behalf of one job (Building, script-run, streamed build output, ...) must be prefixed with
+    emitted on behalf of one job (start, result, script-run, streamed build output, ...) must be prefixed with
     the job's project path so it stays attributable.
   -->
   <build>
