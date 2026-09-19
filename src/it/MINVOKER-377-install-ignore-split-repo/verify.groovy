@@ -17,9 +17,9 @@
  * under the License.
  */
 
-// The outer build enabled a split local repository via .mvn/maven.config, but the forked
-// IT builds only ever read the flat layout, so invoker:install must ignore that setting and
-// write the flat layout regardless (MINVOKER-377).
+// The outer build enabled a split local repository via test.properties and the forked IT build's
+// settings.xml enables it too. invoker:install must write the flat layout regardless, and invoker:run
+// must make the forked build read the flat layout regardless (MINVOKER-377).
 def localRepo = new File(basedir, 'target/local-repo')
 
 def pom = new File(localRepo, 'org/apache/maven/plugins/invoker/minvoker377/1.0-SNAPSHOT/minvoker377-1.0-SNAPSHOT.pom')
@@ -30,3 +30,10 @@ assert jar.isFile()
 
 def splitDir = new File(localRepo, 'installed')
 assert !splitDir.exists()
+
+// the forked build resolved the installed artifact from the flat layout ...
+def consumerLog = new File(basedir, 'target/it/consumer/build.log').text
+assert consumerLog.contains('BUILD SUCCESS')
+
+// ... and did not read the repository as split, which would have put its own downloads under cached/
+assert !new File(localRepo, 'cached').exists()
