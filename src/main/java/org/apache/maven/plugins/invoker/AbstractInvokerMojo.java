@@ -82,7 +82,6 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.maven.shared.scriptinterpreter.ScriptException;
 import org.apache.maven.shared.scriptinterpreter.ScriptReturnException;
 import org.apache.maven.shared.scriptinterpreter.ScriptRunner;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -117,8 +116,6 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     /**
      * The zero-based column index where to print the invoker result.
      */
-    private static final int RESULT_COLUMN = 60;
-
     /**
      * Flag used to suppress certain invocations. This is useful in tailoring the build using profiles.
      *
@@ -1300,8 +1297,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         try {
-            boolean parallelRun = runWithParallelThreads > 1;
-            if (parallelRun) {
+            if (runWithParallelThreads > 1) {
                 getLog().info("use parallelThreads " + runWithParallelThreads);
             }
 
@@ -1315,8 +1311,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                         mergedSettingsFile,
                         javaHome,
                         actualJreVersion,
-                        globalInvokerProperties.get(ancestorFolder),
-                        parallelRun);
+                        globalInvokerProperties.get(ancestorFolder));
             });
         } finally {
             if (interpolatedSettingsFile != null && cloneProjectsTo == null) {
@@ -1508,8 +1503,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             File settingsFile,
             File actualJavaHome,
             CharSequence actualJreVersion,
-            Properties globalInvokerProperties,
-            boolean parallelRun)
+            Properties globalInvokerProperties)
             throws MojoExecutionException {
         // FIXME: Think about the following code part -- START
         File pomFile = new File(projectsDir, buildJob.getProject());
@@ -1529,15 +1523,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         File interpolatedPomFile = interpolatePomFile(pomFile, basedir);
         // FIXME: Think about the following code part -- ^^^^^^^ END
 
-        // when several jobs run in parallel, their console output interleaves; prefix every line emitted on
-        // behalf of this job with its project path so it stays attributable (MINVOKER-684). Lines that already
-        // carry the project name via pad(buildJob) are left alone to avoid a duplicate copy.
-        String logPrefix = parallelRun ? "[" + buildJob.getProject() + "] " : "";
+        // every console line emitted on behalf of this job carries its project path, so the output of jobs
+        // running in parallel stays attributable when it interleaves (MINVOKER-684)
+        String logPrefix = "[" + buildJob.getProject() + "] ";
 
-        getLog().info(buffer().a(logPrefix)
-                .a("Building: ")
-                .strong(buildJob.getProject())
-                .build());
+        getLog().info(logPrefix + "starting");
 
         InvokerProperties invokerProperties = getInvokerProperties(basedir, globalInvokerProperties);
 
@@ -1573,14 +1563,14 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     buildJob.setFailureMessage(null);
 
                     if (!suppressSummaries) {
-                        getLog().info(pad(buildJob).success("SUCCESS").a(' ') + "("
+                        getLog().info(buffer().a(logPrefix).success("SUCCESS").a(' ') + "("
                                 + formatElapsedTime(buildJob.getTime()) + ")");
                     }
                 } else {
                     buildJob.setResult(BuildJob.Result.SKIPPED);
 
                     if (!suppressSummaries) {
-                        getLog().info(pad(buildJob).warning("SKIPPED").a(' ') + "("
+                        getLog().info(buffer().a(logPrefix).warning("SKIPPED").a(' ') + "("
                                 + formatElapsedTime(buildJob.getTime()) + ")");
                     }
                 }
@@ -1608,7 +1598,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
                 String message = String.join(", ", messages);
                 if (!suppressSummaries) {
-                    getLog().info(pad(buildJob).warning("SKIPPED") + " due to " + message);
+                    getLog().info(buffer().a(logPrefix).warning("SKIPPED") + " due to " + message);
                 }
 
                 // Abuse failureMessage, the field in the report which should contain the reason for skipping
@@ -1620,36 +1610,14 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             buildJob.setFailureMessage(e.getMessage());
 
             if (!suppressSummaries) {
-                getLog().info(logPrefix + "  " + e.getMessage());
-                getLog().info(pad(buildJob).failure("FAILED").a(' ') + "(" + formatElapsedTime(buildJob.getTime())
-                        + ")");
+                getLog().info(logPrefix + e.getMessage());
+                getLog().info(buffer().a(logPrefix).failure("FAILED").a(' ') + "("
+                        + formatElapsedTime(buildJob.getTime()) + ")");
             }
         } finally {
             deleteInterpolatedPomFile(interpolatedPomFile);
             writeBuildReport(buildJob);
         }
-    }
-
-    private MessageBuilder pad(BuildJob buildJob) {
-        MessageBuilder buffer = buffer(128);
-
-        buffer.a("          ");
-        buffer.a(buildJob.getProject());
-
-        int l = 10 + buildJob.getProject().length();
-
-        if (l < RESULT_COLUMN) {
-            buffer.a(' ');
-            l++;
-
-            if (l < RESULT_COLUMN) {
-                for (int i = RESULT_COLUMN - l; i > 0; i--) {
-                    buffer.a('.');
-                }
-            }
-        }
-
-        return buffer.a(' ');
     }
 
     /**
@@ -1966,8 +1934,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      *
      * @param basedir The base directory of the project, must not be <code>null</code>.
      * @param executionCount current execution count of the build job, used to determine whether to append to or create a new log file
-     * @param logPrefix prefix prepended to every line mirrored to the mojo logger (empty when not running in
-     *            parallel), never affects the content written to {@code build.log}.
+     * @param logPrefix prefix prepended to every line mirrored to the mojo logger, never affects the content
+     *            written to {@code build.log}.
      * @return The build logger or <code>null</code> if logging has been disabled.
      * @throws org.apache.maven.plugin.MojoExecutionException If the log file could not be created.
      */
