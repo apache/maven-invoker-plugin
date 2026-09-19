@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.invoker.InvocationOutputHandler;
+import org.apache.maven.shared.scriptinterpreter.FileLoggerMirrorHandler;
 
 /**
  *
@@ -37,6 +38,32 @@ class FileLogger extends org.apache.maven.shared.scriptinterpreter.FileLogger im
      * @throws IOException If the output file could not be created.
      */
     FileLogger(File outputFile, final Log log) throws IOException {
-        super(outputFile, log != null ? log::info : null);
+        this(outputFile, log, null);
+    }
+
+    /**
+     * Creates a new logger that writes to the specified file and optionally mirrors messages to the given mojo
+     * logger, prefixing every mirrored line with {@code logPrefix}. The file content is never prefixed, only the
+     * lines mirrored to the mojo logger, which is how per-job output stays attributable when several jobs run in
+     * parallel and interleave on the console.
+     *
+     * @param outputFile The path to the output file, must not be <code>null</code>.
+     * @param log The mojo logger to additionally output messages to, may be <code>null</code> if not used.
+     * @param logPrefix The prefix to prepend to every line mirrored to the mojo logger, may be <code>null</code> or
+     *            empty if no prefix is needed.
+     * @throws IOException If the output file could not be created.
+     */
+    FileLogger(File outputFile, final Log log, final String logPrefix) throws IOException {
+        super(outputFile, toMirrorHandler(log, logPrefix));
+    }
+
+    private static FileLoggerMirrorHandler toMirrorHandler(final Log log, final String logPrefix) {
+        if (log == null) {
+            return null;
+        }
+        if (logPrefix == null || logPrefix.isEmpty()) {
+            return log::info;
+        }
+        return line -> log.info(logPrefix + line);
     }
 }
