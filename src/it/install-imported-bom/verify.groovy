@@ -22,3 +22,7 @@ def localRepo = new File(basedir, 'lib/target/local-repo')
 assert new File(localRepo, 'org/apache/maven/plugins/invoker/minvoker680-bom/1.0-SNAPSHOT/minvoker680-bom-1.0-SNAPSHOT.pom').exists()
 assert new File(localRepo, 'org/apache/maven/plugins/invoker/minvoker680-parent/1.0-SNAPSHOT/minvoker680-parent-1.0-SNAPSHOT.pom').exists()
 assert new File(localRepo, 'org/apache/maven/plugins/invoker/minvoker680-lib/1.0-SNAPSHOT/minvoker680-lib-1.0-SNAPSHOT.pom').exists()
+
+// the imported BOM's own parent, and the BOM it imports in turn through an inherited property
+assert new File(localRepo, 'org/apache/maven/plugins/invoker/minvoker680-bom-parent/1.0-SNAPSHOT/minvoker680-bom-parent-1.0-SNAPSHOT.pom').exists()
+assert new File(localRepo, 'org/apache/maven/plugins/invoker/minvoker680-inner-bom/1.0-SNAPSHOT/minvoker680-inner-bom-1.0-SNAPSHOT.pom').exists()

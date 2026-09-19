@@ -59,6 +59,8 @@ under the License.
   </build>
 
   <modules>
+    <module>bom-parent</module>
+    <module>inner-bom</module>
     <module>bom</module>
     <module>lib</module>
   </modules>

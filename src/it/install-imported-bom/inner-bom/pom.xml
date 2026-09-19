@@ -18,30 +18,21 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.apache.maven.plugins.invoker</groupId>
-    <artifactId>minvoker680-bom-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <relativePath>../bom-parent/pom.xml</relativePath>
-  </parent>
-
-  <artifactId>minvoker680-bom</artifactId>
+  <groupId>org.apache.maven.plugins.invoker</groupId>
+  <artifactId>minvoker680-inner-bom</artifactId>
+  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <dependencyManagement>
     <dependencies>
-      <!-- a BOM importing another BOM, with a version that only the inherited properties can resolve -->
       <dependency>
         <groupId>org.apache.maven.plugins.invoker</groupId>
-        <artifactId>minvoker680-inner-bom</artifactId>
-        <version>${inner.bom.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
+        <artifactId>minvoker680-lib</artifactId>
+        <version>${project.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -38,13 +38,18 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -102,6 +107,8 @@ public class InstallMojo extends AbstractMojo {
 
     private final MavenProject project;
 
+    private final ProjectBuilder projectBuilder;
+
     /**
      * The path to the local repository into which the project artifacts should be installed for the integration tests.
      * If not set, the regular local repository will be used. To prevent soiling of your regular local repository with
@@ -156,10 +163,15 @@ public class InstallMojo extends AbstractMojo {
     private String scope;
 
     @Inject
-    public InstallMojo(RepositorySystem repositorySystem, MavenSession session, MavenProject project) {
+    public InstallMojo(
+            RepositorySystem repositorySystem,
+            MavenSession session,
+            MavenProject project,
+            ProjectBuilder projectBuilder) {
         this.repositorySystem = repositorySystem;
         this.session = session;
         this.project = project;
+        this.projectBuilder = projectBuilder;
     }
 
     /**
@@ -233,32 +245,32 @@ public class InstallMojo extends AbstractMojo {
         for (MavenProject currentProject = project;
                 currentProject != null;
                 currentProject = currentProject.getParent()) {
-            Model originalModel = currentProject.getOriginalModel();
-            if (originalModel == null) {
-                continue;
-            }
-            resolveImportedBoms(
-                    originalModel.getDependencyManagement(),
-                    createInterpolator(currentProject.getModel()),
-                    currentProject.getRemoteProjectRepositories(),
-                    resolvedArtifacts,
-                    visitedBoms);
+            resolveImportedBoms(currentProject, resolvedArtifacts, visitedBoms);
         }
     }
 
+    /**
+     * Resolve the BOMs declared with <code>import</code> scope in the original model of the given project.
+     * <p>
+     * The import declarations are read from the original model, the only place where they survive, while their
+     * coordinates are interpolated against the effective model, which already carries the properties and coordinates
+     * inherited from the parents. This is the same order Maven core follows: it interpolates a model after inheritance
+     * assembly and before it imports the dependency management.
+     */
     private void resolveImportedBoms(
-            DependencyManagement dependencyManagement,
-            Interpolator interpolator,
-            List<RemoteRepository> remoteRepositories,
-            Map<String, Artifact> resolvedArtifacts,
-            Set<String> visitedBoms)
+            MavenProject currentProject, Map<String, Artifact> resolvedArtifacts, Set<String> visitedBoms)
             throws ArtifactResolutionException, MojoExecutionException {
 
-        if (dependencyManagement == null) {
+        Model originalModel = currentProject.getOriginalModel();
+        if (originalModel == null || originalModel.getDependencyManagement() == null) {
             return;
         }
 
-        for (org.apache.maven.model.Dependency dependency : dependencyManagement.getDependencies()) {
+        Interpolator interpolator = createInterpolator(currentProject.getModel());
+        List<RemoteRepository> remoteRepositories = currentProject.getRemoteProjectRepositories();
+
+        for (org.apache.maven.model.Dependency dependency :
+                originalModel.getDependencyManagement().getDependencies()) {
             if (!"pom".equals(dependency.getType()) || !"import".equals(dependency.getScope())) {
                 continue;
             }
@@ -289,31 +301,24 @@ public class InstallMojo extends AbstractMojo {
             resolvePomWithParents(bomArtifact, resolvedArtifacts, remoteRepositories);
 
             // a BOM can import other BOMs in turn
-            Model bomModel = PomUtils.loadPom(bomArtifact.getFile());
-            resolveImportedBoms(
-                    bomModel.getDependencyManagement(),
-                    createInterpolator(inheritCoordinates(bomModel)),
-                    remoteRepositories,
-                    resolvedArtifacts,
-                    visitedBoms);
+            resolveImportedBoms(buildProject(bomArtifact.getFile()), resolvedArtifacts, visitedBoms);
         }
     }
 
     /**
-     * Complete the coordinates a raw model inherits from its parent, so that <code>${project.version}</code> and
-     * <code>${project.groupId}</code> can be interpolated.
+     * Build the effective model of a POM resolved from a repository, so that its import declarations can be
+     * interpolated with the properties it inherits from its parents.
      */
-    private Model inheritCoordinates(Model model) {
-        Parent parent = model.getParent();
-        if (parent != null) {
-            if (model.getGroupId() == null) {
-                model.setGroupId(parent.getGroupId());
-            }
-            if (model.getVersion() == null) {
-                model.setVersion(parent.getVersion());
-            }
+    private MavenProject buildProject(File pomFile) throws MojoExecutionException {
+        ProjectBuildingRequest request = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+        request.setResolveDependencies(false);
+        request.setProcessPlugins(false);
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        try {
+            return projectBuilder.build(pomFile, request).getProject();
+        } catch (ProjectBuildingException e) {
+            throw new MojoExecutionException("Failed to read imported BOM " + pomFile, e);
         }
-        return model;
     }
 
     private Interpolator createInterpolator(Model model) {
