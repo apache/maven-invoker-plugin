@@ -31,8 +31,12 @@ under the License.
   <url>https://issues.apache.org/jira/browse/MINVOKER-377</url>
   <description>
     install must write to the flat local repository layout even when the outer build enabled
-    a split local repository (aether.enhancedLocalRepository.split), since the forked IT builds
-    read the plain flat layout.
+    a split local repository (aether.enhancedLocalRepository.split), and run must make the forked
+    IT builds read it that way even when their settings enable the split layout.
+
+    test.properties enables the split layout for this build with an empty remotePrefix, so the
+    cached (remote) artifacts, the plugin under test among them, stay at the flat paths the IT
+    harness populated, while locally installed artifacts would go to installed/.
   </description>
 
   <properties>
@@ -46,12 +50,15 @@ under the License.
         <artifactId>maven-invoker-plugin</artifactId>
         <version>@project.version@</version>
         <configuration>
+          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
           <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+          <settingsFile>settings.xml</settingsFile>
         </configuration>
         <executions>
           <execution>
             <goals>
               <goal>install</goal>
+              <goal>run</goal>
             </goals>
           </execution>
         </executions>

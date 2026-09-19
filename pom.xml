@@ -296,7 +296,6 @@ under the License.
               <exclude>src/it/staging-dependencies/repo/**/*</exclude>
               <exclude>src/it/**/*.txt</exclude>
               <exclude>src/test/**/*.txt</exclude>
-              <exclude>src/it/**/.mvn/maven.config</exclude>
             </excludes>
           </configuration>
         </plugin>

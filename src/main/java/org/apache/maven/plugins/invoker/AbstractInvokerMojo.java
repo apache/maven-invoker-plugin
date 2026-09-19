@@ -120,6 +120,12 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private static final String INVOKER_TEST_PROPERTY = "invoker.test";
 
     /**
+     * Resolver configuration property enabling the split local repository layout, see the protected
+     * <code>org.eclipse.aether.internal.impl.LocalPathPrefixComposerFactorySupport.CONF_PROP_SPLIT</code>.
+     */
+    static final String SPLIT_LOCAL_REPOSITORY_PROPERTY = "aether.enhancedLocalRepository.split";
+
+    /**
      * The zero-based column index where to print the invoker result.
      */
     private static final int RESULT_COLUMN = 60;
@@ -155,6 +161,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * The local repository for caching artifacts. It is strongly recommended to specify a path to an isolated
      * repository like <code>${project.build.directory}/it-repo</code>. Otherwise, your ordinary local repository will
      * be used, potentially soiling it with broken artifacts.
+     * <p>
+     * The forked builds always read this repository in the flat layout that <code>invoker:install</code> writes:
+     * the plugin passes <code>-Daether.enhancedLocalRepository.split=false</code> to every forked build, which
+     * outranks a split local repository enabled through the merged user settings or the settings file. An IT that
+     * needs the split layout can set that property through {@link #properties} or its user properties file.
      *
      * @since 1.0
      */
@@ -2083,6 +2094,11 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                 throw new MojoExecutionException("Error reading user properties from " + propertiesFile);
             }
         }
+
+        // invoker:install writes the IT local repository in the flat layout; make the forked build read it the same
+        // way, whatever split configuration the outer build or the (merged) settings carry (MINVOKER-377). A user
+        // property outranks system properties and settings profile properties in the resolver configuration.
+        collectedTestProperties.putIfAbsent(SPLIT_LOCAL_REPOSITORY_PROPERTY, "false");
 
         return collectedTestProperties;
     }
