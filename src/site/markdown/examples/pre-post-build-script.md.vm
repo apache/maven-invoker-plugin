@@ -128,10 +128,21 @@ Missing script files will be ignored.
 
 # Script bytecode level
 
-By default, the pre-/post-build Groovy scripts are compiled to the bytecode level of the JDK running Maven. Set the
-[`scriptTargetBytecode`](../run-mojo.html#scriptTargetBytecode) parameter (or the `maven.compiler.release` /
-`maven.compiler.target` project properties, which it defaults to) if the hook scripts need to target the same
-bytecode level as the project under test.
+The pre-/post-build Groovy scripts are compiled to the bytecode level of the project under test, so a project that
+sets `maven.compiler.release` or `maven.compiler.target` needs no further configuration. The level is taken from the
+first of these that is set:
+
+1. the [`scriptTargetBytecode`](../run-mojo.html#scriptTargetBytecode) parameter,
+2. the `maven.compiler.release` property,
+3. the `maven.compiler.target` property.
+
+The properties are looked up on the command line (`-D`) first and then in the project. When none of them is set, the
+scripts are compiled to the bytecode level of the JDK running Maven. To keep that level in a project that does set
+one of the properties, set the parameter to it explicitly:
+
+```xml
+<scriptTargetBytecode>${esc.d}{java.specification.version}</scriptTargetBytecode>
+```
 
 # Predefined global variables
 
