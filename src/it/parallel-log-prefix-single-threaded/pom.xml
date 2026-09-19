@@ -32,8 +32,8 @@ under the License.
   </properties>
 
   <!--
-    MINVOKER-684 control case: with the default parallelThreads=1, console output must stay byte-identical
-    to before the fix, i.e. no "[<project>] " prefix is added to any line.
+    MINVOKER-684 control case: with the default parallelThreads=1 the per-job console lines carry the same
+    "[<project>] " prefix as in a parallel run, so the format does not depend on the thread count.
   -->
   <build>
     <plugins>
