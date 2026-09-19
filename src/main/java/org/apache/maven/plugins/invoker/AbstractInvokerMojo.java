@@ -418,7 +418,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * allows late replacement of properties when the plugin is executed,
      * so properties that have been modified by other plugins will be picked up correctly.
      * <br>
-     * Since version <b>3.10.2</b>, forked builds also get <code>MAVEN_SKIP_RC</code> set to <code>1</code> so that
+     * Since version <b>3.11.0</b>, forked builds also get <code>MAVEN_SKIP_RC</code> set to <code>1</code> so that
      * <code>~/.mavenrc</code> and <code>/etc/mavenrc</code> cannot silently override this value, and
      * <code>MAVEN_ARGS</code> is cleared for the same reason (see {@link #environmentVariables}). An IT can still
      * override <code>MAVEN_SKIP_RC</code> through {@link #environmentVariables} or
@@ -534,7 +534,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     /**
      * Additional environment variables to set on the command line.
      * <br>
-     * Since version <b>3.10.2</b>, each forked IT build is isolated from the environment that invoked this plugin:
+     * Since version <b>3.11.0</b>, each forked IT build is isolated from the environment that invoked this plugin:
      * <code>MAVEN_ARGS</code> is cleared (so the outer run's <code>-pl</code>, <code>-P</code> and <code>-D</code>
      * flags are not appended to every IT) and <code>MAVEN_SKIP_RC</code> is set to <code>1</code> (so
      * <code>~/.mavenrc</code>/<code>/etc/mavenrc</code> cannot override <code>MAVEN_OPTS</code>). Define

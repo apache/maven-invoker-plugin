@@ -167,7 +167,7 @@ invoker.environmentVariables.MY_ENV_NAME = myEnvValue
 invoker.updateSnapshots = true
 ```
 
-Since plugin version 3.10.2, every IT build is isolated from the environment that invoked the plugin: `MAVEN_ARGS`
+Since plugin version 3.11.0, every IT build is isolated from the environment that invoked the plugin: `MAVEN_ARGS`
 is cleared and `MAVEN_SKIP_RC` is set to `1`, so a test build never inherits `-pl`/`-P`/`-D` flags left over in
 `MAVEN_ARGS` by the outer run, and `~/.mavenrc`/`/etc/mavenrc` cannot silently override `MAVEN_OPTS`. Set either
 variable through the `environmentVariables` plugin parameter, or per invocation with
