@@ -50,7 +50,7 @@ The following example configurations are available to illustrate selected use ca
 - [Debug tests](./examples/debugging.html) with a remote JVM debugger (`mvnDebug`).
 - [Filter files](./examples/filtering.html) to introduce some updates before starting the build.
 - [Install](./examples/install-artifacts.html) projects artifacts to a local repository before running.
-- [Run a BeanShell or Groovy script](./examples/pre-post-build-script.html) to prepare or verify project.
+- [Run a Groovy script](./examples/pre-post-build-script.html) to prepare or verify project (BeanShell scripts are deprecated).
 - [Fast Invoker Plugin configuration](./examples/fast-use.html) to accelerate project execution.
 - [Access test classes](./examples/access-test-classes.html) to share code between hook scripts.
 - [Use Invoker Properties](./examples/invoker-properties.html) to configure goals, profiles etc. for individual projects.
