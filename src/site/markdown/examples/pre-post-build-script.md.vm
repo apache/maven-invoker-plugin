@@ -23,6 +23,8 @@ Complementary to the post-build hook script, you can also create a pre-build hoo
 
 Default name of Pre-Build script is `prebuild`, you can use name `prebuild.bsh` or `prebuild.groovy` according to chosen script language.
 
+**BeanShell scripts are deprecated.** Support for `.bsh` scripts will be removed in a future release; write new scripts in Groovy and port existing BeanShell scripts. Tracked in [apache/maven#13207](https://github.com/apache/maven/issues/13207).
+
 In Pre-Build scripts you can prepare a test resources for your project.
 
 You can also define a user properties which will be added to executed test project by `-D` Maven argument.
@@ -61,7 +63,7 @@ Now you can use it in test project:
 
 # Using a Post-Build Script
 
-Here is an example of how the Invoker Plugin can be used to run a set of Maven projects and then verify their output with a [BeanShell](https://beanshell.github.io/) or [Groovy](https://groovy-lang.org/) script. The name of the script file in this case is `verify` - default value is `postbuild`.
+Here is an example of how the Invoker Plugin can be used to run a set of Maven projects and then verify their output with a [Groovy](https://groovy-lang.org/) script (or a deprecated [BeanShell](https://beanshell.github.io/) one). The name of the script file in this case is `verify` - default value is `postbuild`.
 
 ```xml
 <project>
@@ -90,9 +92,16 @@ Here is an example of how the Invoker Plugin can be used to run a set of Maven p
 </project>
 ```
 
-Below is an example post-build BeanShell script (`verify.bsh`) that checks for the existence of a JAR file after the build has run. If the JAR file does not exist, the script throws an exception which causes the Invoker Plugin to log that the build failed. More precisely, any non-null return value which does not equal `true` will be interpreted as a failure condition. And of course, if the script exits abnormally due to an exception, the plugin will flag the corresponding build as a failure, too.
+Below is an example post-build Groovy script (`verify.groovy`) that checks for the existence of a JAR file after the build has run. If the JAR file does not exist, the assertion fails, which causes the Invoker Plugin to log that the build failed. More precisely, any non-null return value which does not equal `true` will be interpreted as a failure condition. And of course, if the script exits abnormally due to an exception, the plugin will flag the corresponding build as a failure, too.
 
-Example `verify.bsh`
+Example `verify.groovy`
+
+```unknown
+def file = new File( basedir, "target/my-test-project-1.0-SNAPSHOT.jar" )
+assert file.isFile()
+```
+
+The same check as a deprecated BeanShell script (`verify.bsh`), for existing scripts that have not been ported yet:
 
 ```unknown
 import java.io.*;
@@ -102,13 +111,6 @@ if ( !file.isFile() )
 {
     throw new FileNotFoundException( "Could not find generated JAR: " + file );
 }
-```
-
-and similar `verify.groovy`
-
-```unknown
-def file = new File( basedir, "target/my-test-project-1.0-SNAPSHOT.jar" )
-assert file.isFile()
 ```
 
 # Pre and Post Build Script for multiple project executions
