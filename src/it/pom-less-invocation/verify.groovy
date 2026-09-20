@@ -30,10 +30,10 @@ try
         return false;
     }
 
-    String[] paths = {
+    String[] paths = [
             "no-pom",
             "no-pom/build.log",
-    };
+    ];
     for ( String path : paths )
     {
         File file = new File( itDir, path );

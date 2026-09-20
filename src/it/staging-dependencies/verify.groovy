@@ -34,7 +34,7 @@ try
         return false;
     }
 
-    String[] files = {
+    String[] files = [
             "junit/junit/4.13.1/junit-4.13.1.pom",
             "junit/junit/4.13.1/junit-4.13.1.jar",
             "junit/junit/maven-metadata-local.xml",
@@ -61,7 +61,7 @@ try
             "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.pom",
             "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
             "org/slf4j/slf4j-parent/1.7.36/slf4j-parent-1.7.36.pom"
-      };
+      ];
     for ( String file : files )
     {
         File stagedFile = new File( itRepoDir, file );

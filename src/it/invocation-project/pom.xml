@@ -49,7 +49,7 @@ under the License.
             <pomInclude>*/pom.xml</pomInclude>
           </pomIncludes>
           <settingsFile>src/it/settings.xml</settingsFile>
-          <preBuildHookScript>setup.bsh</preBuildHookScript>
+          <preBuildHookScript>setup.groovy</preBuildHookScript>
           <goals>
             <goal>clean</goal>
           </goals>

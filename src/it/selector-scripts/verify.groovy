@@ -25,10 +25,10 @@ import org.codehaus.plexus.util.*;
 
 try
 {
-    String[] expected = {
+    String[] expected = [
             "target/its/script-ret-true/target/touch.txt",
             "target/its/script-ret-quiet/target/touch.txt",
-      };
+      ];
     for ( String file : expected )
     {
         File touchFile = new File( basedir, file );
@@ -40,11 +40,11 @@ try
         }
     }
 
-    String[] unexpected = {
+    String[] unexpected = [
             "target/its/script-ret-false/target/touch.txt",
             "target/its/script-ret-other/target/touch.txt",
             "target/its/script-throws/target/touch.txt",
-      };
+      ];
     for ( String file : unexpected )
     {
         File touchFile = new File( basedir, file );
@@ -56,10 +56,10 @@ try
         }
     }
 
-    String[] success = {
+    String[] success = [
             "target/invoker-reports-test/BUILD-script-ret-true.xml",
             "target/invoker-reports-test/BUILD-script-ret-quiet.xml",
-      };
+      ];
     for ( String file : success )
     {
          File resultFile = new File( basedir, file );
@@ -72,10 +72,10 @@ try
          }
     }
 
-    String[] skipped = {
+    String[] skipped = [
             "target/invoker-reports-test/BUILD-script-ret-false.xml",
             "target/invoker-reports-test/BUILD-script-ret-other.xml",
-      };
+      ];
     for ( String file : skipped )
     {
          File resultFile = new File( basedir, file );
@@ -89,9 +89,9 @@ try
     }
 
 
-    String[] inerror = {
+    String[] inerror = [
             "target/invoker-reports-test/BUILD-script-throw.xml",
-      };
+      ];
     for ( String file : inerror )
     {
          File resultFile = new File( basedir, file );

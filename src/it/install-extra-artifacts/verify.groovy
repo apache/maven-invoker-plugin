@@ -31,7 +31,7 @@ try
     }
 
     String[] files =
-    {
+    [
         "org/apache/maven/plugins/maven-clean-plugin/2.4/maven-clean-plugin-2.4.jar",
         "org/apache/maven/plugins/maven-clean-plugin/2.4/maven-clean-plugin-2.4.pom",
         "org/apache/maven/plugins/maven-clean-plugin/2.4/maven-clean-plugin-2.4-javadoc.jar",
@@ -45,7 +45,7 @@ try
         "jdom/jdom/1.1/jdom-1.1.pom",
         "org/jdom/jdom/1.1/jdom-1.1.pom",
         "org/jdom/jdom/1.1/jdom-1.1.jar",
-    };
+    ];
     for ( String file : files )
     {
         File stagedFile = new File( itRepoDir, file );

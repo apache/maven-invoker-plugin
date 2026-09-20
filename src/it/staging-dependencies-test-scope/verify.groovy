@@ -34,7 +34,7 @@ try
         return false;
     }
 
-    String[] files = {
+    String[] files = [
             "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
             "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.pom",
             "org/slf4j/slf4j-api/maven-metadata-local.xml",
@@ -45,7 +45,7 @@ try
             "org/slf4j/slf4j-simple/maven-metadata-local.xml",
             "test/staging-dependencies-test-scope/1.0-SNAPSHOT/staging-dependencies-test-scope-1.0-SNAPSHOT.pom",
             "test/staging-dependencies-test-scope/1.0-SNAPSHOT/staging-dependencies-test-scope-1.0-SNAPSHOT.jar"
-      };
+      ];
     for ( String file : files )
     {
         File stagedFile = new File( itRepoDir, file );

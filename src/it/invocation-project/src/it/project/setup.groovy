@@ -20,12 +20,12 @@
 import java.io.*;
 
 String[] paths =
-{
+[
     "target",
     "sub-1/target",
     "sub-2/target",
     "sub-3/target",
-};
+];
 
 for ( String path : paths )
 {

@@ -23,12 +23,12 @@ import java.util.regex.*;
 
 try
 {
-    String[] files = {
+    String[] files = [
             "target/its/beanshell/target/prebuild.bsh",
             "target/its/beanshell/target/postbuild.bsh",
             "target/its/groovy/target/prebuild.groovy",
             "target/its/groovy/target/postbuild.groovy",
-      };
+      ];
     for ( String file : files )
     {
         File touchFile = new File( basedir, file );
