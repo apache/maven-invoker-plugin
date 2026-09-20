@@ -20,10 +20,10 @@
 import java.io.*;
 
 String[] unexpectedPaths =
-{
+[
     "sub-1/target",
     "sub-3/target",
-};
+];
 
 for ( String path : unexpectedPaths )
 {
@@ -36,10 +36,10 @@ for ( String path : unexpectedPaths )
 }
 
 String[] expectedPaths =
-{
+[
     "target",
     "sub-2/target",
-};
+];
 
 for ( String path : expectedPaths )
 {

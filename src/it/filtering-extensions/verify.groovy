@@ -36,11 +36,11 @@ try
     String xml = FileUtils.fileRead( extensionsFile, "UTF-8" );
   
 
-    String[] values = {
+    String[] values = [
       "<groupId>org.apache.maven.plugins.invoker</groupId>",
       "<artifactId>pom-filtering</artifactId>",
       "<version>1.0-SNAPSHOT</version>",
-    };
+    ];
     for ( String value : values )
     {
         System.out.println( "Checking for occurrence of: " + value );
@@ -51,11 +51,11 @@ try
         }
     }
 
-    String[] badValues = {
+    String[] badValues = [
         "<groupId>@project.groupId@</groupId>",
         "<artifactId>@project.artifactId@</artifactId>",
         "<version>@project.version@</version>",
-    };
+    ];
     for ( String value : badValues )
     {
         System.out.println( "Checking for absence of: " + value );

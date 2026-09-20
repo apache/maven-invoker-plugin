@@ -43,8 +43,8 @@ try
 
     String xml = FileUtils.fileRead( pomFile, "UTF-8" );
 
-    String[] values = {
-            "<prop0>${project.version}</prop0>",
+    String[] values = [
+            '<prop0>${project.version}</prop0>',
             "<prop1>1.0-SNAPSHOT</prop1>",
             "<prop2>PROPERTY-FROM-PLUGIN-CONFIG</prop2>",
             "<prop3>PROPERTY-FROM-PROPERTIES-SECTION</prop3>",
@@ -55,7 +55,7 @@ try
             "<prop8>PASSED</prop8>",
             "<prop10>file:///",
             "<prop12>file:///",
-        };
+        ];
     for ( String value : values )
     {
         System.out.println( "Checking for occurrence of: " + value );
@@ -66,14 +66,14 @@ try
         }
     }
 
-    String[] badValues = {
+    String[] badValues = [
             "<prop9>@basedir@</prop9>",
             "<prop9>FAILED</prop9>",
             "<prop10>@baseurl@</prop10>",
             "<prop10>FAILED</prop10>",
             "<prop11>@localRepository@</prop11>",
             "<prop12>@localRepositoryUrl@</prop12>",
-        };
+        ];
     for ( String value : badValues )
     {
         System.out.println( "Checking for absence of: " + value );

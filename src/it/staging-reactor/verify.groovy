@@ -32,7 +32,7 @@ try
     }
 
     // NOTE: Checking the metadata is included to guard against regression of MINVOKER-43
-    String[] files = {
+    String[] files = [
             "test/mod1/maven-metadata-local.xml",
             "test/mod1/1.0-SNAPSHOT/maven-metadata-local.xml",
             "test/mod1/1.0-SNAPSHOT/mod1-1.0-SNAPSHOT.pom",
@@ -50,7 +50,7 @@ try
             "test/mod2-parent/maven-metadata-local.xml",
             "test/mod2-parent/1.0-SNAPSHOT/maven-metadata-local.xml",
             "test/mod2-parent/1.0-SNAPSHOT/mod2-parent-1.0-SNAPSHOT.pom",
-      };
+      ];
     for ( String file : files )
     {
         File stagedFile = new File( itRepoDir, file );

@@ -33,10 +33,10 @@ try
         return false;
     }
 
-    String[] values = {
+    String[] values = [
         "value with spaces from settings",
         "value with spaces from cli",
-    };
+    ];
 
     BufferedReader reader = new BufferedReader( new InputStreamReader( new FileInputStream( testFile ), "UTF-8" ) );
     try

@@ -43,11 +43,11 @@ boolean check( String project, String encoding )
 
     String xml = FileUtils.fileRead( pomFile, encoding );
 
-    String[] values = {
+    String[] values = [
             "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>",
             "<prop0>\u00A9\u00AE\u00C4\u00D6\u00DC\u00E4\u00F6\u00FC\u00DF</prop0>",
             "<prop1>\u00A9\u00AE\u00C4\u00D6\u00DC\u00E4\u00F6\u00FC\u00DF</prop1>",
-        };
+        ];
     for ( String value : values )
     {
         System.out.println( "Checking for occurrence of: " + value );

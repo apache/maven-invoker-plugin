@@ -35,9 +35,9 @@ boolean check( String project, boolean filtered )
 
     String xml = FileUtils.fileRead( pomFile, "UTF-8" );
 
-    String[] values = {
+    String[] values = [
             "<prop0>pom-filtering-reactor</prop0>",
-        };
+        ];
     for ( String value : values )
     {
         System.out.println( "Checking for " + ( filtered ? "occurrence" : "absence" ) + " of: " + value );

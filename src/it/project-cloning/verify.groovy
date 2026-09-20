@@ -31,7 +31,7 @@ try
     }
 
     // NOTE: It is part of the test design that "module" is a prefix of "module-1"
-    String[] paths = {
+    String[] paths = [
             "module",
             "module/pom.xml",
             "module-1",
@@ -39,7 +39,7 @@ try
             "module-1/empty-dir",
             "module-1/sub-module",
             "module-1/sub-module/pom.xml",
-    };
+    ];
     for ( String path : paths )
     {
         File file = new File( itDir, path );
