@@ -21,9 +21,9 @@ under the License.
 
 Complementary to the post-build hook script, you can also create a pre-build hook script that will be run before the invocation of Maven. This can be used to do some preparations for the build.
 
-Default name of Pre-Build script is `prebuild`, you can use name `prebuild.bsh` or `prebuild.groovy` according to chosen script language.
+The default name of the pre-build script is `prebuild`, which resolves to `prebuild.groovy`, or to the deprecated `prebuild.bsh`.
 
-**BeanShell scripts are deprecated.** Support for `.bsh` scripts will be removed in a future release; write new scripts in Groovy and port existing BeanShell scripts. Tracked in [apache/maven#13207](https://github.com/apache/maven/issues/13207).
+**BeanShell scripts are deprecated.** Support for `.bsh` scripts will be removed in a future release; write new scripts in Groovy and port existing BeanShell scripts. The plugin logs a warning for every BeanShell script it runs. Tracked in [apache/maven#13207](https://github.com/apache/maven/issues/13207).
 
 In Pre-Build scripts you can prepare a test resources for your project.
 

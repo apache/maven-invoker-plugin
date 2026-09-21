@@ -39,7 +39,7 @@ The following example demonstrates a basic plugin configuration for running inte
          +- pom.xml
          +- invoker.properties
          +- test.properties
-         +- verify.bsh
+         +- verify.groovy
          +- src/
 ```
 
@@ -87,7 +87,7 @@ Next up, the `invoker:run` goal will execute during the phase `integration-test`
 
 Once the IT POMs have been filtered, a Maven build will be started on them. By default, the Invoker Plugin will execute the phase `package` on the IT POMs but that can be changed globally in the plugin configuration or for an individual integration test by using the [`invoker.properties`](./examples/invoker-properties.html) as done in the example for `second-it`. Likewise, system properties can be passed to the IT builds via the file `test.properties`. And the file `src/it/settings.xml` can be used to specify custom user settings for the tests. Among others, this allows you to make the integration tests use your local repository as a remote repository, avoiding time-consuming downloads from `central` in order to fill up the initially empty staging repository. Please see the example [Fast Invoker Plugin Configuration](./examples/fast-use.html) for more details on this technique. The output of the IT builds is written to a log file named `build.log` (e.g. `target/it/first-it/build.log`) and allows diagnostics in case an integration test fails.
 
-When an integration test has finished, the plugin will invoke an optional post build hook script. In the example, this is the case for `second-it` where `verify.bsh` will be run. The purpose of this script is usually to check that the build of the integration test did not only succeed but also produced the intended output. Have a look at the example [Using Pre and Post Build Script](./examples/pre-post-build-script.html) for a code snippet.
+When an integration test has finished, the plugin will invoke an optional post build hook script. In the example, this is the case for `second-it` where `verify.groovy` will be run. The purpose of this script is usually to check that the build of the integration test did not only succeed but also produced the intended output. Have a look at the example [Using Pre and Post Build Script](./examples/pre-post-build-script.html) for a code snippet.
 
 Running Only Some Tests
 -----------------------
