@@ -37,4 +37,13 @@ if ( !touchFile.exists() )
     throw new FileNotFoundException( "Did not find marker file: " + touchFile );
 }
 
+// the outer build log carries the deprecation warning for the BeanShell scripts, once per file, and none for Groovy
+File buildLog = new File( basedir, "build.log" )
+String log = buildLog.text
+['setup.bsh', 'verify.bsh'].each { name ->
+    File script = new File( basedir, "target/its/beanshell/" + name )
+    assert log.count( "BeanShell scripts are deprecated, port " + script + " to Groovy" ) == 1 : "expected one warning for " + script
+}
+assert !log.contains( "target/its/groovy/setup.groovy to Groovy" ) && !log.contains( "target/its/groovy/verify.groovy to Groovy" )
+
 return true;

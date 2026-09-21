@@ -19,7 +19,7 @@ under the License.
 
 # Selector Scripts
 
-Starting with plugin version 1.5, a custom script can be used to skip individual projects based on whatever criteria expressed in the script as illustrated in the following example. Assume the following directory structure:
+Starting with plugin version 1.5, a custom script can be used to skip individual projects based on whatever criteria expressed in the script as illustrated in the following example. Write the script in Groovy; BeanShell scripts are deprecated and the plugin warns when it runs one. Assume the following directory structure:
 
 ```unknown
 ./
@@ -29,7 +29,7 @@ Starting with plugin version 1.5, a custom script can be used to skip individual
       +- settings.xml
       +- conditional-it/
          +- pom.xml
-         +- check-assumptions.bsh
+         +- check-assumptions.groovy
          +- src/
 ```
 
@@ -51,7 +51,7 @@ The plugin configuration for this example would look like this:
           </pomIncludes>
           <settingsFile>src/it/settings.xml</settingsFile>
           <localRepositoryPath>${esc.d}{project.build.directory}/local-repo</localRepositoryPath>
-          <selectorScript>check-assumptions.bsh</selectorScript>
+          <selectorScript>check-assumptions.groovy</selectorScript>
         </configuration>
         <executions>
           <execution>
@@ -69,7 +69,7 @@ The plugin configuration for this example would look like this:
 </project>
 ```
 
-If the check-assumptions.bsh script returns `true` or does not return a value, then the project will be executed.
+If the `check-assumptions.groovy` script returns `true` or does not return a value, then the project will be executed.
 
 If the script returns any value other than `true`, then the project will not be executed.
 
