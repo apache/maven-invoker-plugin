@@ -35,7 +35,7 @@ under the License.
     <version.maven-install-plugin>@version.maven-install-plugin@</version.maven-install-plugin>
     <version.maven-jar-plugin>@version.maven-jar-plugin@</version.maven-jar-plugin>
     <version.maven-resources-plugin>@version.maven-resources-plugin@</version.maven-resources-plugin>
-    <version.maven-surefire>@version.maven-surefire@</version.maven-surefire>
+    <version.maven-surefire-plugin>@version.maven-surefire-plugin@</version.maven-surefire-plugin>
   </properties>
 
   <build>
