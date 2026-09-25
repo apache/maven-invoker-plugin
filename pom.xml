@@ -292,11 +292,11 @@ under the License.
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
-            <excludes combine.children="append">
+            <inputExcludes>
               <exclude>src/it/staging-dependencies/repo/**/*</exclude>
               <exclude>src/it/**/*.txt</exclude>
               <exclude>src/test/**/*.txt</exclude>
-            </excludes>
+            </inputExcludes>
           </configuration>
         </plugin>
         <plugin>
