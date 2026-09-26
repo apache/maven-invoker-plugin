@@ -481,6 +481,21 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private String encoding;
 
     /**
+     * The bytecode level the pre-/post-build hook scripts (e.g. <code>verify.groovy</code>) are compiled to, in the
+     * form the Compiler Plugin uses (<code>8</code>, <code>11</code>, <code>17</code>). When not set, the plugin uses
+     * the <code>maven.compiler.release</code> property and then the <code>maven.compiler.target</code> property, each
+     * looked up in the user properties (<code>-D</code>) and then in the project properties. When none of these is set,
+     * the hook scripts are compiled to the bytecode level of the JDK running Maven.
+     * <p>
+     * To keep the level of the running JDK in a project that sets one of these properties, set this parameter to that
+     * level explicitly, for example <code>${java.specification.version}</code>.
+     *
+     * @since 3.11.0
+     */
+    @Parameter(property = "invoker.scriptTargetBytecode")
+    private String scriptTargetBytecode;
+
+    /**
      * A flag to configure whether the test class path of the project under test should be included
      * in the class path of the pre/post-build scripts. If set to <code>false</code>, the class
      * path of script interpreter consists only of the <a href="dependencies.html">runtime
@@ -982,6 +997,46 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             scriptVariables.forEach((key, value) -> scriptRunner.setGlobalVariable(key, value));
         }
         scriptRunner.setClassPath(scriptClassPath);
+
+        String targetBytecode = resolveScriptTargetBytecode();
+        if (targetBytecode != null) {
+            getLog().debug("Compiling hook scripts to bytecode level " + targetBytecode);
+            scriptRunner.setTargetBytecode(targetBytecode);
+        }
+    }
+
+    /**
+     * Resolves the bytecode level for the hook scripts: the explicit {@link #scriptTargetBytecode} parameter, then
+     * <code>maven.compiler.release</code>, then <code>maven.compiler.target</code>.
+     *
+     * @return The bytecode level, or <code>null</code> to compile to the level of the running JDK.
+     */
+    private String resolveScriptTargetBytecode() {
+        if (scriptTargetBytecode != null && !scriptTargetBytecode.isEmpty()) {
+            return scriptTargetBytecode;
+        }
+        for (String property : new String[] {"maven.compiler.release", "maven.compiler.target"}) {
+            String value = lookupProperty(property);
+            if (value != null && !value.isEmpty()) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Looks a property up the way a <code>${...}</code> plugin parameter expression does: user properties first, then
+     * system properties, then the project properties.
+     */
+    private String lookupProperty(String name) {
+        String value = session.getUserProperties().getProperty(name);
+        if (value == null) {
+            value = session.getSystemProperties().getProperty(name);
+        }
+        if (value == null) {
+            value = project.getProperties().getProperty(name);
+        }
+        return value;
     }
 
     private void writeSummaryFile(List<BuildJob> buildJobs) throws MojoExecutionException {
