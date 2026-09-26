@@ -29,6 +29,8 @@ import org.apache.maven.shared.invoker.InvocationOutputHandler;
  */
 class FileLogger extends org.apache.maven.shared.scriptinterpreter.FileLogger implements InvocationOutputHandler {
 
+    private final String projectPrefix;
+
     /**
      * Creates a new logger that writes to the specified file and optionally mirrors messages to the given mojo logger.
      *
@@ -36,7 +38,13 @@ class FileLogger extends org.apache.maven.shared.scriptinterpreter.FileLogger im
      * @param log The mojo logger to additionally output messages to, may be <code>null</code> if not used.
      * @throws IOException If the output file could not be created.
      */
-    FileLogger(File outputFile, final Log log) throws IOException {
+    FileLogger(File outputFile, final Log log, String project) throws IOException {
         super(outputFile, log != null ? log::info : null);
+        this.projectPrefix = "[" + project + "] ";
+    }
+
+    @Override
+    public void consumeLine(String line) {
+        super.consumeLine(projectPrefix + line);
     }
 }

@@ -1606,7 +1606,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                 long startTime = System.currentTimeMillis();
                 boolean executed;
 
-                FileLogger buildLogger = setupBuildLogFile(basedir, buildJob.getExecutionCount());
+                FileLogger buildLogger = setupBuildLogFile(basedir, buildJob.getExecutionCount(), buildJob.getProject());
                 if (buildLogger != null) {
                     buildJob.setBuildlog(buildLogger.getOutputFile().getAbsolutePath());
                 }
@@ -2049,7 +2049,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @return The build logger or <code>null</code> if logging has been disabled.
      * @throws org.apache.maven.plugin.MojoExecutionException If the log file could not be created.
      */
-    private FileLogger setupBuildLogFile(File basedir, int executionCount) throws MojoExecutionException {
+    private FileLogger setupBuildLogFile(File basedir, int executionCount, String project) throws MojoExecutionException {
         FileLogger logger = null;
 
         if (!noLog) {
@@ -2079,7 +2079,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     getLog().debug("Renaming existing log file " + logPath + " to " + logFileBackup);
                     Files.move(logPath, logFileBackup, StandardCopyOption.REPLACE_EXISTING);
                 }
-                logger = new FileLogger(logPath.toFile(), streamLogger);
+                logger = new FileLogger(logPath.toFile(), streamLogger, project);
                 getLog().debug("New build log initialized: " + logPath);
             } catch (IOException e) {
                 throw new MojoExecutionException("Error initializing build logfile in: " + projectLogDirectory, e);
