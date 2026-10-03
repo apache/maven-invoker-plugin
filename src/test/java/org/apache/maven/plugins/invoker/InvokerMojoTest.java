@@ -25,14 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.ReflectionUtils;
-import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.maven.plugins.invoker.TestUtil.getBasedir;
@@ -224,8 +221,13 @@ class InvokerMojoTest {
     }
 
     private MavenSession sessionWithUserProperties(Properties userProperties) {
+        return sessionWithProperties(userProperties, new Properties());
+    }
+
+    private MavenSession sessionWithProperties(Properties userProperties, Properties systemProperties) {
         MavenSession session = mock(MavenSession.class);
         when(session.getUserProperties()).thenReturn(userProperties);
+        when(session.getSystemProperties()).thenReturn(systemProperties);
         return session;
     }
 
@@ -236,7 +238,7 @@ class InvokerMojoTest {
         mavenProject.getProperties().setProperty("maven.compiler.release", "17");
         mavenProject.getProperties().setProperty("maven.compiler.target", "11");
         setVariableValueToObject(invokerMojo, "project", mavenProject);
-        setVariableValueToObject(invokerMojo, "session", newSession(new DefaultMavenExecutionRequest()));
+        setVariableValueToObject(invokerMojo, "session", sessionWithUserProperties(new Properties()));
         setVariableValueToObject(invokerMojo, "scriptTargetBytecode", "8");
 
         // when
@@ -253,7 +255,7 @@ class InvokerMojoTest {
         mavenProject.getProperties().setProperty("maven.compiler.release", "17");
         mavenProject.getProperties().setProperty("maven.compiler.target", "11");
         setVariableValueToObject(invokerMojo, "project", mavenProject);
-        setVariableValueToObject(invokerMojo, "session", newSession(new DefaultMavenExecutionRequest()));
+        setVariableValueToObject(invokerMojo, "session", sessionWithUserProperties(new Properties()));
 
         // when
         String targetBytecode = invokeHandleScriptRunnerAndGetGroovyTargetBytecode();
@@ -268,7 +270,7 @@ class InvokerMojoTest {
         MavenProject mavenProject = getMavenProject();
         mavenProject.getProperties().setProperty("maven.compiler.target", "11");
         setVariableValueToObject(invokerMojo, "project", mavenProject);
-        setVariableValueToObject(invokerMojo, "session", newSession(new DefaultMavenExecutionRequest()));
+        setVariableValueToObject(invokerMojo, "session", sessionWithUserProperties(new Properties()));
 
         // when
         String targetBytecode = invokeHandleScriptRunnerAndGetGroovyTargetBytecode();
@@ -282,10 +284,12 @@ class InvokerMojoTest {
         // given
         MavenProject mavenProject = getMavenProject();
         mavenProject.getProperties().setProperty("maven.compiler.release", "17");
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        request.getUserProperties().setProperty("maven.compiler.release", "21");
+        Properties userProperties = new Properties();
+        userProperties.setProperty("maven.compiler.release", "21");
+        Properties systemProperties = new Properties();
+        systemProperties.setProperty("maven.compiler.release", "17");
         setVariableValueToObject(invokerMojo, "project", mavenProject);
-        setVariableValueToObject(invokerMojo, "session", newSession(request));
+        setVariableValueToObject(invokerMojo, "session", sessionWithProperties(userProperties, systemProperties));
 
         // when
         String targetBytecode = invokeHandleScriptRunnerAndGetGroovyTargetBytecode();
@@ -295,21 +299,34 @@ class InvokerMojoTest {
     }
 
     @Test
+    void scriptTargetBytecodeSystemPropertyWinsOverProjectProperty() throws Exception {
+        // given
+        MavenProject mavenProject = getMavenProject();
+        mavenProject.getProperties().setProperty("maven.compiler.release", "11");
+        Properties systemProperties = new Properties();
+        systemProperties.setProperty("maven.compiler.release", "17");
+        setVariableValueToObject(invokerMojo, "project", mavenProject);
+        setVariableValueToObject(invokerMojo, "session", sessionWithProperties(new Properties(), systemProperties));
+
+        // when
+        String targetBytecode = invokeHandleScriptRunnerAndGetGroovyTargetBytecode();
+
+        // then
+        assertThat(targetBytecode).isEqualTo("17");
+    }
+
+    @Test
     void scriptTargetBytecodeIsUnsetWhenNeitherParameterNorPropertyIsPresent() throws Exception {
         // given
         MavenProject mavenProject = getMavenProject();
         setVariableValueToObject(invokerMojo, "project", mavenProject);
-        setVariableValueToObject(invokerMojo, "session", newSession(new DefaultMavenExecutionRequest()));
+        setVariableValueToObject(invokerMojo, "session", sessionWithUserProperties(new Properties()));
 
         // when
         String targetBytecode = invokeHandleScriptRunnerAndGetGroovyTargetBytecode();
 
         // then
         assertThat(targetBytecode).isNull();
-    }
-
-    private static MavenSession newSession(MavenExecutionRequest request) {
-        return new MavenSession(null, (RepositorySystemSession) null, request, null);
     }
 
     private String invokeHandleScriptRunnerAndGetGroovyTargetBytecode() throws Exception {
