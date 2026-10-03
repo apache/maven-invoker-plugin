@@ -50,6 +50,11 @@ plugin's [`invokerPropertiesFile`](run-mojo.html#invokerPropertiesFile) paramete
 *invoker.buildResult=failure*. Now, the failure of the IT build will be interpreted as a test success.
 Likewise, a successful IT build will be considered a test failure.
 
+On its own, this passes the test whatever made the IT build fail. To pin the test to one goal, add
+*invoker.failedGoal=maven-enforcer-plugin:enforce*; the test then fails when the IT build failed on
+any other goal. See [Invoker Properties](examples/invoker-properties.html#available-properties) for the
+accepted values.
+
 <a id="question3"></a>
 
 ### How can I share common code between the pre-/post-build scripts?

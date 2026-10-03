@@ -64,6 +64,7 @@ class InvokerProperties {
     private enum InvocationProperty {
         PROJECT("invoker.project"),
         BUILD_RESULT("invoker.buildResult"),
+        FAILED_GOAL("invoker.failedGoal"),
         GOALS("invoker.goals"),
         PROFILES("invoker.profiles"),
         MAVEN_EXECUTABLE("invoker.mavenExecutable"),
@@ -476,9 +477,28 @@ class InvokerProperties {
      *         a failue was expected, <code>false</code> otherwise.
      */
     public boolean isExpectedResult(int exitCode, int index) {
-        boolean nonZeroExit = "failure"
+        return (exitCode != 0) == isExpectedFailure(index);
+    }
+
+    /**
+     * Checks whether the given invocation is expected to fail.
+     *
+     * @param index The index of the invocation to check, must not be negative.
+     * @return <code>true</code> if <code>invoker.buildResult</code> is set to <code>failure</code>.
+     */
+    public boolean isExpectedFailure(int index) {
+        return "failure"
                 .equalsIgnoreCase(get(InvocationProperty.BUILD_RESULT, index).orElse(null));
-        return (exitCode != 0) == nonZeroExit;
+    }
+
+    /**
+     * Gets the goal which the given invocation is expected to fail on.
+     *
+     * @param index The index of the invocation, must not be negative.
+     * @return The value of <code>invoker.failedGoal</code> or an empty optional if not set.
+     */
+    public Optional<String> getFailedGoal(int index) {
+        return get(InvocationProperty.FAILED_GOAL, index);
     }
 
     /**
