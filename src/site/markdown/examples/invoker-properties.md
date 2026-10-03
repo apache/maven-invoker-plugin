@@ -167,6 +167,12 @@ invoker.environmentVariables.MY_ENV_NAME = myEnvValue
 invoker.updateSnapshots = true
 ```
 
+Since plugin version 3.11.0, every IT build is isolated from the environment that invoked the plugin: `MAVEN_ARGS`
+is cleared and `MAVEN_SKIP_RC` is set to `1`, so a test build never inherits `-pl`/`-P`/`-D` flags left over in
+`MAVEN_ARGS` by the outer run, and `~/.mavenrc`/`/etc/mavenrc` cannot silently override `MAVEN_OPTS`. Set either
+variable through the `environmentVariables` plugin parameter, or per invocation with
+`invoker.environmentVariables.MAVEN_ARGS`/`invoker.environmentVariables.MAVEN_SKIP_RC`, to opt back out.
+
 The comments given in the example should be rather self-explanatory. Looking closely, you can also notice that the syntax `${expression}` can be used to filter the property values. What deserves some more description is the possibility to perform several Maven builds on the same project. By default, the Invoker Plugin will perform the following steps for each project:
 
 - Run the pre build hook script if existent
