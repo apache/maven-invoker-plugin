@@ -40,7 +40,6 @@ notifications:
   pullrequests: issues@maven.apache.org
 
 # https://releases.apache.org/projects/maven-invoker-plugin
-
 project:
   metadata:
     key: maven-invoker-plugin
