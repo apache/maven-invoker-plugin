@@ -31,18 +31,18 @@ def beanshellLog = new File(basedir, 'target/its/beanshell/build.log').text
 def groovyLog = new File(basedir, 'target/its/groovy/build.log').text
 
 // beanshell failed and no log message
-assert !buildLog.contains('[INFO] Output form beanshell script')
-assert buildLog.contains('[INFO]   org.apache.maven.shared.scriptinterpreter.ScriptEvaluationException: java.lang.OutOfMemoryError: Requested array size exceeds VM limit')
-assert buildLog.contains('[INFO]           beanshell' + FS + 'pom.xml ................................ FAILED')
+assert !buildLog.contains('Output form beanshell script')
+assert buildLog.contains('[INFO] [beanshell' + FS + 'pom.xml] org.apache.maven.shared.scriptinterpreter.ScriptEvaluationException: java.lang.OutOfMemoryError: Requested array size exceeds VM limit')
+assert buildLog.contains('[INFO] [beanshell' + FS + 'pom.xml] FAILED')
 
 assert beanshellLog.contains('Output form beanshell script')
 assert beanshellLog.contains('java.lang.OutOfMemoryError: Requested array size exceeds VM limit')
 
 // groovy failed and no log message
-assert !buildLog.contains('[INFO] Output from groovy script')
+assert !buildLog.contains('Output from groovy script')
 assert buildLog.contains('Assertion failed:')
 assert buildLog.contains('assert pom.contains("<modelVersion>9.9.9</modelVersion>")')
-assert buildLog.contains('[INFO]           groovy' + FS + 'pom.xml ................................... FAILED')
+assert buildLog.contains('[INFO] [groovy' + FS + 'pom.xml] FAILED')
 
 assert groovyLog.contains('Output from groovy script')
 assert groovyLog.contains('Assertion failed:')
