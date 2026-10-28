@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -114,7 +115,10 @@ class SelectorUtils {
                 URL url = new URL("jar:" + file.toURI().toURL().toExternalForm()
                         + "!/META-INF/maven/org.apache.maven/maven-core/pom.properties");
 
-                try (InputStream in = url.openStream()) {
+                URLConnection connection = url.openConnection();
+                // Uncached, so that closing the stream closes the jar (JDK-8239054)
+                connection.setUseCaches(false);
+                try (InputStream in = connection.getInputStream()) {
                     Properties properties = new Properties();
                     properties.load(in);
                     String str = properties.getProperty("version");
