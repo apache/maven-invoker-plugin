@@ -24,11 +24,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -44,6 +46,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.Interpolator;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -195,11 +201,20 @@ public class InstallMojo extends AbstractMojo {
     }
 
     private void resolveProjectPoms(MavenProject project, Map<String, Artifact> resolvedArtifacts)
-            throws ArtifactResolutionException {
+            throws ArtifactResolutionException, MojoExecutionException {
 
         if (project == null) {
             return;
         }
+
+        resolveImportedBoms(
+                project.getOriginalModel(),
+                resolvedArtifacts,
+                project.getRemoteProjectRepositories(),
+                project.getGroupId(),
+                project.getArtifactId(),
+                project.getVersion(),
+                project.getProperties());
 
         Artifact projectPom = RepositoryUtils.toArtifact(new ProjectArtifact(project));
         if (projectPom.getFile() != null) {
@@ -343,6 +358,71 @@ public class InstallMojo extends AbstractMojo {
         }
 
         resolvedArtifacts.put(ArtifactIdUtils.toId(artifact), artifact);
+        resolveImportedBoms(
+                model,
+                resolvedArtifacts,
+                remoteRepositories,
+                artifact.getGroupId(),
+                artifact.getArtifactId(),
+                artifact.getVersion(),
+                model.getProperties());
+    }
+
+    private void resolveImportedBoms(
+            Model model,
+            Map<String, Artifact> resolvedArtifacts,
+            List<RemoteRepository> remoteRepositories,
+            String groupId,
+            String artifactId,
+            String version,
+            Properties projectProperties)
+            throws MojoExecutionException, ArtifactResolutionException {
+
+        DependencyManagement dependencyManagement = model.getDependencyManagement();
+        if (dependencyManagement == null) {
+            return;
+        }
+
+        Map<String, Object> properties = new HashMap<>();
+        model.getProperties()
+                .stringPropertyNames()
+                .forEach(name -> properties.put(name, model.getProperties().getProperty(name)));
+        projectProperties
+                .stringPropertyNames()
+                .forEach(name -> properties.put(name, projectProperties.getProperty(name)));
+        properties.put("project.groupId", groupId);
+        properties.put("project.artifactId", artifactId);
+        properties.put("project.version", version);
+        properties.put("pom.groupId", groupId);
+        properties.put("pom.artifactId", artifactId);
+        properties.put("pom.version", version);
+        Interpolator interpolator = new RegexBasedInterpolator();
+        interpolator.addValueSource(new MapBasedValueSource(properties));
+
+        for (org.apache.maven.model.Dependency dependency : dependencyManagement.getDependencies()) {
+            if (!"pom".equals(dependency.getType()) || !"import".equals(dependency.getScope())) {
+                continue;
+            }
+
+            String bomGroupId;
+            String bomArtifactId;
+            String bomVersion;
+            try {
+                bomGroupId = interpolator.interpolate(dependency.getGroupId());
+                bomArtifactId = interpolator.interpolate(dependency.getArtifactId());
+                bomVersion = interpolator.interpolate(dependency.getVersion());
+            } catch (InterpolationException e) {
+                throw new MojoExecutionException(e.getMessage(), e);
+            }
+
+            Artifact bom = new DefaultArtifact(bomGroupId, bomArtifactId, "", "pom", bomVersion);
+            if (resolvedArtifacts.containsKey(ArtifactIdUtils.toId(bom))) {
+                continue;
+            }
+
+            Artifact resolvedBom = resolveArtifact(bom, remoteRepositories);
+            resolvePomWithParents(resolvedBom, resolvedArtifacts, remoteRepositories);
+        }
     }
 
     private Artifact resolveArtifact(Artifact artifact, List<RemoteRepository> remoteRepositories)
