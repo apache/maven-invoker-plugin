@@ -19,13 +19,21 @@
 package org.apache.maven.plugins.invoker;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
 
 import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -131,5 +139,28 @@ class SelectorUtilsTest {
         String mavenVersion = SelectorUtils.getMavenVersion(mavenHome);
 
         assertThat(mavenVersion).isNotBlank();
+    }
+
+    @Test
+    void mavenVersionFromRewrittenMavenHome(@TempDir Path mavenHome) throws Exception {
+        Path jar = Files.createDirectory(mavenHome.resolve("lib")).resolve("maven-core.jar");
+        writeMavenCore(jar, "4.0.0");
+        assertThat(SelectorUtils.getMavenVersion(mavenHome.toFile())).isEqualTo("4.0.0");
+
+        // Rewritten in place, as a Maven distribution unpacked again by the same build is.
+        writeMavenCore(jar, "4.1.0-SNAPSHOT");
+        assertThat(SelectorUtils.getMavenVersion(mavenHome.toFile())).isEqualTo("4.1.0-SNAPSHOT");
+
+        // Nothing keeps the jar open, so it can be deleted (fails on Windows while it is open).
+        Files.delete(jar);
+    }
+
+    private static void writeMavenCore(Path jar, String version) throws IOException {
+        try (OutputStream out = Files.newOutputStream(jar);
+                JarOutputStream jarOut = new JarOutputStream(out)) {
+            jarOut.putNextEntry(new ZipEntry("META-INF/maven/org.apache.maven/maven-core/pom.properties"));
+            jarOut.write(("version=" + version + "\n").getBytes(StandardCharsets.UTF_8));
+            jarOut.closeEntry();
+        }
     }
 }
