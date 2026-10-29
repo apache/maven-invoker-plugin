@@ -50,8 +50,8 @@ under the License.
     <url>https://github.com/apache/maven-invoker-plugin/issues</url>
   </issueManagement>
   <ciManagement>
-    <system>Jenkins</system>
-    <url>https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven-invoker-plugin/</url>
+    <system>GitHub</system>
+    <url>https://github.com/apache/maven-invoker-plugin/actions</url>
   </ciManagement>
   <distributionManagement>
     <site>
