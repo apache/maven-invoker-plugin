@@ -36,7 +36,7 @@ under the License.
     execution is successful, and optionally can verify the output generated from a given project execution.</description>
 
   <prerequisites>
-    <maven>3.6.3</maven>
+    <maven>3.9.0</maven>
   </prerequisites>
 
   <scm>
