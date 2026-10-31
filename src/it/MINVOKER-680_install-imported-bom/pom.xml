@@ -23,17 +23,20 @@ under the License.
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.apache.maven.plugins.invoker</groupId>
+    <artifactId>MINVOKER-680-properties</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>property-parent/pom.xml</relativePath>
+  </parent>
+
   <groupId>org.apache.maven.plugins.invoker</groupId>
   <artifactId>MINVOKER-680-parent</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <properties>
-    <groovy.version>4.0.33</groovy.version>
-  </properties>
-
   <description>
-    Test that invoker:install copies imported BOMs to the integration-test local repository.
+    Test that invoker:install copies an imported BOM with an inherited version property to the integration-test local repository.
   </description>
 
   <dependencyManagement>
