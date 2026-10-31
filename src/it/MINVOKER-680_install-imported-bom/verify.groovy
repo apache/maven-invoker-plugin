@@ -18,5 +18,7 @@
  */
 
 def importedBom = new File(basedir, 'consumer/target/it-repo/org/apache/groovy/groovy-bom/4.0.33/groovy-bom-4.0.33.pom')
+def inheritedImportedBom = new File(basedir, 'consumer/target/it-repo/org/apache/groovy/groovy-bom/4.0.32/groovy-bom-4.0.32.pom')
 
 assert importedBom.isFile()
+assert inheritedImportedBom.isFile()

@@ -32,6 +32,21 @@ under the License.
   <artifactId>MINVOKER-680-consumer</artifactId>
   <packaging>pom</packaging>
 
+  <repositories>
+    <repository>
+      <id>fixture-repository</id>
+      <url>file://${project.basedir}/../repository</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.plugins.invoker</groupId>
+      <artifactId>MINVOKER-680-bom-dependent</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>

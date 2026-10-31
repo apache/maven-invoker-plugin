@@ -25,12 +25,14 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -173,13 +175,14 @@ public class InstallMojo extends AbstractMojo {
         }
 
         Map<String, Artifact> resolvedArtifacts = new LinkedHashMap<>();
+        PomResolutionContext pomResolution = new PomResolutionContext();
 
         try {
 
             resolveProjectArtifacts(resolvedArtifacts);
-            resolveProjectPoms(project, resolvedArtifacts);
-            resolveProjectDependencies(resolvedArtifacts);
-            resolveExtraArtifacts(resolvedArtifacts);
+            resolveProjectPoms(project, resolvedArtifacts, pomResolution);
+            resolveProjectDependencies(resolvedArtifacts, pomResolution);
+            resolveExtraArtifacts(resolvedArtifacts, pomResolution);
             installArtifacts(resolvedArtifacts);
 
         } catch (DependencyResolutionException | InstallationException | ArtifactResolutionException e) {
@@ -200,7 +203,8 @@ public class InstallMojo extends AbstractMojo {
                 .forEach(a -> resolvedArtifacts.put(ArtifactIdUtils.toId(a), a));
     }
 
-    private void resolveProjectPoms(MavenProject project, Map<String, Artifact> resolvedArtifacts)
+    private void resolveProjectPoms(
+            MavenProject project, Map<String, Artifact> resolvedArtifacts, PomResolutionContext pomResolution)
             throws ArtifactResolutionException, MojoExecutionException {
 
         if (project == null) {
@@ -211,10 +215,9 @@ public class InstallMojo extends AbstractMojo {
                 project.getOriginalModel(),
                 resolvedArtifacts,
                 project.getRemoteProjectRepositories(),
-                project.getGroupId(),
-                project.getArtifactId(),
-                project.getVersion(),
-                project.getProperties());
+                RepositoryUtils.toArtifact(new ProjectArtifact(project)),
+                project.getProperties(),
+                pomResolution);
 
         Artifact projectPom = RepositoryUtils.toArtifact(new ProjectArtifact(project));
         if (projectPom.getFile() != null) {
@@ -223,10 +226,10 @@ public class InstallMojo extends AbstractMojo {
             Artifact artifact = resolveArtifact(projectPom, project.getRemoteProjectRepositories());
             resolvedArtifacts.put(ArtifactIdUtils.toId(artifact), artifact);
         }
-        resolveProjectPoms(project.getParent(), resolvedArtifacts);
+        resolveProjectPoms(project.getParent(), resolvedArtifacts, pomResolution);
     }
 
-    private void resolveProjectDependencies(Map<String, Artifact> resolvedArtifacts)
+    private void resolveProjectDependencies(Map<String, Artifact> resolvedArtifacts, PomResolutionContext pomResolution)
             throws ArtifactResolutionException, MojoExecutionException, DependencyResolutionException {
 
         DependencyFilter classpathFilter = DependencyFilterUtils.classpathFilter(scope);
@@ -263,13 +266,13 @@ public class InstallMojo extends AbstractMojo {
                 .collect(Collectors.toList());
 
         artifacts.forEach(a -> resolvedArtifacts.put(ArtifactIdUtils.toId(a), a));
-        resolvePomsForArtifacts(artifacts, resolvedArtifacts, collectRequest.getRepositories());
+        resolvePomsForArtifacts(artifacts, resolvedArtifacts, pomResolution, collectRequest.getRepositories());
     }
 
     /**
      * Resolve extra artifacts.
      */
-    private void resolveExtraArtifacts(Map<String, Artifact> resolvedArtifacts)
+    private void resolveExtraArtifacts(Map<String, Artifact> resolvedArtifacts, PomResolutionContext pomResolution)
             throws MojoExecutionException, DependencyResolutionException, ArtifactResolutionException {
 
         if (extraArtifacts == null) {
@@ -308,7 +311,8 @@ public class InstallMojo extends AbstractMojo {
 
             Artifact artifact = new DefaultArtifact(groupId, artifactId, classifier, null, version, artifactType);
 
-            resolvePomsForArtifacts(Collections.singletonList(artifact), resolvedArtifacts, remoteRepositories);
+            resolvePomsForArtifacts(
+                    Collections.singletonList(artifact), resolvedArtifacts, pomResolution, remoteRepositories);
 
             CollectRequest collectRequest = new CollectRequest();
             Dependency root = new Dependency(artifact, JavaScopes.COMPILE);
@@ -324,58 +328,70 @@ public class InstallMojo extends AbstractMojo {
                     .collect(Collectors.toList());
 
             artifacts.forEach(a -> resolvedArtifacts.put(ArtifactIdUtils.toId(a), a));
-            resolvePomsForArtifacts(artifacts, resolvedArtifacts, collectRequest.getRepositories());
+            resolvePomsForArtifacts(artifacts, resolvedArtifacts, pomResolution, collectRequest.getRepositories());
         }
     }
 
     private void resolvePomsForArtifacts(
             List<Artifact> artifacts,
             Map<String, Artifact> resolvedArtifacts,
+            PomResolutionContext pomResolution,
             List<RemoteRepository> remoteRepositories)
             throws ArtifactResolutionException, MojoExecutionException {
 
         for (Artifact a : artifacts) {
             Artifact artifactResult = resolveArtifact(new SubArtifact(a, "", "pom"), remoteRepositories);
-            resolvePomWithParents(artifactResult, resolvedArtifacts, remoteRepositories);
+            resolvePomWithParents(artifactResult, resolvedArtifacts, pomResolution, remoteRepositories);
         }
     }
 
-    private void resolvePomWithParents(
-            Artifact artifact, Map<String, Artifact> resolvedArtifacts, List<RemoteRepository> remoteRepositories)
+    private Properties resolvePomWithParents(
+            Artifact artifact,
+            Map<String, Artifact> resolvedArtifacts,
+            PomResolutionContext pomResolution,
+            List<RemoteRepository> remoteRepositories)
             throws MojoExecutionException, ArtifactResolutionException {
 
-        if (resolvedArtifacts.containsKey(ArtifactIdUtils.toId(artifact))) {
-            return;
+        String artifactId = ArtifactIdUtils.toId(artifact);
+        Properties cachedProperties = pomResolution.resolvedProperties.get(artifactId);
+        if (cachedProperties != null) {
+            return cachedProperties;
         }
 
-        Model model = PomUtils.loadPom(artifact.getFile());
-        Parent parent = model.getParent();
-        if (parent != null) {
-            DefaultArtifact pom =
-                    new DefaultArtifact(parent.getGroupId(), parent.getArtifactId(), "", "pom", parent.getVersion());
-            Artifact resolvedPom = resolveArtifact(pom, remoteRepositories);
-            resolvePomWithParents(resolvedPom, resolvedArtifacts, remoteRepositories);
+        if (!pomResolution.resolving.add(artifactId)) {
+            return new Properties();
         }
 
-        resolvedArtifacts.put(ArtifactIdUtils.toId(artifact), artifact);
-        resolveImportedBoms(
-                model,
-                resolvedArtifacts,
-                remoteRepositories,
-                artifact.getGroupId(),
-                artifact.getArtifactId(),
-                artifact.getVersion(),
-                model.getProperties());
+        try {
+            Model model = PomUtils.loadPom(artifact.getFile());
+            Properties projectProperties = new Properties();
+            Parent parent = model.getParent();
+            if (parent != null) {
+                DefaultArtifact pom = new DefaultArtifact(
+                        parent.getGroupId(), parent.getArtifactId(), "", "pom", parent.getVersion());
+                Artifact resolvedPom = resolveArtifact(pom, remoteRepositories);
+                projectProperties.putAll(
+                        resolvePomWithParents(resolvedPom, resolvedArtifacts, pomResolution, remoteRepositories));
+            }
+            projectProperties.putAll(model.getProperties());
+
+            pomResolution.resolvedProperties.put(artifactId, projectProperties);
+            resolvedArtifacts.putIfAbsent(artifactId, artifact);
+            resolveImportedBoms(
+                    model, resolvedArtifacts, remoteRepositories, artifact, projectProperties, pomResolution);
+            return projectProperties;
+        } finally {
+            pomResolution.resolving.remove(artifactId);
+        }
     }
 
     private void resolveImportedBoms(
             Model model,
             Map<String, Artifact> resolvedArtifacts,
             List<RemoteRepository> remoteRepositories,
-            String groupId,
-            String artifactId,
-            String version,
-            Properties projectProperties)
+            Artifact projectArtifact,
+            Properties projectProperties,
+            PomResolutionContext pomResolution)
             throws MojoExecutionException, ArtifactResolutionException {
 
         DependencyManagement dependencyManagement = model.getDependencyManagement();
@@ -390,12 +406,12 @@ public class InstallMojo extends AbstractMojo {
         projectProperties
                 .stringPropertyNames()
                 .forEach(name -> properties.put(name, projectProperties.getProperty(name)));
-        properties.put("project.groupId", groupId);
-        properties.put("project.artifactId", artifactId);
-        properties.put("project.version", version);
-        properties.put("pom.groupId", groupId);
-        properties.put("pom.artifactId", artifactId);
-        properties.put("pom.version", version);
+        properties.put("project.groupId", projectArtifact.getGroupId());
+        properties.put("project.artifactId", projectArtifact.getArtifactId());
+        properties.put("project.version", projectArtifact.getVersion());
+        properties.put("pom.groupId", projectArtifact.getGroupId());
+        properties.put("pom.artifactId", projectArtifact.getArtifactId());
+        properties.put("pom.version", projectArtifact.getVersion());
         Interpolator interpolator = new RegexBasedInterpolator();
         interpolator.addValueSource(new MapBasedValueSource(properties));
 
@@ -416,12 +432,16 @@ public class InstallMojo extends AbstractMojo {
             }
 
             Artifact bom = new DefaultArtifact(bomGroupId, bomArtifactId, "", "pom", bomVersion);
-            if (resolvedArtifacts.containsKey(ArtifactIdUtils.toId(bom))) {
+            String bomId = ArtifactIdUtils.toId(bom);
+            if (pomResolution.resolvedProperties.containsKey(bomId)) {
                 continue;
             }
 
-            Artifact resolvedBom = resolveArtifact(bom, remoteRepositories);
-            resolvePomWithParents(resolvedBom, resolvedArtifacts, remoteRepositories);
+            Artifact resolvedBom = resolvedArtifacts.get(bomId);
+            if (resolvedBom == null) {
+                resolvedBom = resolveArtifact(bom, remoteRepositories);
+            }
+            resolvePomWithParents(resolvedBom, resolvedArtifacts, pomResolution, remoteRepositories);
         }
     }
 
@@ -433,6 +453,11 @@ public class InstallMojo extends AbstractMojo {
         request.setRepositories(remoteRepositories);
         ArtifactResult artifactResult = repositorySystem.resolveArtifact(session.getRepositorySession(), request);
         return artifactResult.getArtifact();
+    }
+
+    private static final class PomResolutionContext {
+        private final Map<String, Properties> resolvedProperties = new HashMap<>();
+        private final Set<String> resolving = new HashSet<>();
     }
 
     /**
