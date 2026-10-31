@@ -19,7 +19,7 @@ package org.apache.maven.plugins.foo;
  * under the License.
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HelloTest {
 
