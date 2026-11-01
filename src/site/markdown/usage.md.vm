@@ -26,7 +26,7 @@ Basic Example
 
 The following example demonstrates a basic plugin configuration for running integration tests. Let's assume the following directory structure of your project:
 
-```unknown
+```text
 ./
 +- pom.xml
 +- src/
