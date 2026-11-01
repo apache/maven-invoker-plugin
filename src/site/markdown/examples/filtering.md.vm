@@ -29,7 +29,7 @@ Some files of the sub projects can be filtered, i.e. special tokens will be repl
 
 The following example directory structure highlights the files which are filtered by the Invoker Plugin:
 
-```unknown
+```text
 ./
 +- pom.xml
 +- src/

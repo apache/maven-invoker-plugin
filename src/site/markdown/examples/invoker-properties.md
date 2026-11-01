@@ -21,7 +21,7 @@ under the License.
 
 The various parameters in the plugin configuration provide a means to globally configure the goals, profiles etc. used to run a Maven build on the projects. However, for certain projects you might want to specify different settings. To avoid the hassle of multiple plugin executions, you can simply use a file named `invoker.properties` to control the build settings on a per project basis or in one of its ancestor folders to apply it for a group of projects. The exact name of this properties file is configurable but it needs to reside in the base directory of the respective project as shown below:
 
-```unknown
+```text
 ./
 +- src/
    +- it/

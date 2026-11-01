@@ -31,7 +31,7 @@ You can also define a user properties which will be added to executed test proje
 
 Here is an example of groovy script:
 
-```unknown
+```groovy
 def userProperties = context.get('userProperties')
 
 def server = new MockServer()
@@ -96,14 +96,14 @@ Below is an example post-build Groovy script (`verify.groovy`) that checks for t
 
 Example `verify.groovy`
 
-```unknown
+```groovy
 def file = new File( basedir, "target/my-test-project-1.0-SNAPSHOT.jar" )
 assert file.isFile()
 ```
 
 The same check as a deprecated BeanShell script (`verify.bsh`), for existing scripts that have not been ported yet:
 
-```unknown
+```java
 import java.io.*;
 
 File file = new File( basedir, "target/my-test-project-1.0-SNAPSHOT.jar" );

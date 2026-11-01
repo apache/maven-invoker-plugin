@@ -21,7 +21,7 @@ under the License.
 
 Starting with plugin version 1.5, a custom script can be used to skip individual projects based on whatever criteria expressed in the script as illustrated in the following example. Write the script in Groovy; BeanShell scripts are deprecated and the plugin warns when it runs one. Assume the following directory structure:
 
-```unknown
+```text
 ./
 +- pom.xml
 +- src/
