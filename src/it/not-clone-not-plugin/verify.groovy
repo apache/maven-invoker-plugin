@@ -17,15 +17,10 @@
  * under the License.
  */
 
-import java.io.*;
+// the project is not a maven-plugin, so cloning is off: no clone directory, neither the one the
+// plugin would use by default for plugin projects nor the one other ITs configure
+assert !new File( basedir, "target/its" ).exists()
+assert !new File( basedir, "target/it" ).exists()
 
-try
-{
-    File itRoot = new File( basedir, "target/it/clone-clean" );
-    return !itRoot.exists();
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
+// and the nested project was built in place
+assert new File( basedir, "src/it/clone-clean/build.log" ).isFile()

@@ -23,7 +23,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.plugins.invoker</groupId>
-  <artifactId>script-streamLogs-false</artifactId>
+  <artifactId>script-streamLogs</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
@@ -39,7 +39,7 @@ under the License.
         <version>@project.version@</version>
         <configuration>
           <writeJunitReport>true</writeJunitReport>
-          <cloneProjectsTo>${project.build.directory}/its</cloneProjectsTo>
+          <cloneProjectsTo>${project.build.directory}/${it.dir}</cloneProjectsTo>
           <pomIncludes>
             <pomInclude>*/pom.xml</pomInclude>
           </pomIncludes>
@@ -48,7 +48,7 @@ under the License.
             <goal>validate</goal>
           </goals>
           <ignoreFailures>true</ignoreFailures>
-          <streamLogs>false</streamLogs>
+          <streamLogs>${stream.logs}</streamLogs>
           <streamLogsOnFailures>false</streamLogsOnFailures>
         </configuration>
         <executions>

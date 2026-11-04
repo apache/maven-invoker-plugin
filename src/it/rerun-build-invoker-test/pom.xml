@@ -27,7 +27,10 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <description>Test to check that failed jobs are not rerun when invoker.test is used</description>
+  <description>
+    Test to check that failed jobs are not rerun when invoker.test is used, but are rerun when invokerTest is
+    only set in the plugin configuration.
+  </description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -41,7 +44,8 @@ under the License.
         <version>@project.version@</version>
         <configuration>
           <rerunFailingTestsCount>1</rerunFailingTestsCount>
-          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+          <invokerTest>project</invokerTest>
+          <cloneProjectsTo>${project.build.directory}/${it.dir}</cloneProjectsTo>
           <goals>
             <goal>validate</goal>
           </goals>
