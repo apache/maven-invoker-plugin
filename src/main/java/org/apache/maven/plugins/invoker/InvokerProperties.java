@@ -47,7 +47,7 @@ class InvokerProperties {
     private static final String SELECTOR_PREFIX = "selector.";
 
     private static final Pattern ENVIRONMENT_VARIABLES_PATTERN =
-            Pattern.compile("invoker\\.environmentVariables\\.([A-Za-z][^.]+)(\\.(\\d+))?");
+            Pattern.compile("invoker\\.environmentVariables\\.([A-Za-z_][^.]*)(\\.(\\d+))?");
 
     // default values from Mojo configuration
     private Boolean defaultDebug;
