@@ -1169,7 +1169,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      *            <code>null</code> nor contain <code>null</code> elements.
      * @throws org.apache.maven.plugin.MojoExecutionException If the projects could not be copied/filtered.
      */
-    private void cloneProjects(Collection<String> projectPaths) throws MojoExecutionException {
+    void cloneProjects(Collection<String> projectPaths) throws MojoExecutionException {
         if (!cloneProjectsTo.mkdirs() && cloneClean) {
             try {
                 FileUtils.cleanDirectory(cloneProjectsTo);
@@ -1832,7 +1832,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
     }
 
-    private void writeJunitReport(BuildJob buildJob, String safeFileName) throws MojoExecutionException {
+    void writeJunitReport(BuildJob buildJob, String safeFileName) throws MojoExecutionException {
         File reportFile = new File(reportsDirectory, "TEST-" + safeFileName + ".xml");
         Xpp3Dom testsuite = new Xpp3Dom("testsuite");
         testsuite.setAttribute("name", junitPackageName + "." + safeFileName);
@@ -2123,7 +2123,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @return The build logger or <code>null</code> if logging has been disabled.
      * @throws org.apache.maven.plugin.MojoExecutionException If the log file could not be created.
      */
-    private FileLogger setupBuildLogFile(File basedir, int executionCount) throws MojoExecutionException {
+    FileLogger setupBuildLogFile(File basedir, int executionCount) throws MojoExecutionException {
         FileLogger logger = null;
 
         if (!noLog) {

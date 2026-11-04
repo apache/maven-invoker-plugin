@@ -20,6 +20,7 @@ package org.apache.maven.plugins.invoker;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.apache.maven.plugins.invoker.TestUtil.getBasedir;
 import static org.apache.maven.plugins.invoker.TestUtil.setVariableValueToObject;
@@ -356,5 +358,18 @@ class InvokerMojoTest {
 
             assertThat(expectedParallelThreads).isEqualTo(invokerMojo.getParallelThreadsCount());
         }
+    }
+
+    @Test
+    void skipInvocationReturnsBeforeAnythingIsRun(@TempDir Path tempDir) throws Exception {
+        File reportsDirectory = tempDir.resolve("invoker-reports").toFile();
+        setVariableValueToObject(invokerMojo, "skipInvocation", true);
+        setVariableValueToObject(invokerMojo, "reportsDirectory", reportsDirectory);
+        setVariableValueToObject(invokerMojo, "projectsDirectory", new File(getBasedir(), "src/test/resources/unit"));
+
+        // no project, invoker or settings are set, so any attempt to run a build would fail
+        invokerMojo.execute();
+
+        assertThat(reportsDirectory).doesNotExist();
     }
 }

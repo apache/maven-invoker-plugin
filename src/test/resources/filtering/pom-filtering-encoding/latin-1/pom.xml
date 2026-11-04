@@ -32,23 +32,4 @@ under the License.
     <prop0>©®ÄÖÜäöüß</prop0>
     <prop1>@latin1Chars@</prop1>
   </properties>
-
-  <build>
-    <!-- using the Resources Plugin to create a backup of the executed POM for later inspection by the parent build -->
-    <resources>
-      <resource>
-        <directory>${basedir}</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>*.xml</include>
-        </includes>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>@version.maven-resources-plugin@</version>
-      </plugin>
-    </plugins>
-  </build>
 </project>
