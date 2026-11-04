@@ -17,13 +17,24 @@
  * under the License.
  */
 
+// both invocations of this IT write to build.log, the second one starts with the header of this project
 def buildLog = new File(basedir, 'build.log').text
+String header = '[INFO] Building rerun-build-invoker-test 1.0-SNAPSHOT'
+int second = buildLog.indexOf(header, buildLog.indexOf(header) + 1)
+assert second > 0 : 'build.log has only one invocation'
 
-assert buildLog.contains('Rerunning of failed jobs is disabled when the invoker.test user property is used')
+// invoker.test given as user property: the selected project was executed only once - no rerun
+def userPropertyLog = buildLog.substring(0, second)
+assert userPropertyLog.contains('Rerunning of failed jobs is disabled when the invoker.test user property is used')
+assert userPropertyLog.count('FAILED') == 1
+assert !userPropertyLog.contains('SUCCESS ')
+assert !userPropertyLog.contains('Rerunning 1 failed job')
+assert !new File(basedir, 'target/it-user-property/project/build.log.1').exists()
 
-// the selected project was executed only once - no rerun
-assert buildLog.count('FAILED') == 1
-assert !buildLog.contains('SUCCESS ')
-assert !buildLog.contains('Rerunning 1 failed job')
-
-assert !new File(basedir, 'target/it/project/build.log.1').exists()
+// invokerTest only in the plugin configuration: selecting a project doesn't disable rerunning
+def configLog = buildLog.substring(second)
+assert !configLog.contains('Rerunning of failed jobs is disabled')
+assert configLog.count('FAILED') == 1
+assert configLog.count('SUCCESS (') == 1
+assert configLog.contains('Rerunning 1 failed job')
+assert new File(basedir, 'target/it-config/project/build.log.1').exists()

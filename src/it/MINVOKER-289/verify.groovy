@@ -20,7 +20,7 @@ import java.util.stream.Collectors
  * under the License.
  */
 
-assert new File( basedir, 'target/it/project/touch.txt' )
+assert new File( basedir, 'target/it/project/touch.txt' ).exists()
 
 File buildLog = new File( basedir, 'build.log' )
 
