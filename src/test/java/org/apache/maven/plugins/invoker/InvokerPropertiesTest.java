@@ -428,6 +428,20 @@ class InvokerPropertiesTest {
     }
 
     @Test
+    void configureEnvironmentVariablesWithUnderscoreAndSingleLetterNames() {
+        Properties props = new Properties();
+        InvokerProperties facade = new InvokerProperties(props);
+
+        props.setProperty("invoker.environmentVariables._JAVA_OPTIONS", "-Dabc=def");
+        props.setProperty("invoker.environmentVariables.X", "x");
+        props.setProperty("invoker.environmentVariables.X.1", "x1");
+        facade.configureInvocation(request, 1);
+        verify(request).addShellEnvironment("_JAVA_OPTIONS", "-Dabc=def");
+        verify(request).addShellEnvironment("X", "x1");
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
     void configureUpdateSnapshots() {
         Properties props = new Properties();
         InvokerProperties facade = new InvokerProperties(props);
