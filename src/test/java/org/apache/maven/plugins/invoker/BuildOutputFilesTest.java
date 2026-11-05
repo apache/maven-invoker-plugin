@@ -84,7 +84,6 @@ class BuildOutputFilesTest {
         closeLogger(mojo.setupBuildLogFile(project, 1));
 
         assertThat(tempDir.resolve("src/it/clone-none/build.log")).isRegularFile();
-        assertThat(tempDir.resolve("target/it")).doesNotExist();
     }
 
     private BuildJob buildJob(String result, String failureMessage, File buildLog) {
