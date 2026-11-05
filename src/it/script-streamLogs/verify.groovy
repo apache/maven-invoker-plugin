@@ -20,6 +20,7 @@
 def FS = File.separator
 
 // both invocations of this IT write to build.log, the second one starts with the header of this project:
+// (the invoker renames build.log only when it reruns a failed job, so the invocations of invoker.goals.N share one file)
 // the first has streamLogs=false, the second streamLogs=true
 def buildLog = new File(basedir, 'build.log').text
 String header = '[INFO] Building script-streamLogs 1.0-SNAPSHOT'
