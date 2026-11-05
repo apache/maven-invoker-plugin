@@ -18,6 +18,7 @@
  */
 
 // both invocations of this IT write to build.log, the second one starts with the header of this project
+// (the invoker renames build.log only when it reruns a failed job, so the invocations of invoker.goals.N share one file)
 def buildLog = new File(basedir, 'build.log').text
 String header = '[INFO] Building rerun-build-invoker-test 1.0-SNAPSHOT'
 int second = buildLog.indexOf(header, buildLog.indexOf(header) + 1)
