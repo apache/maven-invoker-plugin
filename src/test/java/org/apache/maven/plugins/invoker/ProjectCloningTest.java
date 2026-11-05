@@ -43,6 +43,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ProjectCloningTest {
 
+    /** Latin-1 symbols and umlauts, escaped so that the build's source encoding does not matter. */
+    private static final String LATIN1_CHARS = "\u00a9\u00ae\u00c4\u00d6\u00dc\u00e4\u00f6\u00fc\u00df";
+
     private static final File FILTERING = new File(getBasedir(), "src/test/resources/filtering");
 
     @TempDir
@@ -128,15 +131,15 @@ class ProjectCloningTest {
     @CsvSource({"latin-1, ISO-8859-1", "utf-8, UTF-8"})
     void pomKeepsItsEncodingWhileFiltering(String project, String encoding) throws Exception {
         Properties filterProperties = new Properties();
-        filterProperties.setProperty("latin1Chars", "©®ÄÖÜäöüß");
+        filterProperties.setProperty("latin1Chars", LATIN1_CHARS);
         setVariableValueToObject(mojo, "filterProperties", filterProperties);
 
         cloneFrom("pom-filtering-encoding", project + "/pom.xml");
 
         String xml = read(project + "/pom.xml", Charset.forName(encoding));
         assertThat(xml).contains("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>");
-        assertThat(xml).contains("<prop0>©®ÄÖÜäöüß</prop0>");
-        assertThat(xml).contains("<prop1>©®ÄÖÜäöüß</prop1>");
+        assertThat(xml).contains("<prop0>" + LATIN1_CHARS + "</prop0>");
+        assertThat(xml).contains("<prop1>" + LATIN1_CHARS + "</prop1>");
     }
 
     @ParameterizedTest
