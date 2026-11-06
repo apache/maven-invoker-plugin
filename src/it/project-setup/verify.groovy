@@ -35,24 +35,28 @@ try
 
     String log = FileUtils.fileRead( logFile );
 
+    String project3Start = "[project3" + File.separator + "pom.xml] starting";
+    String project6Start = "[project6" + File.separator + "pom.xml] starting";
+
     System.out.println( "Checking for first build" );
-    int index = log.indexOf( "Building: project" );
-    if ( !log.substring( index, index + 18 ).equals( "Building: project3" ) )
+    int index = log.indexOf( "] starting" );
+    int lineStart = log.lastIndexOf( "[project", index );
+    if ( lineStart < 0 || !log.substring( lineStart ).startsWith( project3Start ) )
     {
-        System.out.println( "FAILED!\n" + log.substring( index, index + 18 ) );
+        System.out.println( "FAILED!\n" + log.substring( lineStart < 0 ? 0 : lineStart, index + 10 ) );
         return false;
     }
 
     System.out.println( "Checking for duplicate build" );
-    index = log.indexOf( "Building: project3", index + 1 );
+    index = log.indexOf( project3Start, lineStart + 1 );
     if ( index >= 0 )
     {
         System.out.println( "FAILED!" );
         return false;
     }
 
-    int indexProject3 = log.indexOf( "Building: project3" );
-    int indexProject6 = log.indexOf( "Building: project6" );
+    int indexProject3 = log.indexOf( project3Start );
+    int indexProject6 = log.indexOf( project6Start );
     if(indexProject3 > indexProject6)
     {
         System.out.println( "FAILED! project3 should be build before project6" );
