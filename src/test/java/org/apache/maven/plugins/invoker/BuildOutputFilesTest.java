@@ -66,7 +66,7 @@ class BuildOutputFilesTest {
         setVariableValueToObject(
                 mojo, "logDirectory", tempDir.resolve("target/it-logs").toFile());
 
-        closeLogger(mojo.setupBuildLogFile(module, 1));
+        closeLogger(mojo.setupBuildLogFile(module, 1, ""));
 
         assertThat(tempDir.resolve("target/it-logs/module/build.log")).isRegularFile();
         assertThat(tempDir.resolve("target/it/module/build.log")).doesNotExist();
@@ -81,7 +81,7 @@ class BuildOutputFilesTest {
         assertThat(ReflectionUtils.getValueIncludingSuperclasses("cloneProjectsTo", mojo))
                 .isNull();
 
-        closeLogger(mojo.setupBuildLogFile(project, 1));
+        closeLogger(mojo.setupBuildLogFile(project, 1, ""));
 
         assertThat(tempDir.resolve("src/it/clone-none/build.log")).isRegularFile();
     }
