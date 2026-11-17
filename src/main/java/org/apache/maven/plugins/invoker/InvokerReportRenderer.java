@@ -93,7 +93,7 @@ public class InvokerReportRenderer extends AbstractMavenReportRenderer {
         int totalSuccess = 0;
         int totalFailures = 0;
         int totalSkipped = 0;
-        float totalTime = 0.0F;
+        float totalTime = 0.0f;
 
         for (BuildJob buildJob : buildJobs) {
             switch (buildJob.getResult()) {

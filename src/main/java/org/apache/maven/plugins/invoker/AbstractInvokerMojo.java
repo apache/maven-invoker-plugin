@@ -113,7 +113,7 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
  * @since 15-Aug-2009 09:09:29
  */
 public abstract class AbstractInvokerMojo extends AbstractMojo {
-    private static final float ONE_SECOND = 1000.0F;
+    private static final float ONE_SECOND = 1000.0f;
 
     /**
      * The name of the user property used to select projects to run.
@@ -1377,7 +1377,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         List<Path> folderGroup = new ArrayList<>(folderGroupSet);
-        folderGroup.sort(null);
+        Collections.sort(folderGroup);
 
         final Map<Path, Properties> globalInvokerProperties = new HashMap<>();
 
