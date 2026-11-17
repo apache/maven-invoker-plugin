@@ -120,7 +120,7 @@ class InvokerProperties {
      * @param properties The invoker properties to wrap, may be <code>null</code> if none.
      */
     InvokerProperties(Properties properties) {
-        this.properties = (properties != null) ? properties : new Properties();
+        this.properties = properties != null ? properties : new Properties();
     }
 
     /**

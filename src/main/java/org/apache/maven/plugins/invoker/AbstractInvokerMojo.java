@@ -113,7 +113,7 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
  * @since 15-Aug-2009 09:09:29
  */
 public abstract class AbstractInvokerMojo extends AbstractMojo {
-    private static final float ONE_SECOND = 1000.0f;
+    private static final float ONE_SECOND = 1000.0F;
 
     /**
      * The name of the user property used to select projects to run.
@@ -833,7 +833,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             // Run setup jobs in single thread mode.
             //
             // Jobs are ordered according to ordinal value from invoker.properties
-            getLog().info("Running " + setupBuildJobs.size() + " setup job" + ((setupBuildJobs.size() < 2) ? "" : "s")
+            getLog().info("Running " + setupBuildJobs.size() + " setup job" + (setupBuildJobs.size() < 2 ? "" : "s")
                     + ":");
             runBuildsWithRetry(projectsDir, setupBuildJobs, 1);
             getLog().info("Setup done.");
@@ -880,7 +880,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         do {
             if (executionCount > 0) {
                 getLog().warn("Rerunning " + jobsToExecute.size() + " failed job"
-                        + ((jobsToExecute.size() < 2) ? "" : "s"));
+                        + (jobsToExecute.size() < 2 ? "" : "s"));
             }
 
             executionCount++;
@@ -1268,7 +1268,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      */
     private String getParentPath(String path) {
         int lastSep = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
-        return (lastSep < 0) ? "." : path.substring(0, lastSep);
+        return lastSep < 0 ? "." : path.substring(0, lastSep);
     }
 
     /**
@@ -1376,7 +1376,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
 
         List<Path> folderGroup = new ArrayList<>(folderGroupSet);
-        Collections.sort(folderGroup);
+        folderGroup.sort(null);
 
         final Map<Path, Properties> globalInvokerProperties = new HashMap<>();
 

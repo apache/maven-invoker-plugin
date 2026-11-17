@@ -93,7 +93,7 @@ public class InvokerReportRenderer extends AbstractMavenReportRenderer {
         int totalSuccess = 0;
         int totalFailures = 0;
         int totalSkipped = 0;
-        float totalTime = 0.0f;
+        float totalTime = 0.0F;
 
         for (BuildJob buildJob : buildJobs) {
             switch (buildJob.getResult()) {
@@ -114,8 +114,8 @@ public class InvokerReportRenderer extends AbstractMavenReportRenderer {
             Integer.toString(totalSuccess),
             Integer.toString(totalFailures),
             Integer.toString(totalSkipped),
-            (totalSuccess + totalFailures > 0)
-                    ? formatI18nString("value.successrate", (totalSuccess / (float) (totalSuccess + totalFailures)))
+            totalSuccess + totalFailures > 0
+                    ? formatI18nString("value.successrate", totalSuccess / (float) (totalSuccess + totalFailures))
                     : "",
             formatI18nString("value.time", totalTime)
         });

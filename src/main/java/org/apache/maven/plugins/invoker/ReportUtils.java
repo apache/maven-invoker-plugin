@@ -42,8 +42,7 @@ class ReportUtils {
      * @return The paths to the invoker reports, can be empty but never <code>null</code>.
      */
     public static File[] getReportFiles(File reportsDirectory) {
-        File[] reportFiles =
-                (reportsDirectory != null) ? reportsDirectory.listFiles(new FileFilterOnlyXmlFile()) : null;
+        File[] reportFiles = reportsDirectory != null ? reportsDirectory.listFiles(new FileFilterOnlyXmlFile()) : null;
 
         if (reportFiles == null) {
             reportFiles = new File[0];
