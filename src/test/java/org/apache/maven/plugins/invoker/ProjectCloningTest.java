@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.apache.maven.plugins.invoker.TestUtil.getBasedir;
 import static org.apache.maven.plugins.invoker.TestUtil.setVariableValueToObject;
@@ -143,7 +144,7 @@ class ProjectCloningTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"project/pom.xml", "no-pom-project"})
+    @ValueSource(strings = {"project/pom.xml", "no-pom-project"})
     void mavenExtensionsAreFiltered(String projectPath) throws Exception {
         // 'project' has a pom.xml, 'no-pom-project' has none: in both cases .mvn/extensions.xml must be filtered
         cloneFrom("extensions", projectPath);
