@@ -71,6 +71,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#clear()
      */
+    @Override
     public void clear() {
         // nothing here
     }
@@ -80,6 +81,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#containsKey(java.lang.Object)
      */
+    @Override
     public boolean containsKey(Object key) {
         if (!(key instanceof String)) {
             return false;
@@ -105,6 +107,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#containsValue(java.lang.Object)
      */
+    @Override
     public boolean containsValue(Object value) {
         throw new UnsupportedOperationException();
     }
@@ -114,6 +117,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#entrySet()
      */
+    @Override
     public Set<Entry<String, Object>> entrySet() {
         throw new UnsupportedOperationException();
     }
@@ -123,6 +127,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#get(java.lang.Object)
      */
+    @Override
     public Object get(Object key) {
         if (!(key instanceof String)) {
             return null;
@@ -165,6 +170,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#isEmpty()
      */
+    @Override
     public boolean isEmpty() {
         return this.mavenProject.getProperties().isEmpty() && this.properties.isEmpty();
     }
@@ -174,6 +180,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#keySet()
      */
+    @Override
     public Set<String> keySet() {
         throw new UnsupportedOperationException();
     }
@@ -183,6 +190,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
+    @Override
     public Object put(String key, Object value) {
         throw new UnsupportedOperationException();
     }
@@ -201,6 +209,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#remove(java.lang.Object)
      */
+    @Override
     public Object remove(Object key) {
         throw new UnsupportedOperationException();
     }
@@ -210,6 +219,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#size()
      */
+    @Override
     public int size() {
         throw new UnsupportedOperationException();
     }
@@ -219,6 +229,7 @@ class CompositeMap implements Map<String, Object> {
      *
      * @see java.util.Map#values()
      */
+    @Override
     public Collection<Object> values() {
         throw new UnsupportedOperationException();
     }

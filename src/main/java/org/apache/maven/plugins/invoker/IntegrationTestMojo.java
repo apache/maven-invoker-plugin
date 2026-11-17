@@ -53,6 +53,7 @@ public class IntegrationTestMojo extends AbstractInvokerMojo {
         super(invoker, settingsBuilder, toolchainManagerPrivate, interpolatorUtils);
     }
 
+    @Override
     void processResults(InvokerSession invokerSession) throws MojoFailureException {
         // do nothing
     }

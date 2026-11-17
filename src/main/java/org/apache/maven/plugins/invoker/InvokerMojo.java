@@ -80,6 +80,7 @@ public class InvokerMojo extends AbstractInvokerMojo {
         super(invoker, settingsBuilder, toolchainManager, interpolaterUtils);
     }
 
+    @Override
     void processResults(InvokerSession invokerSession) throws MojoFailureException {
         if (streamLogsOnFailures) {
             invokerSession.logFailedBuildLog(getLog(), ignoreFailures);

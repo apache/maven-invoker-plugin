@@ -160,6 +160,7 @@ public class InstallMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the artifacts could not be installed.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         if (skipInstallation) {
             getLog().info("Skipping artifact installation per configuration.");
