@@ -90,11 +90,13 @@ public class InvokerReport extends AbstractMavenReport {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getName(Locale locale) {
         return getI18nString(locale, "name");
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getDescription(Locale locale) {
         return getI18nString(locale, "description");
     }

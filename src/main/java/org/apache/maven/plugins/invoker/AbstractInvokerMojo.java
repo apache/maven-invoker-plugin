@@ -743,6 +743,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @throws org.apache.maven.plugin.MojoExecutionException if the goal encountered severe errors
      * @throws org.apache.maven.plugin.MojoFailureException if any of the Maven builds failed
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (skipInvocation) {
             getLog().info("Skipping invocation per configuration."

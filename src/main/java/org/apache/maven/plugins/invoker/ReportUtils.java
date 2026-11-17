@@ -30,6 +30,7 @@ class ReportUtils {
 
     private static class FileFilterOnlyXmlFile implements FilenameFilter {
 
+        @Override
         public boolean accept(File dir, String name) {
             return name.startsWith("BUILD-") && name.endsWith(".xml");
         }
