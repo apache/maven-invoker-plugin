@@ -22,7 +22,7 @@ import java.io.File;
 
 import org.codehaus.plexus.util.ReflectionUtils;
 
-class TestUtil {
+final class TestUtil {
 
     private TestUtil() {}
 
