@@ -19,9 +19,9 @@ under the License.
 
 # Fast Build Configuration
 
-If you follow the recommended approach and use a dedicated local repository for the integration tests (e.g. `target/local-repo`), you will likely encounter long build times. If the test repository has been cleaned, the plugin needs to re-download all artifacts from the central repo and the resulting network traffic slows the test execution down.
+If you follow the recommended approach and use a dedicated local repository for the integration tests (e.g. `target/local-repo`), you will likely encounter long build times. If the test repository has been cleaned, the plugin needs to re-download all artifacts from Maven Central and the resulting network traffic slows the test execution down.
 
-But you can configure the plugin to download released artifacts from your local repo. _Note:_ This will work without optional settings with Maven &gt;= 2.0.9 because many plugins versions are locked in the super POM. For older versions, you have to lock plugins versions.
+But you can configure the plugin to download artifacts from your local repository instead.
 
 To enable this feature, you have to add a `settings.xml` file in your project (for example in `src/it/settings.xml`) and modify the plugin configuration as this: 
 
@@ -90,7 +90,7 @@ The token `@localRepositoryUrl@` will be automatically replaced by the Invoker P
 
 # Fast Build Configuration - mergeUserSettings and mirrors
 
-When you want to use Fast Build Configuration with options `mergeUserSettings` you should take care for your mirror setting.
+If you use the Fast Build Configuration together with the `mergeUserSettings` parameter, check your mirror settings.
 
 If you have in `~/.m2/settings.xml` something like:
 
@@ -105,9 +105,9 @@ If you have in `~/.m2/settings.xml` something like:
 </mirrors>
 ```
 
-Please look at `mirrorOf` tag, single `*` means match all repositories for mirroring - also repository with id `local.central` will be mirrored. In effective Fast Build Configuration will not work as expected.
+Look at the `mirrorOf` element: a single `*` matches all repositories, including the repository with ID `local.central`, so the test builds download from the mirror and the Fast Build Configuration has no effect.
 
-You should change this to similar:
+Change it to something like this:
 
 ```xml
 <mirrors>
@@ -120,4 +120,4 @@ You should change this to similar:
 </mirrors>
 ```
 
-Where `external:*` - matches all repositories except those using localhost or file based repositories.
+`external:*` matches all repositories except those on `localhost` or with a `file:` URL.

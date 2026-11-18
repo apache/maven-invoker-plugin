@@ -19,9 +19,9 @@ under the License.
 
 # Inspect logs for failed tests
 
-In the usual build all tests pass as we expect, so printing logs from all tests to project build log make our standard build log illegible. The problem begin when some of test was failed, especially when happened on CI system when access to files from build workspace is difficult.
+The output of each test build goes to its own `build.log` file, which keeps the main build output readable. When a test fails on a CI system, though, the files of the build workspace are often hard to reach.
 
-In order to help investigation on failed test we can use option: `streamLogsOnFailures`. Now logs from all failed test will be printed to project build log when all test will have finished.
+Set the `streamLogsOnFailures` parameter of the [`run`](../run-mojo.html#streamLogsOnFailures) or [`verify`](../verify-mojo.html#streamLogsOnFailures) goal to print the `build.log` of every failed test to the main build output once all tests have finished.
 
 ```xml
 <project>

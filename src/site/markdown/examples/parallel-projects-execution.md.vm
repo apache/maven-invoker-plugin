@@ -19,7 +19,7 @@ under the License.
 
 # Parallel projects execution
 
-In order to speed up your tests execution you can use options `parallelThreads`. This will be the number of maven forked process in parallel. When terminated with "C", the number part is multiplied by the number of processors (cores) available to the Java virtual machine.
+To speed up test execution, set the `parallelThreads` parameter to the number of Maven processes to run in parallel. When the value ends with "C", the number is multiplied by the number of processors (cores) available to the Java virtual machine.
 
 Example configuration:
 
@@ -44,14 +44,14 @@ Example configuration:
 
 # Order of projects execution in parallel mode
 
-When use parallel, at any point, at most `parallelThreads` threads will be active for projects executions.
+In parallel mode, at most `parallelThreads` projects run at any point.
 
-Projects are send to execute by available thread in **non guaranteed sequence**, the most time it is determined by file system ordering. Internally `java.io.File#list()` is used for scanning projects.
+The order in which projects start is **not guaranteed**; most of the time it follows the order in which the file system lists the project directories.
 
-Some of projects can take more time and some can finish quicker. Next projects from queue will be executed as soon as thread in pool will be available. So order of executing can change, depends on many thing, like available processor, current system load etc...
+Some projects take longer than others. The next project in the queue starts as soon as a thread is free, so the order of execution can change with the number of processors, the system load and so on.
 
-If you need be sure of execution sequence, you can use `invoker.ordinal` property in [Invoker Properties](./invoker-properties.html)
+If you need a defined order, use the `invoker.ordinal` property in [Invoker Properties](./invoker-properties.html).
 
-In parallel mode projects are **grouped** by `invoker.ordinal` and projects from each groups are running in parallel. Projects from next group will start running after all projects from previous group are finished.
+In parallel mode, projects are **grouped** by `invoker.ordinal`, and the projects of a group run in parallel. The projects of the next group start after all projects of the previous group have finished.
 
-`Setup` projects are executed first in sequential always on one thread.
+Setup projects always run first, one after the other on a single thread.

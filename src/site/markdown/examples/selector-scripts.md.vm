@@ -19,7 +19,7 @@ under the License.
 
 # Selector Scripts
 
-Starting with plugin version 1.5, a custom script can be used to skip individual projects based on whatever criteria expressed in the script as illustrated in the following example. Write the script in Groovy; BeanShell scripts are deprecated and the plugin warns when it runs one. Assume the following directory structure:
+Starting with plugin version 1.5, a custom script can be used to skip individual projects based on whatever criteria expressed in the script as illustrated in the following example. Write the script in Groovy; BeanShell scripts are [deprecated](./pre-post-build-script.html${esc.hash}BeanShell_scripts) and the plugin warns when it runs one. Assume the following directory structure:
 
 ```text
 ./
@@ -75,6 +75,12 @@ If the script returns any value other than `true`, then the project will not be 
 
 If the script throws an exception, then the project will be marked as being in ERROR.
 
+For example, this `check-assumptions.groovy` runs the project only when a `docker` executable is on the `PATH`:
+
+```groovy
+return System.getenv('PATH').split(File.pathSeparator).any { new File(it, 'docker').canExecute() }
+```
+
 # Predefined global variables
 
-In Selector Scripts the same global variables are defined as in [Pre and Post Build Script](./pre-post-build-script.html#predefined-global-variables)
+In Selector Scripts the same global variables are defined as in [Pre and Post Build Script](./pre-post-build-script.html#Predefined_global_variables)

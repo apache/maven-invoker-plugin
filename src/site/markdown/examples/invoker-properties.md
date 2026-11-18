@@ -54,7 +54,7 @@ invoker.goals.2 = ${project.groupId}:${project.artifactId}:${project.version}:ru
 
 # A comma or space separated list of profiles to activate
 # can be indexed
-invoker.profiles = its,jdk15
+invoker.profiles = its,java17
 
 # The path to an alternative POM or base directory to invoke Maven on, defaults to the
 # project that was originally specified in the plugin configuration
@@ -93,6 +93,8 @@ invoker.offline = true
 # filename given by the plugin parameter testPropertiesFile
 # Since plugin version 1.4
 # can be indexed
+# The older key invoker.systemPropertiesFile still works but is deprecated;
+# set only one of the two keys
 invoker.userPropertiesFile = test.properties
 
 # An optional human friendly name and description for this build job.
@@ -103,7 +105,7 @@ invoker.description = Checks the support for build reports.
 
 # A comma separated list of JRE versions on which this build job should be run.
 # Since plugin version 1.4
-invoker.java.version = 1.4+, !1.4.1, 1.7-
+invoker.java.version = 17+, !21.0.1
 
 # A comma separated list of OS families on which this build job should be run.
 # Since plugin version 1.4
@@ -111,24 +113,25 @@ invoker.os.family = !windows, unix, mac
 
 # A comma separated list of Maven versions on which this build should be run.
 # Since plugin version 1.5
-invoker.maven.version = 2.0.10+, !2.1.0, !2.2.0
+invoker.maven.version = 3.9.0+, !3.9.2
 
 # A mapping for toolchain to ensure it exists
 # Since plugin version 3.2.0
 invoker.toolchain.<type>.<provides> = value
 # Exact match
-invoker.toolchain.jdk.version = 11
+# invoker.toolchain.jdk.version = 17
 # Range match
-invoker.toolchain.jdk.version = [11,12)
+invoker.toolchain.jdk.version = [17,22)
 
 # For java.version, maven.version, os.family and toolchain it is possible to define multiple selectors.
 # If one of the indexed selectors matches, the test is executed.
 # With the invoker.x.y equivalents you can specify global matchers.
-selector.1.java.version = 1.8+
-selector.1.maven.version = 3.2.5+
+# An indexed toolchain selector uses the key selector.N.invoker.toolchain.<type>.<provides>
+selector.1.java.version = 17+
+selector.1.maven.version = 3.9.0+
 selector.1.os.family = !windows
-selector.2.maven.version = 3.0+
-selector.3.java.version = 9+
+selector.2.maven.version = 4.0.0+
+selector.3.java.version = 21+
 
 # A boolean value controlling the debug logging level of Maven, defaults to "false"
 # Since plugin version 1.8
@@ -146,9 +149,11 @@ invoker.quiet = true
 invoker.timeoutInSeconds = 5
 
 # Path to an alternate settings.xml to use for Maven invocation with this IT.
+# A relative path is resolved against the working directory of the main build,
+# usually the base directory of the project that runs the plugin.
 # Since plugin version 3.0.1
 # can be indexed
-invoker.settingsFile = ../
+invoker.settingsFile = src/it/other-settings.xml
 
 # An integer value to control run order of projects. sorted in the descending order of the ordinal.
 # In other words, the BuildJobs with the highest numbers will be executed first
@@ -158,8 +163,10 @@ invoker.ordinal = 3
 
 # The additional value for the environment variable.
 # Since plugin version 3.2.2
+# can be indexed, with the index after the variable name
 invoker.environmentVariables.<variableName> = variableValue
 invoker.environmentVariables.MY_ENV_NAME = myEnvValue
+invoker.environmentVariables.MY_ENV_NAME.2 = valueForSecondInvocation
 
 # A boolean value indicating a check for missing releases and updated snapshots on remote repositories to be done
 # Passed to the invoker. Same as passing -U, --update-snapshots flag on the command line

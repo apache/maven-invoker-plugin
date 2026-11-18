@@ -21,7 +21,7 @@ under the License.
 
 The Invoker Plugin usually performs an installation setup and runs the configured Maven invocations. Since version 1.4 of the plugin all these steps may be skipped.
 
-To skip running the invocations for a particular project, set the `skipInvocation` property to `true`. The artifact staging to a local repository can be skipped by setting the parameter `skipInstallation` to `true`.
+To skip running the invocations for a particular project, set the `skipInvocation` parameter to `true`. The artifact staging to a local repository can be skipped by setting the parameter `skipInstallation` to `true`.
 
 ```xml
 <project>
@@ -43,7 +43,7 @@ To skip running the invocations for a particular project, set the `skipInvocatio
 </project>
 ```
 
-All these steps can also be omited via the command line by use of the `invoker.skip` property:
+You can also skip all these steps from the command line with the `invoker.skip` property:
 
 ```shell
 mvn install -Dinvoker.skip=true
