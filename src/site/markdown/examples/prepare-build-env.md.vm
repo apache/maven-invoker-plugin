@@ -19,7 +19,7 @@ under the License.
 
 # Preparing the Build Environment
 
-In general, the plugin assumes that the projects to build are unrelated to one other such that their build order does not matter. However, you might sometimes want to ensure that certain projects are build before others. As a motivation, imagine that a project performs some kind of common setup for the other projects, e.g. installing utility artifacts into the local repository.
+In general, the plugin assumes that the projects to build are unrelated to one another such that their build order does not matter. However, you might sometimes want to ensure that certain projects are built before others. As a motivation, imagine that a project performs some kind of common setup for the other projects, e.g. installing utility artifacts into the local repository.
 
 Starting with plugin version 1.3, you can declare a group of setup projects that must be run before all the other projects by means of the parameter `<setupIncludes>` as shown in the following example:
 
@@ -56,4 +56,4 @@ This tells the plugin that the project `utility-plugin/pom.xml` must be run befo
 
 The build order of several such setup projects is still undefined. So if the setup projects have inter-dependencies that require a certain build order, you should group them by an aggregator POM and feed that into the Invoker Plugin such that the correct build order will be determined by Maven's multi-module reactor.
 
-You can also apply `invoker.ordinal` property in [Invoker Properties](./invoker-properties.html) for setup projects to ensure order
+You can also set the `invoker.ordinal` property in [Invoker Properties](./invoker-properties.html) of setup projects to define their order.

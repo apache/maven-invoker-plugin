@@ -19,11 +19,11 @@ under the License.
 
 # Selector Conditions
 
-Starting with plugin version 1.4, some keys of the [Invoker Properties](./invoker-properties.html) can be used to skip individual projects based on the current JRE version or OS family as illustrated in the example below:
+Starting with plugin version 1.4, some keys of the [Invoker Properties](./invoker-properties.html) can be used to skip individual projects based on the current Java version or OS family as illustrated in the example below:
 
 ```properties
-# build project if JRE version is 1.4 or higher, but exclude version 1.4.1
-invoker.java.version = 1.4+, !1.4.1
+# build project if Java version is 17 or higher, but exclude version 21.0.1
+invoker.java.version = 17+, !21.0.1
 
 # build project if OS family is not Windows
 invoker.os.family = !windows
@@ -32,9 +32,13 @@ invoker.os.family = !windows
 In addition, with plugin version 1.5, there is the ability to skip individual projects based on the current Maven version as illustrated in the example below:
 
 ```properties
-# build project if Maven version is 2.0.10 or higher, but exclude versions 2.1.0 and 2.2.0
-invoker.maven.version = 2.0.10+, !2.1.0, !2.2.0
+# build project if Maven version is 3.9.0 or higher, but exclude version 3.9.2
+invoker.maven.version = 3.9.0+, !3.9.2
 ```
+
+The Java version is the one of the JVM that runs the test builds: the JVM running Maven, or the one given by the
+[`javaHome`](../run-mojo.html#javaHome) parameter. The Maven version is the one of the Maven installation that runs
+the test builds.
 
 The values of these keys are comma separated tokens. A token prefixed with "\!" denotes an exclusion, otherwise it denotes an inclusion. A project is build if no exclusion matches and if no inclusions are given or at least one of them matches the current environment.
 
@@ -42,8 +46,18 @@ The tokens to describe versions can be suffixed with "+" or "-". The table below
 
 |Version Token|Equivalent Version Range|
 |:---|:---|
-|1\.5|\[1.5,1.6)|
-|1\.5+|\[1.5,)|
-|1\.5-|(,1.5)|
+|17|\[17,18)|
+|17+|\[17,)|
+|17-|(,17)|
+|3\.9|\[3.9,3.10)|
 
-For the OS family, the tokens "windows", "unix" and "mac" are supported.
+For the OS family, use tokens such as "windows", "unix" and "mac".
+
+A project can also require a toolchain configured in `toolchains.xml`, for example a JDK 17 toolchain:
+
+```properties
+invoker.toolchain.jdk.version = 17
+```
+
+To run a project if any one of several combinations matches, use indexed selectors such as `selector.1.java.version`;
+see [Invoker Properties](./invoker-properties.html).

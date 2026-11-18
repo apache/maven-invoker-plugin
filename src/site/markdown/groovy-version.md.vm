@@ -19,15 +19,16 @@ under the License.
 
 # Groovy version and extensions
 
-**NOTICE**: Plugin `maven-invoker-plugin` in versions older than `3.3.0` has dependency on `groovy-all` artifact from `Groovy 2`.
-
-Plugin `maven-invoker-plugin` in version `3.4.0` has only dependency on `Groovy 4` core add common extensions:
+The plugin runs Groovy hook and selector scripts with Groovy ${groovyVersion}. Groovy 4.0.33 added the Java 26 and 27
+bytecode levels ([GROOVY-12200](https://issues.apache.org/jira/browse/GROOVY-12200)), so scripts also run when Maven
+runs on JDK 27. The plugin depends on these Groovy modules:
 
 - `org.apache.groovy:groovy:${groovyVersion}`
 - `org.apache.groovy:groovy-json:${groovyVersion}`
 - `org.apache.groovy:groovy-xml:${groovyVersion}`
 
-If you need additional `Groovy` extension in your scripts ( post, pre, setup, ... ) you must add a dependency to plugin definition, eg:
+If your scripts (`setup`, `prebuild`, `postbuild`, `selector`) need another Groovy module, add it as a dependency of
+the plugin, with the same version as the Groovy modules above, for example:
 
 ```xml
 <project>
@@ -36,7 +37,6 @@ If you need additional `Groovy` extension in your scripts ( post, pre, setup, ..
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
         <version>${project.version}</version>
-        .....
         <dependencies>
           <dependency>
             <groupId>org.apache.groovy</groupId>
@@ -50,4 +50,10 @@ If you need additional `Groovy` extension in your scripts ( post, pre, setup, ..
 </project>
 ```
 
-**NOTICE**: In plugin version `3.3.0` only `Groovy 4` extensions can be used.
+Older plugin versions shipped other Groovy versions, so an extension has to match the plugin version you use:
+
+|Plugin version|Groovy|Group ID of the modules|
+|:---|:---|:---|
+|3.4.0 and later|Groovy 4|`org.apache.groovy`|
+|3.3.0|Groovy 3|`org.codehaus.groovy`|
+|before 3.3.0|Groovy 2, as `groovy-all`|`org.codehaus.groovy`|

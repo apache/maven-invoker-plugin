@@ -18,29 +18,59 @@ under the License.
 -->
 
 # Apache Maven Invoker Plugin
-The Invoker Plugin is used to run a set of Maven projects. The plugin can determine whether each project execution is successful, and optionally can verify the output generated from a given project execution.
 
-This plugin is in particular handy to perform integration tests for other Maven plugins. The Invoker Plugin can be employed to run a set of test projects that have been designed to assert certain features of the plugin under test.
+The Invoker Plugin runs a set of Maven projects and checks the result of each build. Its main use is integration
+testing of Maven plugins and extensions: each test is a small Maven project under `src/it` that exercises the plugin
+under test, and an optional Groovy script checks what the build produced.
+
+The plugin requires Maven 3.9.0 or later and Java 8 or later.
+
+Most users come to the plugin for these tasks:
+
+- Run all integration tests in `src/it` as part of the build:
+
+    ```shell
+    mvn verify
+    ```
+
+- Rerun one or a few integration tests:
+
+    ```shell
+    mvn verify -Dinvoker.test=first-it,second-*
+    ```
+
+- Check the result of a build with a [post-build Groovy script](./examples/pre-post-build-script.html), and
+  configure each test with an [`invoker.properties`](./examples/invoker-properties.html) file.
+- Skip the integration tests:
+
+    ```shell
+    mvn install -Dinvoker.skip=true
+    ```
+
+The [usage page](./usage.html) shows the plugin configuration these commands rely on.
 
 ## Goals Overview
 
-The plugin has four goals meant to participate in the default build lifecycle:
+The plugin has four goals that take part in the default build lifecycle:
 
 - [invoker:install](./install-mojo.html) copies the project artifacts and dependencies of the main build into a dedicated local repository to prepare the execution of the selected sub projects in an isolated environment.
 - [invoker:integration-test](./integration-test-mojo.html) runs a set of Maven projects in a directory.
 - [invoker:verify](./verify-mojo.html) verifies the result of `invoker:integration-test`.
 - [invoker:run](./run-mojo.html) runs a set of Maven projects in a directory and verifies the result. This is equivalent to running both `invoker:integration-test` and `invoker:verify`.
 
-This last goal is intended for usage with the site lifecycle:
+One goal is meant for the site lifecycle:
 
 - [invoker:report](./report-mojo.html) integrates the results from previous builds into the site.
+
+[invoker:help](./help-mojo.html) displays help information on the plugin's goals and parameters.
+
 ## Usage
 
 General instructions on how to use the Invoker Plugin can be found on the [usage page](./usage.html). Some more specific use cases are described in the examples given below.
 
-In case you still have questions regarding the plugin's usage, please have a look at the [FAQ](./faq.html) and feel free to contact the [user mailing list](./mailing-lists.html). The posts to the mailing list are archived and could already contain the answer to your question as part of an older thread. Hence, it is also worth browsing/searching the [mail archive](./mailing-lists.html).
+If you still have questions about the plugin's usage, see the [FAQ](./faq.html) and ask on the [user mailing list](./mailing-lists.html), whose archive may already answer your question.
 
-If you feel like the plugin is missing a feature or has a defect, you can fill a feature request or bug report in our [issue tracker](./issue-management.html). When creating a new issue, please provide a comprehensive description of your concern. Especially for fixing bugs it is crucial that the developers can reproduce your problem. For this reason, entire debug logs, POMs or most preferably little demo projects attached to the issue are very much appreciated. Of course, patches are welcome, too. Contributors can check out the project from our [source repository](./scm.html) and will find supplementary information in the [guide to helping with Maven](https://maven.apache.org/guides/development/guide-helping.html).
+If the plugin is missing a feature or has a defect, open an issue in our [issue tracker](./issue-management.html). For a bug, include a debug log (`mvn -X`) and, ideally, a small project that reproduces the problem. Contributors can check out the project from our [source repository](./scm.html) and will find supplementary information in the [guide to helping with Maven](https://maven.apache.org/guides/development/guide-helping.html).
 
 ## Examples
 
@@ -54,9 +84,12 @@ The following example configurations are available to illustrate selected use ca
 - [Fast Invoker Plugin configuration](./examples/fast-use.html) to accelerate project execution.
 - [Access test classes](./examples/access-test-classes.html) to share code between hook scripts.
 - [Use Invoker Properties](./examples/invoker-properties.html) to configure goals, profiles etc. for individual projects.
-- [Use Selector Conditions](./examples/selector-conditions.html) to skip projects based on JRE version or OS family.
+- [Use Selector Conditions](./examples/selector-conditions.html) to skip projects based on the Java version, Maven version, OS family or available toolchains.
+- [Use Selector Scripts](./examples/selector-scripts.html) to skip projects based on a Groovy script.
 - [Parallel projects execution](./examples/parallel-projects-execution.html) to speed up project execution.
 - [Prepare the Build Environment](./examples/prepare-build-env.html) by building some setup projects before other projects.
+- [Skip invocations](./examples/skipping.html) or the installation step.
+- [Inspect logs for failed tests](./examples/logs-for-failed-tests.html) in the main build output.
 - [Using with other integration test frameworks](./examples/integration-test-verify.html) by decoupling checking the results of the integration tests from executing the integration tests.
 
 You can also study some real-life usages of the Invoker Plugin by browsing its own integration tests which are located in the directory `src/it` of the [project source tree](./scm.html).

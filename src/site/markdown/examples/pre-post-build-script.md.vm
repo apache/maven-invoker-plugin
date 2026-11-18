@@ -21,22 +21,20 @@ under the License.
 
 Complementary to the post-build hook script, you can also create a pre-build hook script that will be run before the invocation of Maven. This can be used to do some preparations for the build.
 
-The default name of the pre-build script is `prebuild`, which resolves to `prebuild.groovy`, or to the deprecated `prebuild.bsh`.
+The default name of the pre-build script is `prebuild`, which resolves to `prebuild.groovy`, or to the deprecated `prebuild.bsh`. Write hook scripts in Groovy; see [BeanShell scripts](${esc.hash}BeanShell_scripts) for the deprecation of BeanShell.
 
-**BeanShell scripts are deprecated.** Support for `.bsh` scripts will be removed in a future release; write new scripts in Groovy and port existing BeanShell scripts. The plugin logs a warning for every BeanShell script it runs. Tracked in [apache/maven#13207](https://github.com/apache/maven/issues/13207).
+In a pre-build script you can prepare test resources for your project.
 
-In Pre-Build scripts you can prepare a test resources for your project.
+You can also define user properties, which the plugin passes to the build of the test project as `-D` arguments.
 
-You can also define a user properties which will be added to executed test project by `-D` Maven argument.
-
-Here is an example of groovy script:
+Here is an example of a Groovy script (`prebuild.groovy`) that finds a free port and passes it to the build:
 
 ```groovy
 def userProperties = context.get('userProperties')
 
-def server = new MockServer()
-userProperties.put('serverHost', server.getHost())
-userProperties.put('serverPort', server.getPort())
+def port = new ServerSocket(0).withCloseable { it.localPort }
+userProperties.put('serverHost', 'localhost')
+userProperties.put('serverPort', String.valueOf(port))
 ```
 
 Now you can use it in test project:
@@ -63,7 +61,7 @@ Now you can use it in test project:
 
 # Using a Post-Build Script
 
-Here is an example of how the Invoker Plugin can be used to run a set of Maven projects and then verify their output with a [Groovy](https://groovy-lang.org/) script (or a deprecated [BeanShell](https://beanshell.github.io/) one). The name of the script file in this case is `verify` - default value is `postbuild`.
+Here is an example of how the Invoker Plugin can be used to run a set of Maven projects and then verify their output with a [Groovy](https://groovy-lang.org/) script. The name of the script file in this case is `verify`; the default name is `postbuild`.
 
 ```xml
 <project>
@@ -101,7 +99,22 @@ def file = new File( basedir, "target/my-test-project-1.0-SNAPSHOT.jar" )
 assert file.isFile()
 ```
 
-The same check as a deprecated BeanShell script (`verify.bsh`), for existing scripts that have not been ported yet:
+# BeanShell scripts
+
+Since plugin version 3.11.0, BeanShell (`.bsh`) scripts are deprecated, and support for them will be removed in a
+future release. This covers every script the plugin runs: the selector script and the pre-build and post-build hook
+scripts, including the indexed ones such as `postbuild.1.bsh`. Write new scripts in Groovy and port existing ones.
+Removing BeanShell across Maven is tracked in [apache/maven#13207](https://github.com/apache/maven/issues/13207).
+
+The plugin still runs BeanShell scripts. For each `.bsh` script it runs, it logs a warning once per plugin execution,
+both in the Maven output and in the `build.log` of the test project:
+
+```text
+[WARNING] BeanShell scripts are deprecated, port /path/to/project/target/it/first-it/verify.bsh to Groovy: https://maven.apache.org/plugins/maven-invoker-plugin/examples/pre-post-build-script.html
+```
+
+To port a script, rename it to `.groovy` and adjust the code. Most BeanShell code is valid Groovy; the `verify.bsh`
+below behaves like the `verify.groovy` above:
 
 ```java
 import java.io.*;
@@ -112,6 +125,9 @@ if ( !file.isFile() )
     throw new FileNotFoundException( "Could not find generated JAR: " + file );
 }
 ```
+
+Delete the `.bsh` file once the `.groovy` file exists: when you configure a script name without an extension and both
+files exist, the plugin runs the `.bsh` one.
 
 # Pre and Post Build Script for multiple project executions
 

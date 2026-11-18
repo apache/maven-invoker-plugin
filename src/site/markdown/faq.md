@@ -34,11 +34,9 @@ under the License.
 
 ### Why do I need to use this plugin?
 
-It is essential that you provide some form of integration testing for your projects and the Invoker Plugin
-tries to make is easy for you to create integration tests for your Maven Plugins, new Lifecycles, or any other
-type of Maven component that you've created. Currently the Invoker Plugin forks Maven to execute the specified
-projects, but it is hoped that soon we will integrate the Maven Embedder into the mix to allow you run your
-projects in process for great speed.
+Integration tests show that your Maven plugin, lifecycle or other Maven component works in a real build. The
+Invoker Plugin runs each test project in a separate Maven process, so the test sees the same behavior as a user's
+build, and it reports which test projects passed or failed.
 
 <a id="question2"></a>
 
@@ -47,14 +45,14 @@ projects in process for great speed.
 Sometimes you might want to test that error conditions are properly dealt with, i.e. fail a build. To assert a
 failure for a particular IT project, put the following setting into the properties file denoted by the
 plugin's [`invokerPropertiesFile`](run-mojo.html#invokerPropertiesFile) parameter:
-*invoker.buildResult=failure*. Now, the failure of the IT build will be interpreted as a test success.
+`invoker.buildResult = failure`. Now, the failure of the IT build will be interpreted as a test success.
 Likewise, a successful IT build will be considered a test failure.
 
 <a id="question3"></a>
 
 ### How can I share common code between the pre-/post-build scripts?
 
-If you want to avoid copy&amp;paste of lengthy code snippets within the hook scripts, you can move this code
+If you want to avoid copy and paste of lengthy code snippets within the hook scripts, you can move this code
 into a regular Java class. More precisely, you would place this utility code somewhere in your test source
 tree and set the plugin parameter [`addTestClassPath`](run-mojo.html#addTestClassPath) to `true`. For more
 details, please see the example [Accessing Test Classes](examples/access-test-classes.html).

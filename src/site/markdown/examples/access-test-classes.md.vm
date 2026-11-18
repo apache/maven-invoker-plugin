@@ -19,7 +19,7 @@ under the License.
 
 # Accessing Test Classes
 
-In case your pre-/post-build scripts perform complex operations that you would rather like to refactor out into some utility class instead of copy&amp;pasting them in each script, you can use the parameter `addTestClassPath`:
+In case your pre-/post-build scripts perform complex operations that you would rather like to refactor out into some utility class instead of copying and pasting them in each script, you can use the parameter `addTestClassPath`:
 
 ```xml
 <project>

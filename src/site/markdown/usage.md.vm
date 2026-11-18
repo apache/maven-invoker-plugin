@@ -19,7 +19,7 @@ under the License.
 
 # Usage
 
-This page provides general usage information along with a basic example. The plugin is commonly used to run and verify integration tests for a project, say a Maven plugin. This is done using the [` invoker:run `](./run-mojo.html) goal. And as a preparation for the integration tests, one usually wants to stage the artifacts under tests into a testing repository. For this job, the [` invoker:install `](./install-mojo.html) goal can be used.
+This page provides general usage information along with a basic example. The plugin is commonly used to run and verify integration tests for a project, say a Maven plugin. This is done using the [`invoker:run`](./run-mojo.html) goal. And as a preparation for the integration tests, one usually wants to stage the artifacts under tests into a testing repository. For this job, the [`invoker:install`](./install-mojo.html) goal can be used.
 
 Basic Example
 -------------
