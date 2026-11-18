@@ -46,23 +46,23 @@ for ( String itDir : [ 'its-stream-false', 'its-stream-true' ] ) {
 // streamLogs=false: failed scripts show no output in the build log
 def notStreamed = buildLog.substring(0, second)
 // beanshell failed and no log message
-assert !notStreamed.contains('[INFO] Output form beanshell script')
-assert notStreamed.contains('[INFO]   org.apache.maven.shared.scriptinterpreter.ScriptEvaluationException: java.lang.OutOfMemoryError: Requested array size exceeds VM limit')
-assert notStreamed.contains('[INFO]           beanshell' + FS + 'pom.xml ................................ FAILED')
+assert !notStreamed.contains('Output form beanshell script')
+assert notStreamed.contains('[INFO] [beanshell' + FS + 'pom.xml] org.apache.maven.shared.scriptinterpreter.ScriptEvaluationException: java.lang.OutOfMemoryError: Requested array size exceeds VM limit')
+assert notStreamed.contains('[INFO] [beanshell' + FS + 'pom.xml] FAILED')
 // groovy failed and no log message
-assert !notStreamed.contains('[INFO] Output from groovy script')
+assert !notStreamed.contains('Output from groovy script')
 assert notStreamed.contains('Assertion failed:')
 assert notStreamed.contains('assert pom.contains("<modelVersion>9.9.9</modelVersion>")')
-assert notStreamed.contains('[INFO]           groovy' + FS + 'pom.xml ................................... FAILED')
+assert notStreamed.contains('[INFO] [groovy' + FS + 'pom.xml] FAILED')
 
 // streamLogs=true: the output of the failed scripts is in the build log
 def streamed = buildLog.substring(second)
 // beanshell failed and log message
-assert streamed.contains('[INFO] Output form beanshell script')
+assert streamed.contains('[INFO] [beanshell' + FS + 'pom.xml] Output form beanshell script')
 assert streamed.contains('java.lang.OutOfMemoryError: Requested array size exceeds VM limit')
-assert streamed.contains('[INFO]           beanshell' + FS + 'pom.xml ................................ FAILED')
+assert streamed.contains('[INFO] [beanshell' + FS + 'pom.xml] FAILED')
 // groovy failed and log message
-assert streamed.contains('[INFO] Output from groovy script')
+assert streamed.contains('[INFO] [groovy' + FS + 'pom.xml] Output from groovy script')
 assert streamed.contains('Assertion failed:')
 assert streamed.contains('assert pom.contains("<modelVersion>9.9.9</modelVersion>")')
-assert streamed.contains('[INFO]           groovy' + FS + 'pom.xml ................................... FAILED')
+assert streamed.contains('[INFO] [groovy' + FS + 'pom.xml] FAILED')
