@@ -378,9 +378,10 @@ class InvokerProperties {
      */
     public boolean isSelectorDefined(int index) {
         return Arrays.stream(SelectorProperty.values())
-                .map(v -> v.suffix)
-                .map(v -> properties.getProperty(SELECTOR_PREFIX + index + v))
-                .anyMatch(Objects::nonNull);
+                        .map(v -> v.suffix)
+                        .map(v -> properties.getProperty(SELECTOR_PREFIX + index + v))
+                        .anyMatch(Objects::nonNull)
+                || !getToolchains(index).isEmpty();
     }
 
     private <T> void setIfNotNull(Consumer<T> consumer, T value) {

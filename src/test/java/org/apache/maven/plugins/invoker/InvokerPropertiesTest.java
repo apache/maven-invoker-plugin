@@ -518,6 +518,10 @@ class InvokerPropertiesTest {
         assertThat(facade.isSelectorDefined(3)).isTrue();
         assertThat(facade.isSelectorDefined(4)).isTrue();
         assertThat(facade.isSelectorDefined(5)).isFalse();
+
+        props.setProperty("selector.6.invoker.toolchain.jdk.version", "17");
+        assertThat(facade.isSelectorDefined(6)).isTrue();
+        assertThat(facade.isSelectorDefined(5)).isFalse();
     }
 
     @Test
