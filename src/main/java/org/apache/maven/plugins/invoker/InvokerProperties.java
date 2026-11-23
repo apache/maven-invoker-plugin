@@ -370,7 +370,7 @@ class InvokerProperties {
     }
 
     /**
-     * Determines whether these invoker properties contain a build definition for the specified selector index.
+     * Determines whether these invoker properties contain a selector definition for the specified index.
      *
      * @param index the index
      * @return <code>true</code> if the selector with the specified index is defined, <code>false</code> otherwise.
