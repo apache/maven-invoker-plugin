@@ -20,9 +20,14 @@ package org.apache.maven.plugins.invoker;
 
 import java.util.Properties;
 
+import org.apache.maven.plugins.invoker.AbstractInvokerMojo.ToolchainPrivateManager;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test for {@link Selector}.
@@ -71,6 +76,22 @@ class SelectorTest {
         assertThat(selector.getSelection(invokerProperties)).isEqualTo(Selector.SELECTOR_MULTI);
 
         props.setProperty("selector.2.os.family", "!myos");
+        assertThat(selector.getSelection(invokerProperties)).isZero();
+    }
+
+    @Test
+    void toolchainOnlySelector() {
+        ToolchainPrivateManager toolchainPrivateManager = mock(ToolchainPrivateManager.class);
+        Selector selector = new Selector("3.2.5", "1.7", toolchainPrivateManager);
+
+        Properties props = new Properties();
+        props.setProperty("selector.1.invoker.toolchain.jdk.version", "17");
+        InvokerProperties invokerProperties = new InvokerProperties(props);
+
+        when(toolchainPrivateManager.isToolchains(eq("jdk"), any())).thenReturn(false);
+        assertThat(selector.getSelection(invokerProperties)).isEqualTo(Selector.SELECTOR_MULTI);
+
+        when(toolchainPrivateManager.isToolchains(eq("jdk"), any())).thenReturn(true);
         assertThat(selector.getSelection(invokerProperties)).isZero();
     }
 }
