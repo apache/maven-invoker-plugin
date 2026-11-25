@@ -50,7 +50,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
@@ -672,11 +671,6 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * The scripter runner that is responsible to execute hook scripts.
      */
     private ScriptRunner scriptRunner;
-
-    /**
-     * The BeanShell scripts already reported as deprecated, so that each file is reported once.
-     */
-    private final Set<File> reportedBeanShellScripts = ConcurrentHashMap.newKeySet();
 
     /**
      * A string used to prefix the file name of the filtered POMs in case the POMs couldn't be filtered in-place (i.e.
@@ -2074,32 +2068,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
     }
 
-    /**
-     * Warns once per file when the script the runner is about to pick is a BeanShell script, which follows the
-     * resolution of the script runner: the name as given, then the name with the {@code .bsh} extension.
-     */
-    private void warnIfBeanShell(File basedir, String scriptName, FileLogger logger) {
-        if (scriptName == null || scriptName.isEmpty()) {
-            return;
-        }
-        File script = new File(basedir, scriptName);
-        if (!script.exists()) {
-            script = new File(basedir, scriptName + ".bsh");
-        }
-        if (script.isFile() && script.getName().endsWith(".bsh") && reportedBeanShellScripts.add(script)) {
-            String message = "BeanShell scripts are deprecated, port " + script + " to Groovy: "
-                    + "https://maven.apache.org/plugins/maven-invoker-plugin/examples/pre-post-build-script.html";
-            getLog().warn(message);
-            if (logger != null) {
-                logger.consumeLine("[WARNING] " + message);
-            }
-        }
-    }
-
     private boolean runSelectorHook(File basedir, Map<String, Object> context, FileLogger logger)
             throws MojoExecutionException, RunFailureException {
         try {
-            warnIfBeanShell(basedir, selectorScript, logger);
             scriptRunner.run("selector script", basedir, selectorScript, context, logger);
         } catch (ScriptReturnException e) {
             return false;
@@ -2118,7 +2089,6 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             throws MojoExecutionException, RunFailureException {
         try {
             String hookName = invocationIndex > 0 ? preBuildHookScript + "." + invocationIndex : preBuildHookScript;
-            warnIfBeanShell(basedir, hookName, logger);
             scriptRunner.run("pre-build script", basedir, hookName, context, logger);
         } catch (ScriptException e) {
             if (logger != null) {
@@ -2134,7 +2104,6 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             throws MojoExecutionException, RunFailureException {
         try {
             String hookName = invocationIndex > 0 ? postBuildHookScript + "." + invocationIndex : postBuildHookScript;
-            warnIfBeanShell(basedir, hookName, logger);
             scriptRunner.run("post-build script", basedir, hookName, context, logger);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);

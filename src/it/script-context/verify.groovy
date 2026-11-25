@@ -42,7 +42,7 @@ File buildLog = new File( basedir, "build.log" )
 String log = buildLog.text
 ['setup.bsh', 'verify.bsh'].each { name ->
     File script = new File( basedir, "target/its/beanshell/" + name )
-    assert log.count( "BeanShell scripts are deprecated, port " + script + " to Groovy" ) == 1 : "expected one warning for " + script
+    assert log.count( "BeanShell scripts are deprecated and support for them will be removed, port " + script + " to Groovy" ) == 1 : "expected one warning for " + script
 }
 assert !log.contains( "target/its/groovy/setup.groovy to Groovy" ) && !log.contains( "target/its/groovy/verify.groovy to Groovy" )
 
