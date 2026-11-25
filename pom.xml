@@ -222,6 +222,11 @@ under the License.
       <artifactId>groovy-xml</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-nio</artifactId>
+      <scope>runtime</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

@@ -25,6 +25,8 @@ runs on JDK 27. The plugin depends on these Groovy modules:
 
 - `org.apache.groovy:groovy:${groovyVersion}`
 - `org.apache.groovy:groovy-json:${groovyVersion}`
+- `org.apache.groovy:groovy-nio:${groovyVersion}`, since 3.11.0: `java.nio.file.Path` extension methods such as
+  `path.text` and `path.readLines()`
 - `org.apache.groovy:groovy-xml:${groovyVersion}`
 
 If your scripts (`setup`, `prebuild`, `postbuild`, `selector`) need another Groovy module, add it as a dependency of
