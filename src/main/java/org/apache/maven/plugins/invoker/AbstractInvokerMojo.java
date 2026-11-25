@@ -341,6 +341,15 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private String postBuildHookScript;
 
     /**
+     * Whether running a BeanShell script logs the deprecation warning. Set it to <code>false</code> to silence the
+     * warning for a while, until the scripts are ported to Groovy.
+     *
+     * @since 3.11.0
+     */
+    @Parameter(property = "invoker.beanShellWarning", defaultValue = "true")
+    private boolean beanShellWarning;
+
+    /**
      * Location of a properties file that defines CLI properties for the test.
      *
      * @since 1.0
@@ -1006,6 +1015,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
         scriptRunner = new ScriptRunner();
         scriptRunner.setScriptEncoding(encoding);
+        scriptRunner.setBeanShellWarning(beanShellWarning);
         scriptRunner.setGlobalVariable("localRepositoryPath", localRepositoryPath);
         scriptRunner.setGlobalVariable("mavenVersion", actualMavenVersion);
         if (scriptVariables != null) {
