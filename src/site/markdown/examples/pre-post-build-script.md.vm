@@ -165,6 +165,9 @@ both in the Maven output and in the `build.log` of the test project:
 [WARNING] BeanShell scripts are deprecated and support for them will be removed, port /path/to/project/target/it/first-it/verify.bsh to Groovy
 ```
 
+To silence the warning for a while, until the scripts are ported, run with `-Dinvoker.beanShellWarning=false` or
+set `<beanShellWarning>false</beanShellWarning>` in the plugin configuration.
+
 To port a script, rename it to `.groovy` and adjust the code. Most BeanShell code is valid Groovy; the `verify.bsh`
 below behaves like the `verify.groovy` above:
 
