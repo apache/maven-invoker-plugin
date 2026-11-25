@@ -17,24 +17,20 @@
  * under the License.
  */
 
-File testFile = new File( basedir, "target/it projects/project/target/classes/test.txt" );
-System.out.println( "Checking for existence of test file: " + testFile );
+File testFile = new File(basedir, "target/it projects/project/target/classes/test.txt")
+System.out.println("Checking for existence of test file: " + testFile)
 assert testFile.exists()
 
-String[] values = [
-    "value with spaces from settings",
-    "value with spaces from cli",
-];
+String[] values = ["value with spaces from settings", "value with spaces from cli",]
 
-testFile.withReader( 'UTF-8' ) { reader ->
-    for ( String value : values )
-    {
-        String line = reader.readLine();
-        System.out.println( "Checking for occurrence of: " + value );
+testFile.withReader('UTF-8') { reader ->
+    for (String value : values) {
+        String line = reader.readLine()
+        System.out.println("Checking for occurrence of: " + value)
         assert value == line
     }
 }
 
-File installedFile = new File( basedir, "target/it repo/test/spacy-pom/0.1-SNAPSHOT/spacy-pom-0.1-SNAPSHOT.jar" );
-System.out.println( "Checking for existence of installed file: " + installedFile );
+File installedFile = new File(basedir, "target/it repo/test/spacy-pom/0.1-SNAPSHOT/spacy-pom-0.1-SNAPSHOT.jar")
+System.out.println("Checking for existence of installed file: " + installedFile)
 assert installedFile.exists()

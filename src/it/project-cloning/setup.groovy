@@ -17,7 +17,7 @@
  * under the License.
  */
 
-File emptyDir = new File( basedir, "src/it/module-1/empty-dir" );
-emptyDir.mkdirs();
+File emptyDir = new File(basedir, "src/it/module-1/empty-dir")
+emptyDir.mkdirs()
 
-return true;
+return true

@@ -17,19 +17,18 @@
  * under the License.
  */
 
-File itRepoDir = new File( basedir, "target/it-repo" );
-System.out.println( "Checking for existence of: " + itRepoDir );
+File itRepoDir = new File(basedir, "target/it-repo")
+System.out.println("Checking for existence of: " + itRepoDir)
 assert itRepoDir.isDirectory()
 
 String[] files = [
-        "test/pom-packaging/1.0-SNAPSHOT/pom-packaging-1.0-SNAPSHOT.pom",
-        "org/apache/maven/plugins/maven-plugins/39/maven-plugins-39.pom",
-        "org/apache/maven/maven-parent/39/maven-parent-39.pom",
-        "org/apache/apache/29/apache-29.pom"
-  ];
-for ( String file : files )
-{
-    File stagedFile = new File( itRepoDir, file );
-    System.out.println( "Checking for existence of: " + stagedFile );
+    "test/pom-packaging/1.0-SNAPSHOT/pom-packaging-1.0-SNAPSHOT.pom",
+    "org/apache/maven/plugins/maven-plugins/39/maven-plugins-39.pom",
+    "org/apache/maven/maven-parent/39/maven-parent-39.pom",
+    "org/apache/apache/29/apache-29.pom"
+]
+for (String file : files) {
+    File stagedFile = new File(itRepoDir, file)
+    System.out.println("Checking for existence of: " + stagedFile)
     assert stagedFile.isFile()
 }

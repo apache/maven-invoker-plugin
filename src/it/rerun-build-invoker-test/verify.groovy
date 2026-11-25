@@ -22,7 +22,7 @@
 def buildLog = new File(basedir, 'build.log').text
 String header = '[INFO] Building rerun-build-invoker-test 1.0-SNAPSHOT'
 int second = buildLog.indexOf(header, buildLog.indexOf(header) + 1)
-assert second > 0 : 'build.log has only one invocation'
+assert second> 0 : 'build.log has only one invocation'
 
 // invoker.test given as user property: the selected project was executed only once - no rerun
 def userPropertyLog = buildLog.substring(0, second)

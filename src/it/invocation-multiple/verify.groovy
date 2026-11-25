@@ -17,18 +17,18 @@
  * under the License.
  */
 
-File test0File = new File( basedir, "target/it/project/target/test0.txt" );
-System.out.println( "Checking for existence of first test file: " + test0File );
+File test0File = new File(basedir, "target/it/project/target/test0.txt")
+System.out.println("Checking for existence of first test file: " + test0File)
 assert test0File.exists()
 
-String test0 = test0File.getText( 'UTF-8' ).trim();
-System.out.println( "Checking contents of first test file: " + test0 );
+String test0 = test0File.getText('UTF-8').trim()
+System.out.println("Checking contents of first test file: " + test0)
 assert "ISO-8859-1" == test0
 
-File test1File = new File( basedir, "target/it/project/target/test1.txt" );
-System.out.println( "Checking for existence of second test file: " + test1File );
+File test1File = new File(basedir, "target/it/project/target/test1.txt")
+System.out.println("Checking for existence of second test file: " + test1File)
 assert test1File.exists()
 
-String test1 = test1File.getText( 'UTF-8' ).trim();
-System.out.println( "Checking contents of second test file: " + test1 );
+String test1 = test1File.getText('UTF-8').trim()
+System.out.println("Checking contents of second test file: " + test1)
 assert "UTF-8" == test1

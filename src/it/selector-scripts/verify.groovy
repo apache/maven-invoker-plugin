@@ -17,60 +17,50 @@
  * under the License.
  */
 
-String[] expected = [
-        "target/its/script-ret-true/target/touch.txt",
-        "target/its/script-ret-quiet/target/touch.txt",
-  ];
-for ( String file : expected )
-{
-    File touchFile = new File( basedir, file );
-    System.out.println( "Checking for existence of: " + touchFile );
+String[] expected = ["target/its/script-ret-true/target/touch.txt", "target/its/script-ret-quiet/target/touch.txt",]
+for (String file : expected) {
+    File touchFile = new File(basedir, file)
+    System.out.println("Checking for existence of: " + touchFile)
     assert touchFile.isFile()
 }
 
 String[] unexpected = [
-        "target/its/script-ret-false/target/touch.txt",
-        "target/its/script-ret-other/target/touch.txt",
-        "target/its/script-throws/target/touch.txt",
-  ];
-for ( String file : unexpected )
-{
-    File touchFile = new File( basedir, file );
-    System.out.println( "Checking for absence of: " + touchFile );
-    assert !touchFile.exists() : file  + " should not be here -> FAILED!"
+    "target/its/script-ret-false/target/touch.txt",
+    "target/its/script-ret-other/target/touch.txt",
+    "target/its/script-throws/target/touch.txt",
+]
+for (String file : unexpected) {
+    File touchFile = new File(basedir, file)
+    System.out.println("Checking for absence of: " + touchFile)
+    assert !touchFile.exists() : file + " should not be here -> FAILED!"
 }
 
 String[] success = [
-        "target/invoker-reports-test/BUILD-script-ret-true.xml",
-        "target/invoker-reports-test/BUILD-script-ret-quiet.xml",
-  ];
-for ( String file : success )
-{
-    File resultFile = new File( basedir, file );
-    System.out.println( "Checking build result: " + resultFile );
-    String xml = resultFile.getText( 'UTF-8' );
+    "target/invoker-reports-test/BUILD-script-ret-true.xml",
+    "target/invoker-reports-test/BUILD-script-ret-quiet.xml",
+]
+for (String file : success) {
+    File resultFile = new File(basedir, file)
+    System.out.println("Checking build result: " + resultFile)
+    String xml = resultFile.getText('UTF-8')
     assert xml.indexOf("result=\"success\"") >= 0 || xml.indexOf("result='success'") >= 0 : resultFile + " not success -> FAILED!"
 }
 
 String[] skipped = [
-        "target/invoker-reports-test/BUILD-script-ret-false.xml",
-        "target/invoker-reports-test/BUILD-script-ret-other.xml",
-  ];
-for ( String file : skipped )
-{
-    File resultFile = new File( basedir, file );
-    System.out.println( "Checking build result: " + resultFile );
-    String xml = resultFile.getText( 'UTF-8' );
+    "target/invoker-reports-test/BUILD-script-ret-false.xml",
+    "target/invoker-reports-test/BUILD-script-ret-other.xml",
+]
+for (String file : skipped) {
+    File resultFile = new File(basedir, file)
+    System.out.println("Checking build result: " + resultFile)
+    String xml = resultFile.getText('UTF-8')
     assert xml.indexOf("result=\"skipped\"") >= 0 || xml.indexOf("result='skipped'") >= 0 : resultFile + " not skipped -> FAILED!"
 }
 
-String[] inerror = [
-        "target/invoker-reports-test/BUILD-script-throw.xml",
-  ];
-for ( String file : inerror )
-{
-    File resultFile = new File( basedir, file );
-    System.out.println( "Checking build result: " + resultFile );
-    String xml = resultFile.getText( 'UTF-8' );
+String[] inerror = ["target/invoker-reports-test/BUILD-script-throw.xml",]
+for (String file : inerror) {
+    File resultFile = new File(basedir, file)
+    System.out.println("Checking build result: " + resultFile)
+    String xml = resultFile.getText('UTF-8')
     assert xml.indexOf("result=\"error\"") >= 0 || xml.indexOf("result='error'") >= 0 : resultFile + " not failed -> FAILED!"
 }

@@ -17,33 +17,27 @@
  * under the License.
  */
 
-boolean check( String project, boolean filtered )
-{
-    File pomFile = new File( basedir, "target/it/" + project + "/pom.xml" );
-    System.out.println( "Checking for existence of " + ( filtered ? "" : "un" ) + "filtered POM: " + pomFile );
-    if ( !pomFile.exists() )
-    {
-        System.out.println( "FAILED!" );
-        return false;
+boolean check(String project, boolean filtered) {
+    File pomFile = new File(basedir, "target/it/" + project + "/pom.xml")
+    System.out.println("Checking for existence of " + (filtered ? "" : "un") + "filtered POM: " + pomFile)
+    if (!pomFile.exists()) {
+        System.out.println("FAILED!")
+        return false
     }
 
-    String xml = pomFile.getText( 'UTF-8' );
+    String xml = pomFile.getText('UTF-8')
 
-    String[] values = [
-            "<prop0>pom-filtering-reactor</prop0>",
-        ];
-    for ( String value : values )
-    {
-        System.out.println( "Checking for " + ( filtered ? "occurrence" : "absence" ) + " of: " + value );
-        if ( ( filtered && xml.indexOf( value ) < 0 ) || ( !filtered && xml.indexOf( value ) >= 0 ) )
-        {
-            System.out.println( "FAILED!" );
-            return false;
+    String[] values = ["<prop0>pom-filtering-reactor</prop0>",]
+    for (String value : values) {
+        System.out.println("Checking for " + (filtered ? "occurrence" : "absence") + " of: " + value)
+        if ((filtered && xml.indexOf(value) < 0) || (!filtered && xml.indexOf(value) >= 0)) {
+            System.out.println("FAILED!")
+            return false
         }
     }
-    return true;
+    return true
 }
 
-assert check( "mod2-parent", true ) && check( "mod2-parent/mod2", true ) && check( "mod2-parent/mod1-parent", true ) &&
-        check( "mod2-parent/mod1", true ) && check( "mod2-parent/mod3", true) &&
-        check( "mod2-parent/mod1/src/it", false )
+assert check("mod2-parent", true) && check("mod2-parent/mod2", true) && check("mod2-parent/mod1-parent", true) &&
+check("mod2-parent/mod1", true) && check("mod2-parent/mod3", true) &&
+check("mod2-parent/mod1/src/it", false)

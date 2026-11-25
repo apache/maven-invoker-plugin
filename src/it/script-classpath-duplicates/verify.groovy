@@ -18,14 +18,13 @@
  */
 
 String[] files = [
-        "target/it/beanshell/target/created-by-prebuild.bsh",
-        "target/it/beanshell/target/created-by-postbuild.bsh",
-        "target/it/groovy/target/created-by-prebuild.groovy",
-        "target/it/groovy/target/created-by-postbuild.groovy",
-  ];
-for ( String file : files )
-{
-    File touchFile = new File( basedir, file );
-    System.out.println( "Checking for existence of: " + touchFile );
+    "target/it/beanshell/target/created-by-prebuild.bsh",
+    "target/it/beanshell/target/created-by-postbuild.bsh",
+    "target/it/groovy/target/created-by-prebuild.groovy",
+    "target/it/groovy/target/created-by-postbuild.groovy",
+]
+for (String file : files) {
+    File touchFile = new File(basedir, file)
+    System.out.println("Checking for existence of: " + touchFile)
     assert touchFile.isFile()
 }

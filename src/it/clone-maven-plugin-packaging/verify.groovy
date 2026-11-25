@@ -17,5 +17,5 @@
  * under the License.
  */
 
-File itRoot = new File( basedir, "target/it/clone-clean" );
+File itRoot = new File(basedir, "target/it/clone-clean")
 assert itRoot.exists()

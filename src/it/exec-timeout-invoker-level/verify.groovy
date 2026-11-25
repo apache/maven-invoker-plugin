@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-def buildLog = new File( basedir, 'target/it/basic/build.log' )
+def buildLog = new File(basedir, 'target/it/basic/build.log')
 
 assert !buildLog.text.contains('Total time: ')
 assert !buildLog.text.contains('Finished at: ')

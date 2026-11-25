@@ -20,10 +20,10 @@
 import groovy.xml.XmlSlurper
 
 // from http://groovy-lang.org/processing-xml.html
-// A lot of examples covering xml assertions 
+// A lot of examples covering xml assertions
 
 class XmlExamples {
-  static def CAR_RECORDS = '''
+    static def CAR_RECORDS = '''
     <records>
       <car name='HSV Maloo' make='Holden' year='2006'>
         <country>Australia</country>
@@ -54,16 +54,32 @@ assert carsWith_e_InMake.size() == 2
 // alternative way to find cars with 'e' in make
 assert 2 == records.car.findAll{ it.@make =~ '.*e.*' }.size()
 // makes of cars that have an 's' followed by an 'a' in the country
-assert ['Holden', 'Peel'] == records.car.findAll{ it.country =~ '.*s.*a.*' }.@make.collect{ it.text() }
+assert ['Holden', 'Peel'] == records.car.findAll{
+    it.country =~ '.*s.*a.*'
+}.@make.collect{
+    it.text()
+}
 def expectedRecordTypes = ['speed', 'size', 'price']
-assert expectedRecordTypes == records.depthFirst().grep{ it.@type != '' }.'@type'*.text()
-assert expectedRecordTypes == records.'**'.grep{ it.@type != '' }.'@type'*.text()
+assert expectedRecordTypes == records.depthFirst().grep{
+    it.@type != ''
+}.'@type'*.text()
+assert expectedRecordTypes == records.'**'.grep{
+    it.@type != ''
+}.'@type'*.text()
 def countryOne = records.car[1].country
 assert 'Peel' == countryOne.parent().@make.text()
 assert 'Peel' == countryOne.'..'.@make.text()
 // names of cars with records sorted by year
-def sortedNames = records.car.list().sort{ it.@year.toInteger() }.'@name'*.text()
+def sortedNames = records.car.list().sort{
+    it.@year.toInteger()
+}.'@name'*.text()
 assert ['Royale', 'P50', 'HSV Maloo'] == sortedNames
-assert ['Australia', 'Isle of Man'] == records.'**'.grep{ it.@type =~ 's.*' }*.parent().country*.text()
-assert 'co-re-co-re-co-re' == records.car.children().collect{ it.name()[0..1] }.join('-')
-assert 'co-re-co-re-co-re' == records.car.'*'.collect{ it.name()[0..1] }.join('-')
+assert ['Australia', 'Isle of Man'] == records.'**'.grep{
+    it.@type =~ 's.*'
+}*.parent().country*.text()
+assert 'co-re-co-re-co-re' == records.car.children().collect{
+    it.name()[0..1]
+}.join('-')
+assert 'co-re-co-re-co-re' == records.car.'*'.collect{
+    it.name()[0..1]
+}.join('-')

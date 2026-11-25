@@ -18,6 +18,6 @@
  */
 
 // sanity check to make sure the builds were actually run
-File itDir = new File( basedir, "target/it" );
-System.out.println( "Checking for existence of clones: " + itDir );
+File itDir = new File(basedir, "target/it")
+System.out.println("Checking for existence of clones: " + itDir)
 assert itDir.exists() : "Missing IT directory: " + itDir

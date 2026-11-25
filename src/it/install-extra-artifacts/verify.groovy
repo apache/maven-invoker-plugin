@@ -17,29 +17,28 @@
  * under the License.
  */
 
-File itRepoDir = new File( basedir, "target/it-repo" );
+File itRepoDir = new File(basedir, "target/it-repo")
 assert itRepoDir.isDirectory() : "IT local repository missing: " + itRepoDir
 
 String[] files =
-[
-    "org/apache/maven/plugins/maven-clean-plugin/2.4/maven-clean-plugin-2.4.jar",
-    "org/apache/maven/plugins/maven-clean-plugin/2.4/maven-clean-plugin-2.4.pom",
-    "org/apache/maven/plugins/maven-clean-plugin/2.4/maven-clean-plugin-2.4-javadoc.jar",
-    "org/apache/maven/plugins/maven-plugins/16/maven-plugins-16.pom",
-    "org/apache/maven/maven-parent/15/maven-parent-15.pom",
-    "org/apache/apache/6/apache-6.pom",
-    "org/codehaus/plexus/plexus-utils/1.5.6/plexus-utils-1.5.6.jar",
-    "org/codehaus/plexus/plexus-utils/1.5.6/plexus-utils-1.5.6.pom",
-    "junit/junit/3.8.2/junit-3.8.2.jar",
-    "junit/junit/3.8.2/junit-3.8.2.pom",
-    "jdom/jdom/1.1/jdom-1.1.pom",
-    "org/jdom/jdom/1.1/jdom-1.1.pom",
-    "org/jdom/jdom/1.1/jdom-1.1.jar",
-];
-for ( String file : files )
-{
-    File stagedFile = new File( itRepoDir, file );
-    System.out.println( "Checking for existence of: " + stagedFile );
+        [
+            "org/apache/maven/plugins/maven-clean-plugin/2.4/maven-clean-plugin-2.4.jar",
+            "org/apache/maven/plugins/maven-clean-plugin/2.4/maven-clean-plugin-2.4.pom",
+            "org/apache/maven/plugins/maven-clean-plugin/2.4/maven-clean-plugin-2.4-javadoc.jar",
+            "org/apache/maven/plugins/maven-plugins/16/maven-plugins-16.pom",
+            "org/apache/maven/maven-parent/15/maven-parent-15.pom",
+            "org/apache/apache/6/apache-6.pom",
+            "org/codehaus/plexus/plexus-utils/1.5.6/plexus-utils-1.5.6.jar",
+            "org/codehaus/plexus/plexus-utils/1.5.6/plexus-utils-1.5.6.pom",
+            "junit/junit/3.8.2/junit-3.8.2.jar",
+            "junit/junit/3.8.2/junit-3.8.2.pom",
+            "jdom/jdom/1.1/jdom-1.1.pom",
+            "org/jdom/jdom/1.1/jdom-1.1.pom",
+            "org/jdom/jdom/1.1/jdom-1.1.jar",
+        ]
+for ( String file : files ) {
+    File stagedFile = new File( itRepoDir, file )
+    System.out.println( "Checking for existence of: " + stagedFile )
     assert stagedFile.isFile() : "Missing: " + stagedFile
     assert !( file.endsWith( "jdom-1.1.jar" ) && stagedFile.length() < 1024 * 10 ) : "Corrupt: " + stagedFile
 }

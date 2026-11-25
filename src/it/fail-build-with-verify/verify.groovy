@@ -18,6 +18,6 @@
  */
 
 // make sure the Invoker Plugin was indeed run and the build didn't fail somewhere else
-File touchFile = new File( basedir, "target/it/project/touch.txt" );
-System.out.println( "Checking for existence of touch file: " + touchFile );
+File touchFile = new File(basedir, "target/it/project/touch.txt")
+System.out.println("Checking for existence of touch file: " + touchFile)
 assert touchFile.exists()

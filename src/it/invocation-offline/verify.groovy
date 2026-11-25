@@ -18,6 +18,6 @@
  */
 
 // sanity check to make sure the builds were actually run
-File repoDir = new File( basedir, "target/it-repo" );
-System.out.println( "Checking for existence of test repo: " + repoDir );
+File repoDir = new File(basedir, "target/it-repo")
+System.out.println("Checking for existence of test repo: " + repoDir)
 assert repoDir.exists() : "Missing repository directory: " + repoDir
