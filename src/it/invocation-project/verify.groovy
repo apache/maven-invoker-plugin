@@ -17,8 +17,6 @@
  * under the License.
  */
 
-import java.io.*;
-
 String[] unexpectedPaths =
 [
     "sub-1/target",
@@ -29,10 +27,7 @@ for ( String path : unexpectedPaths )
 {
     File file = new File( new File( basedir, "target/it/project" ), path);
     System.out.println( "Checking for absence of: " + file );
-    if ( file.exists() )
-    {
-        throw new IOException( "Unexpected path found: " + file );
-    }
+    assert !file.exists() : "Unexpected path found: " + file
 }
 
 String[] expectedPaths =
@@ -45,10 +40,5 @@ for ( String path : expectedPaths )
 {
     File file = new File( new File( basedir, "target/it/project" ), path);
     System.out.println( "Checking for existence of: " + file );
-    if ( !file.exists() )
-    {
-        throw new IOException( "Expected path not found: " + file );
-    }
+    assert file.exists() : "Expected path not found: " + file
 }
-
-return true;

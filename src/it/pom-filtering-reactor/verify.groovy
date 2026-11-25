@@ -17,12 +17,6 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-
-import org.codehaus.plexus.util.*;
-
 boolean check( String project, boolean filtered )
 {
     File pomFile = new File( basedir, "target/it/" + project + "/pom.xml" );
@@ -33,7 +27,7 @@ boolean check( String project, boolean filtered )
         return false;
     }
 
-    String xml = FileUtils.fileRead( pomFile, "UTF-8" );
+    String xml = pomFile.getText( 'UTF-8' );
 
     String[] values = [
             "<prop0>pom-filtering-reactor</prop0>",
@@ -50,16 +44,6 @@ boolean check( String project, boolean filtered )
     return true;
 }
 
-try
-{
-    return check( "mod2-parent", true ) && check( "mod2-parent/mod2", true ) && check( "mod2-parent/mod1-parent", true )
-            && check( "mod2-parent/mod1", true ) && check( "mod2-parent/mod3", true)
-            && check( "mod2-parent/mod1/src/it", false );
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
-
-return true;
+assert check( "mod2-parent", true ) && check( "mod2-parent/mod2", true ) && check( "mod2-parent/mod1-parent", true ) &&
+        check( "mod2-parent/mod1", true ) && check( "mod2-parent/mod3", true) &&
+        check( "mod2-parent/mod1/src/it", false )

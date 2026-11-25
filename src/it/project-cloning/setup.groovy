@@ -17,19 +17,7 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-
-try
-{
-    File emptyDir = new File( basedir, "src/it/module-1/empty-dir" );
-    emptyDir.mkdirs();
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
+File emptyDir = new File( basedir, "src/it/module-1/empty-dir" );
+emptyDir.mkdirs();
 
 return true;

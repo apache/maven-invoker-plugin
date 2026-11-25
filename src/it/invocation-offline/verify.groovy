@@ -17,16 +17,7 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-
 // sanity check to make sure the builds were actually run
 File repoDir = new File( basedir, "target/it-repo" );
 System.out.println( "Checking for existence of test repo: " + repoDir );
-if ( !repoDir.exists() )
-{
-    throw new FileNotFoundException( "Missing repository directory: " + repoDir );
-}
-
-return true;
+assert repoDir.exists() : "Missing repository directory: " + repoDir

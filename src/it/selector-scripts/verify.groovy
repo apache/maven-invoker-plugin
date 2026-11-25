@@ -17,99 +17,60 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-
-import org.codehaus.plexus.util.*;
-
-try
+String[] expected = [
+        "target/its/script-ret-true/target/touch.txt",
+        "target/its/script-ret-quiet/target/touch.txt",
+  ];
+for ( String file : expected )
 {
-    String[] expected = [
-            "target/its/script-ret-true/target/touch.txt",
-            "target/its/script-ret-quiet/target/touch.txt",
-      ];
-    for ( String file : expected )
-    {
-        File touchFile = new File( basedir, file );
-        System.out.println( "Checking for existence of: " + touchFile );
-        if ( !touchFile.isFile() )
-        {
-            System.out.println( "FAILED!" );
-            return false;
-        }
-    }
-
-    String[] unexpected = [
-            "target/its/script-ret-false/target/touch.txt",
-            "target/its/script-ret-other/target/touch.txt",
-            "target/its/script-throws/target/touch.txt",
-      ];
-    for ( String file : unexpected )
-    {
-        File touchFile = new File( basedir, file );
-        System.out.println( "Checking for absence of: " + touchFile );
-        if ( touchFile.exists() )
-        {
-            System.out.println( file  + " should not be here -> FAILED!" );
-            return false;
-        }
-    }
-
-    String[] success = [
-            "target/invoker-reports-test/BUILD-script-ret-true.xml",
-            "target/invoker-reports-test/BUILD-script-ret-quiet.xml",
-      ];
-    for ( String file : success )
-    {
-         File resultFile = new File( basedir, file );
-         System.out.println( "Checking build result: " + resultFile );
-         String xml = FileUtils.fileRead( resultFile, "UTF-8" );
-         if ( xml.indexOf("result=\"success\"") < 0 && xml.indexOf("result='success'") < 0 )
-         {
-             System.out.println( resultFile + " not success -> FAILED!" );
-             return false;
-         }
-    }
-
-    String[] skipped = [
-            "target/invoker-reports-test/BUILD-script-ret-false.xml",
-            "target/invoker-reports-test/BUILD-script-ret-other.xml",
-      ];
-    for ( String file : skipped )
-    {
-         File resultFile = new File( basedir, file );
-         System.out.println( "Checking build result: " + resultFile );
-         String xml = FileUtils.fileRead( resultFile, "UTF-8" );
-         if ( xml.indexOf("result=\"skipped\"") < 0 && xml.indexOf("result='skipped'") < 0 )
-         {
-             System.out.println( resultFile + " not skipped -> FAILED!" );
-             return false;
-         }
-    }
-
-
-    String[] inerror = [
-            "target/invoker-reports-test/BUILD-script-throw.xml",
-      ];
-    for ( String file : inerror )
-    {
-         File resultFile = new File( basedir, file );
-         System.out.println( "Checking build result: " + resultFile );
-         String xml = FileUtils.fileRead( resultFile, "UTF-8" );
-         if ( xml.indexOf("result=\"error\"") < 0 && xml.indexOf("result='error'") < 0 )
-         {
-             System.out.println( resultFile + " not failed -> FAILED!" );
-             return false;
-         }
-    }
-
-
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
+    File touchFile = new File( basedir, file );
+    System.out.println( "Checking for existence of: " + touchFile );
+    assert touchFile.isFile()
 }
 
-return true;
+String[] unexpected = [
+        "target/its/script-ret-false/target/touch.txt",
+        "target/its/script-ret-other/target/touch.txt",
+        "target/its/script-throws/target/touch.txt",
+  ];
+for ( String file : unexpected )
+{
+    File touchFile = new File( basedir, file );
+    System.out.println( "Checking for absence of: " + touchFile );
+    assert !touchFile.exists() : file  + " should not be here -> FAILED!"
+}
+
+String[] success = [
+        "target/invoker-reports-test/BUILD-script-ret-true.xml",
+        "target/invoker-reports-test/BUILD-script-ret-quiet.xml",
+  ];
+for ( String file : success )
+{
+    File resultFile = new File( basedir, file );
+    System.out.println( "Checking build result: " + resultFile );
+    String xml = resultFile.getText( 'UTF-8' );
+    assert xml.indexOf("result=\"success\"") >= 0 || xml.indexOf("result='success'") >= 0 : resultFile + " not success -> FAILED!"
+}
+
+String[] skipped = [
+        "target/invoker-reports-test/BUILD-script-ret-false.xml",
+        "target/invoker-reports-test/BUILD-script-ret-other.xml",
+  ];
+for ( String file : skipped )
+{
+    File resultFile = new File( basedir, file );
+    System.out.println( "Checking build result: " + resultFile );
+    String xml = resultFile.getText( 'UTF-8' );
+    assert xml.indexOf("result=\"skipped\"") >= 0 || xml.indexOf("result='skipped'") >= 0 : resultFile + " not skipped -> FAILED!"
+}
+
+String[] inerror = [
+        "target/invoker-reports-test/BUILD-script-throw.xml",
+  ];
+for ( String file : inerror )
+{
+    File resultFile = new File( basedir, file );
+    System.out.println( "Checking build result: " + resultFile );
+    String xml = resultFile.getText( 'UTF-8' );
+    assert xml.indexOf("result=\"error\"") >= 0 || xml.indexOf("result='error'") >= 0 : resultFile + " not failed -> FAILED!"
+}

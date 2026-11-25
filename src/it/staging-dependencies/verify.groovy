@@ -17,89 +17,59 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-
 import org.codehaus.plexus.util.*;
 import org.codehaus.plexus.util.xml.*;
 
-try
+File itRepoDir = new File( basedir, "target/it-repo" );
+System.out.println( "Checking for existence of: " + itRepoDir );
+assert itRepoDir.isDirectory()
+
+String[] files = [
+        "junit/junit/4.13.1/junit-4.13.1.pom",
+        "junit/junit/4.13.1/junit-4.13.1.jar",
+        "junit/junit/maven-metadata-local.xml",
+        "org/apache/maven/its/minvoker-70/1.0-SNAPSHOT/minvoker-70-1.0-SNAPSHOT.pom",
+        "org/apache/maven/its/minvoker-70/1.0-SNAPSHOT/minvoker-70-1.0-SNAPSHOT.jar",
+        "org/apache/maven/its/minvoker-70/1.0-SNAPSHOT/maven-metadata-local.xml",
+        "org/apache/maven/its/minvoker-70/maven-metadata-local.xml",
+        "org/apache/maven/its/parent-b/0.1-SNAPSHOT/parent-b-0.1-SNAPSHOT.pom",
+        "org/apache/maven/its/parent-b/0.1-SNAPSHOT/maven-metadata-local.xml",
+        "org/apache/maven/its/parent-b/maven-metadata-local.xml",
+        "org/apache/maven/its/parent-a/0.1-SNAPSHOT/parent-a-0.1-SNAPSHOT.pom",
+        "org/apache/maven/its/parent-a/0.1-SNAPSHOT/maven-metadata-local.xml",
+        "org/apache/maven/its/parent-a/maven-metadata-local.xml",
+        "org/apache/maven/its/pom/0.3-SNAPSHOT/pom-0.3-SNAPSHOT.pom",
+        "org/apache/maven/its/pom/0.3-SNAPSHOT/maven-metadata-local.xml",
+        "org/apache/maven/its/pom/maven-metadata-local.xml",
+        "org/apache/maven/its/dep/1.0/dep-1.0.pom",
+        "org/apache/maven/its/dep/1.0/dep-1.0-tests.jar",
+        "org/apache/maven/its/dep/2.0/dep-2.0.pom",
+        "org/apache/maven/its/dep/2.0/dep-2.0.jar",
+        "org/apache/maven/its/dep/maven-metadata-local.xml",
+        "test/staging-dependencies/1.0-SNAPSHOT/staging-dependencies-1.0-SNAPSHOT.jar",
+        "test/staging-dependencies/1.0-SNAPSHOT/staging-dependencies-1.0-SNAPSHOT.pom",
+        "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.pom",
+        "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
+        "org/slf4j/slf4j-parent/1.7.36/slf4j-parent-1.7.36.pom"
+  ];
+for ( String file : files )
 {
-    File itRepoDir = new File( basedir, "target/it-repo" );
-    System.out.println( "Checking for existence of: " + itRepoDir );
-    if ( !itRepoDir.isDirectory() )
-    {
-        System.out.println( "FAILED!" );
-        return false;
-    }
-
-    String[] files = [
-            "junit/junit/4.13.1/junit-4.13.1.pom",
-            "junit/junit/4.13.1/junit-4.13.1.jar",
-            "junit/junit/maven-metadata-local.xml",
-            "org/apache/maven/its/minvoker-70/1.0-SNAPSHOT/minvoker-70-1.0-SNAPSHOT.pom",
-            "org/apache/maven/its/minvoker-70/1.0-SNAPSHOT/minvoker-70-1.0-SNAPSHOT.jar",
-            "org/apache/maven/its/minvoker-70/1.0-SNAPSHOT/maven-metadata-local.xml",
-            "org/apache/maven/its/minvoker-70/maven-metadata-local.xml",
-            "org/apache/maven/its/parent-b/0.1-SNAPSHOT/parent-b-0.1-SNAPSHOT.pom",
-            "org/apache/maven/its/parent-b/0.1-SNAPSHOT/maven-metadata-local.xml",
-            "org/apache/maven/its/parent-b/maven-metadata-local.xml",
-            "org/apache/maven/its/parent-a/0.1-SNAPSHOT/parent-a-0.1-SNAPSHOT.pom",
-            "org/apache/maven/its/parent-a/0.1-SNAPSHOT/maven-metadata-local.xml",
-            "org/apache/maven/its/parent-a/maven-metadata-local.xml",
-            "org/apache/maven/its/pom/0.3-SNAPSHOT/pom-0.3-SNAPSHOT.pom",
-            "org/apache/maven/its/pom/0.3-SNAPSHOT/maven-metadata-local.xml",
-            "org/apache/maven/its/pom/maven-metadata-local.xml",
-            "org/apache/maven/its/dep/1.0/dep-1.0.pom",
-            "org/apache/maven/its/dep/1.0/dep-1.0-tests.jar",
-            "org/apache/maven/its/dep/2.0/dep-2.0.pom",
-            "org/apache/maven/its/dep/2.0/dep-2.0.jar",
-            "org/apache/maven/its/dep/maven-metadata-local.xml",
-            "test/staging-dependencies/1.0-SNAPSHOT/staging-dependencies-1.0-SNAPSHOT.jar",
-            "test/staging-dependencies/1.0-SNAPSHOT/staging-dependencies-1.0-SNAPSHOT.pom",
-            "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.pom",
-            "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
-            "org/slf4j/slf4j-parent/1.7.36/slf4j-parent-1.7.36.pom"
-      ];
-    for ( String file : files )
-    {
-        File stagedFile = new File( itRepoDir, file );
-        System.out.println( "Checking for existence of: " + stagedFile );
-        if ( !stagedFile.isFile() )
-        {
-            throw new IllegalStateException( "Missing: " + stagedFile );
-        }
-    }
-
-    File stagedTestScope = new File(itRepoDir, "org/slf4j/slf4j-simple");
-    if ( stagedTestScope.exists() )
-    {
-        throw new IllegalStateException( "Test scope dependencies should not exists" );
-    }
-
-    Reader reader = ReaderFactory.newXmlReader( new File( itRepoDir, "org/apache/maven/its/dep/maven-metadata-local.xml" ) );
-    Xpp3Dom dom = Xpp3DomBuilder.build( reader );
-    IOUtil.close( reader );
-
-    if ( dom.getChild( "versioning" ).getChild( "versions" ).getChildCount() != 2 )
-    {
-        throw new IllegalStateException( "Invalid version number count in metadata" );
-    }
-
-    List versions = new ArrayList();
-    versions.add( dom.getChild( "versioning" ).getChild( "versions" ).getChild( 0 ).getValue() );
-    versions.add( dom.getChild( "versioning" ).getChild( "versions" ).getChild( 1 ).getValue() );
-    Collections.sort( versions );
-    if ( !versions.equals( Arrays.asList( new String[] { "1.0", "2.0" } ) ) )
-    {
-        throw new IllegalStateException( "Invalid version numbers in metadata: " + versions );
-    }
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
+    File stagedFile = new File( itRepoDir, file );
+    System.out.println( "Checking for existence of: " + stagedFile );
+    assert stagedFile.isFile() : "Missing: " + stagedFile
 }
 
-return true;
+File stagedTestScope = new File(itRepoDir, "org/slf4j/slf4j-simple");
+assert !stagedTestScope.exists() : "Test scope dependencies should not exists"
+
+Reader reader = ReaderFactory.newXmlReader( new File( itRepoDir, "org/apache/maven/its/dep/maven-metadata-local.xml" ) );
+Xpp3Dom dom = Xpp3DomBuilder.build( reader );
+IOUtil.close( reader );
+
+assert dom.getChild( "versioning" ).getChild( "versions" ).getChildCount() == 2 : "Invalid version number count in metadata"
+
+List versions = new ArrayList();
+versions.add( dom.getChild( "versioning" ).getChild( "versions" ).getChild( 0 ).getValue() );
+versions.add( dom.getChild( "versioning" ).getChild( "versions" ).getChild( 1 ).getValue() );
+Collections.sort( versions );
+assert versions.equals( Arrays.asList( new String[] { "1.0", "2.0" } ) ) : "Invalid version numbers in metadata: " + versions

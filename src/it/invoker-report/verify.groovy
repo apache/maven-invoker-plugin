@@ -17,71 +17,20 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-
 File reportFile = new File( basedir, "target/site/invoker.html");
 
-passed = true;
-
 System.out.println( "Checking for existence of report file: " + reportFile );
-if ( !reportFile.exists() )
-{
-    System.out.println( "FAILED!" );
-    passed = false;
+assert reportFile.exists() : "Report file missing: " + reportFile
+
+allWarningLines = new File( basedir, "build.log" ).readLines().findAll {
+    it.contains( "[WARNING] Incomplete job name-description" )
 }
 
-buildLogReader = null;
-try
-{
-    buildLogReader = new BufferedReader( new FileReader( new File( basedir, "build.log" ) ) );
-    allWarningLines = new ArrayList();
+missingNameLinesCount = allWarningLines.count { it.contains( "name is missing" ) };
+missingDescriptionLinesCount = allWarningLines.count { it.contains( "description is missing" ) };
 
-    currentLine = null;
-    while ( ( currentLine = buildLogReader.readLine() ) != null )
-    {
-        if ( currentLine.contains( "[WARNING] Incomplete job name-description" ) )
-        {
-            allWarningLines.add( currentLine );
-        }
-    }
+expectedMissingNames = 4;
+assert expectedMissingNames == missingNameLinesCount : "Current missingNameLinesCount: " + missingNameLinesCount + " but expecting: " + expectedMissingNames
 
-    missingNameLinesCount = 0;
-    missingDescriptionLinesCount = 0;
-
-    for ( currentLine : allWarningLines )
-    {
-        if ( currentLine.contains( "name is missing" ) )
-        {
-            ++missingNameLinesCount;
-        }
-
-        if ( currentLine.contains( "description is missing" ) )
-        {
-            ++missingDescriptionLinesCount;
-        }
-    }
-
-    expectedMissingNames = 4;
-    if ( expectedMissingNames != missingNameLinesCount )
-    {
-        System.out.println( "Current missingNameLinesCount: " + missingNameLinesCount + " but expecting: " + expectedMissingNames );
-        passed = false;
-    }
-
-    expectedMissingDescriptions = 1;
-    if ( expectedMissingDescriptions != missingDescriptionLinesCount )
-    {
-        System.out.println( "Current missingDescriptionLinesCount: " + missingDescriptionLinesCount + " but expecting: " + expectedMissingDescriptions );
-        passed = false;
-    }
-}
-finally
-{
-    if ( buildLogReader != null )
-    {
-        buildLogReader.close();
-    }
-}
-
-return passed;
+expectedMissingDescriptions = 1;
+assert expectedMissingDescriptions == missingDescriptionLinesCount : "Current missingDescriptionLinesCount: " + missingDescriptionLinesCount + " but expecting: " + expectedMissingDescriptions
