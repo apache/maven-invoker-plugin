@@ -17,25 +17,13 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-
 // make sure the Invoker Plugin was indeed run and the build didn't fail somewhere else
 File touchFile;
 
 touchFile = new File( basedir, "target/its/beanshell/touch.txt" );
 System.out.println( "Checking for existence of touch file: " + touchFile );
-if ( !touchFile.exists() )
-{
-    throw new FileNotFoundException( "Did not find marker file: " + touchFile );
-}
+assert touchFile.exists() : "Did not find marker file: " + touchFile
 
 touchFile = new File( basedir, "target/its/groovy/touch.txt" );
 System.out.println( "Checking for existence of touch file: " + touchFile );
-if ( !touchFile.exists() )
-{
-    throw new FileNotFoundException( "Did not find marker file: " + touchFile );
-}
-
-return true;
+assert touchFile.exists() : "Did not find marker file: " + touchFile

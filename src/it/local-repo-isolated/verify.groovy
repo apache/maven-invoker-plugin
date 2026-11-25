@@ -17,37 +17,11 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+File badRepoDir = new File( basedir, "target/bad-repo" );
+assert !badRepoDir.exists() : "IT used wrong local repository: " + badRepoDir
 
-try
-{
-    File badRepoDir = new File( basedir, "target/bad-repo" );
-    if ( badRepoDir.exists() )
-    {
-        System.out.println( "IT used wrong local repository: " + badRepoDir );
-        return false;
-    }
+File itRepoDir = new File( basedir, "target/it-repo" );
+assert itRepoDir.isDirectory() : "IT local repository missing: " + itRepoDir
 
-    File itRepoDir = new File( basedir, "target/it-repo" );
-    if ( !itRepoDir.isDirectory() )
-    {
-        System.out.println( "IT local repository missing: " + itRepoDir );
-        return false;
-    }
-
-    File installedFile = new File( itRepoDir, "test/local-repo-isolated/0.1-SNAPSHOT/local-repo-isolated-0.1-SNAPSHOT.pom" );
-    if ( !installedFile.isFile() )
-    {
-        System.out.println( "Installed file missing in local repo: " + installedFile );
-        return false;
-    }
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
-
-return true;
+File installedFile = new File( itRepoDir, "test/local-repo-isolated/0.1-SNAPSHOT/local-repo-isolated-0.1-SNAPSHOT.pom" );
+assert installedFile.isFile() : "Installed file missing in local repo: " + installedFile

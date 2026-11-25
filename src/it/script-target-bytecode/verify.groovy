@@ -22,5 +22,3 @@
 File result = new File( basedir, "target/its/project/record-superclass.txt" )
 assert result.exists() : "the post-build hook script did not run"
 assert result.text == "java.lang.Object"
-
-return true

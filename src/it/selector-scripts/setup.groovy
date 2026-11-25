@@ -17,8 +17,6 @@
  * under the License.
  */
 
-import java.io.File
-
 // Previous potential target 'content' has impact on IT execution
 // (Some new file should be created by verify.sh) 
 new File( basedir, "target/invoker-reports-test" ).deleteDir()

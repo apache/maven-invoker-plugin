@@ -17,18 +17,8 @@
  * under the License.
  */
 
-import java.io.*;
-
 File marker = new File( basedir, "target/it/project/target/marker.txt" );
-if ( !marker.exists() )
-{
-  throw new IOException( "Marker file should have been created in setup: " + marker );
-}
+assert marker.exists() : "Marker file should have been created in setup: " + marker
 
 File archive = new File( basedir, "target/it/project/target/project-0.1-SNAPSHOT.jar" );
-if ( archive.exists() )
-{
-  throw new IOException( "Target file creation should have been skipped: " + archive );
-}
-
-return true;
+assert !archive.exists() : "Target file creation should have been skipped: " + archive

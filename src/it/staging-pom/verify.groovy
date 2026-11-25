@@ -17,41 +17,19 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+File itRepoDir = new File( basedir, "target/it-repo" );
+System.out.println( "Checking for existence of: " + itRepoDir );
+assert itRepoDir.isDirectory()
 
-try
+String[] files = [
+        "test/pom-packaging/1.0-SNAPSHOT/pom-packaging-1.0-SNAPSHOT.pom",
+        "org/apache/maven/plugins/maven-plugins/39/maven-plugins-39.pom",
+        "org/apache/maven/maven-parent/39/maven-parent-39.pom",
+        "org/apache/apache/29/apache-29.pom"
+  ];
+for ( String file : files )
 {
-    File itRepoDir = new File( basedir, "target/it-repo" );
-    System.out.println( "Checking for existence of: " + itRepoDir );
-    if ( !itRepoDir.isDirectory() )
-    {
-        System.out.println( "FAILED!" );
-        return false;
-    }
-
-    String[] files = [
-            "test/pom-packaging/1.0-SNAPSHOT/pom-packaging-1.0-SNAPSHOT.pom",
-            "org/apache/maven/plugins/maven-plugins/39/maven-plugins-39.pom",
-            "org/apache/maven/maven-parent/39/maven-parent-39.pom",
-            "org/apache/apache/29/apache-29.pom"
-      ];
-    for ( String file : files )
-    {
-        File stagedFile = new File( itRepoDir, file );
-        System.out.println( "Checking for existence of: " + stagedFile );
-        if ( !stagedFile.isFile() )
-        {
-            System.out.println( "FAILED!" );
-            return false;
-        }
-    }
+    File stagedFile = new File( itRepoDir, file );
+    System.out.println( "Checking for existence of: " + stagedFile );
+    assert stagedFile.isFile()
 }
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
-
-return true;

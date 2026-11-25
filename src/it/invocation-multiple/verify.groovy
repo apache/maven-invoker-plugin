@@ -17,50 +17,18 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+File test0File = new File( basedir, "target/it/project/target/test0.txt" );
+System.out.println( "Checking for existence of first test file: " + test0File );
+assert test0File.exists()
 
-import org.codehaus.plexus.util.*;
+String test0 = test0File.getText( 'UTF-8' ).trim();
+System.out.println( "Checking contents of first test file: " + test0 );
+assert "ISO-8859-1" == test0
 
-try
-{
-    File test0File = new File( basedir, "target/it/project/target/test0.txt" );
-    System.out.println( "Checking for existence of first test file: " + test0File );
-    if ( !test0File.exists() )
-    {
-        System.out.println( "FAILED!" );
-        return false;
-    }
+File test1File = new File( basedir, "target/it/project/target/test1.txt" );
+System.out.println( "Checking for existence of second test file: " + test1File );
+assert test1File.exists()
 
-    String test0 = FileUtils.fileRead( test0File, "UTF-8" ).trim();
-    System.out.println( "Checking contents of first test file: " + test0 );
-    if ( !"ISO-8859-1".equals( test0 ) )
-    {
-        System.out.println( "FAILED!" );
-        return false;
-    }
-
-    File test1File = new File( basedir, "target/it/project/target/test1.txt" );
-    System.out.println( "Checking for existence of second test file: " + test1File );
-    if ( !test1File.exists() )
-    {
-        System.out.println( "FAILED!" );
-        return false;
-    }
-
-    String test1 = FileUtils.fileRead( test1File, "UTF-8" ).trim();
-    System.out.println( "Checking contents of second test file: " + test1 );
-    if ( !"UTF-8".equals( test1 ) )
-    {
-        System.out.println( "FAILED!" );
-        return false;
-    }
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
-
-return true;
+String test1 = test1File.getText( 'UTF-8' ).trim();
+System.out.println( "Checking contents of second test file: " + test1 );
+assert "UTF-8" == test1

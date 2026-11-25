@@ -17,15 +17,5 @@
  * under the License.
  */
 
-import java.io.*;
-
-try
-{
-    File itRoot = new File( basedir, "target/it/clone-clean" );
-    return itRoot.exists();
-}
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
+File itRoot = new File( basedir, "target/it/clone-clean" );
+assert itRoot.exists()

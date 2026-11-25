@@ -17,37 +17,15 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+File itDir = new File( basedir, "target/it" );
+assert itDir.isDirectory() : "IT directory not existent: " + itDir
 
-try
+String[] paths = [
+        "no-pom",
+        "no-pom/build.log",
+];
+for ( String path : paths )
 {
-    File itDir = new File( basedir, "target/it" );
-    if ( !itDir.isDirectory() )
-    {
-        System.out.println( "IT directory not existent: " + itDir );
-        return false;
-    }
-
-    String[] paths = [
-            "no-pom",
-            "no-pom/build.log",
-    ];
-    for ( String path : paths )
-    {
-        File file = new File( itDir, path );
-        if ( !file.exists() )
-        {
-            System.out.println( "Expected file/directory not existent: " + file );
-            return false;
-        }
-    }
+    File file = new File( itDir, path );
+    assert file.exists() : "Expected file/directory not existent: " + file
 }
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
-
-return true;

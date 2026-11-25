@@ -17,16 +17,7 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-
 // sanity check to make sure the builds were actually run
 File itDir = new File( basedir, "target/it" );
 System.out.println( "Checking for existence of clones: " + itDir );
-if ( !itDir.exists() )
-{
-    throw new FileNotFoundException( "Missing IT directory: " + itDir );
-}
-
-return true;
+assert itDir.exists() : "Missing IT directory: " + itDir

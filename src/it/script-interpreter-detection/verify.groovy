@@ -17,33 +17,15 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
-
-try
+String[] files = [
+        "target/its/beanshell/target/prebuild.bsh",
+        "target/its/beanshell/target/postbuild.bsh",
+        "target/its/groovy/target/prebuild.groovy",
+        "target/its/groovy/target/postbuild.groovy",
+  ];
+for ( String file : files )
 {
-    String[] files = [
-            "target/its/beanshell/target/prebuild.bsh",
-            "target/its/beanshell/target/postbuild.bsh",
-            "target/its/groovy/target/prebuild.groovy",
-            "target/its/groovy/target/postbuild.groovy",
-      ];
-    for ( String file : files )
-    {
-        File touchFile = new File( basedir, file );
-        System.out.println( "Checking for existence of: " + touchFile );
-        if ( !touchFile.isFile() )
-        {
-            System.out.println( "FAILED!" );
-            return false;
-        }
-    }
+    File touchFile = new File( basedir, file );
+    System.out.println( "Checking for existence of: " + touchFile );
+    assert touchFile.isFile()
 }
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
-}
-
-return true;
