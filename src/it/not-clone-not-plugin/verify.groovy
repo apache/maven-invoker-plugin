@@ -19,8 +19,8 @@
 
 // the project is not a maven-plugin, so cloning is off: no clone directory, neither the one the
 // plugin would use by default for plugin projects nor the one other ITs configure
-assert !new File( basedir, "target/its" ).exists()
-assert !new File( basedir, "target/it" ).exists()
+assert !new File(basedir, "target/its").exists()
+assert !new File(basedir, "target/it").exists()
 
 // and the nested project was built in place
-assert new File( basedir, "src/it/clone-clean/build.log" ).isFile()
+assert new File(basedir, "src/it/clone-clean/build.log").isFile()

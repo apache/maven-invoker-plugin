@@ -17,21 +17,20 @@
  * under the License.
  */
 
-File itDir = new File( basedir, "target/it" );
+File itDir = new File(basedir, "target/it")
 assert itDir.isDirectory() : "IT directory not existent: " + itDir
 
 // NOTE: It is part of the test design that "module" is a prefix of "module-1"
 String[] paths = [
-        "module",
-        "module/pom.xml",
-        "module-1",
-        "module-1/pom.xml",
-        "module-1/empty-dir",
-        "module-1/sub-module",
-        "module-1/sub-module/pom.xml",
-];
-for ( String path : paths )
-{
-    File file = new File( itDir, path );
+    "module",
+    "module/pom.xml",
+    "module-1",
+    "module-1/pom.xml",
+    "module-1/empty-dir",
+    "module-1/sub-module",
+    "module-1/sub-module/pom.xml",
+]
+for ( String path : paths ) {
+    File file = new File( itDir, path )
     assert file.exists() : "Cloned file/directory not existent: " + file
 }

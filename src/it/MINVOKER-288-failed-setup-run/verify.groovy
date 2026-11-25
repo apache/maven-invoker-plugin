@@ -18,23 +18,23 @@
  */
 import groovy.xml.XmlSlurper
 
-File invokerReports = new File( new File(basedir, 'target'), 'invoker-reports-test' )
+File invokerReports = new File(new File(basedir, 'target'), 'invoker-reports-test')
 assert invokerReports.exists()
 
-def build1 = new XmlSlurper().parse( new File( invokerReports, 'BUILD-project1.xml' ) )
+def build1 = new XmlSlurper().parse(new File(invokerReports, 'BUILD-project1.xml'))
 
 assert build1.@result.text() == 'failure-build'
 assert build1.@type.text() == 'setup'
 
-def build2 = new XmlSlurper().parse( new File( invokerReports, 'BUILD-project2.xml' ) )
+def build2 = new XmlSlurper().parse(new File(invokerReports, 'BUILD-project2.xml'))
 
 assert build2.@result.text() == 'skipped'
 assert build2.failureMessage.text() == 'Skipped due to setup job(s) failure'
 
-def testsuite = new XmlSlurper().parse( new File( invokerReports, 'TEST-project2.xml' ) )
+def testsuite = new XmlSlurper().parse(new File(invokerReports, 'TEST-project2.xml'))
 
 assert testsuite.@skipped.text() == '1'
 assert testsuite.testcase.skipped.text() == 'Skipped due to setup job(s) failure'
 
-def buildLog = new File( basedir, 'build.log' ).text
+def buildLog = new File(basedir, 'build.log').text
 assert buildLog.contains('[INFO]   Passed: 0, Failed: 1, Errors: 0, Skipped: 1')

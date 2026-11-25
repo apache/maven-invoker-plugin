@@ -18,14 +18,14 @@
  */
 
 def FS = File.separator
-def buildLogOfProject = new File( basedir, 'target/it/project/build.log' ).text
+def buildLogOfProject = new File(basedir, 'target/it/project/build.log').text
 
-def buildLog = new File( basedir, 'build.log' ).text
+def buildLog = new File(basedir, 'build.log').text
 
-assert buildLog.contains( '*** begin build.log for: project' + FS + 'pom.xml ***' )
-assert buildLog.contains( buildLogOfProject )
-assert buildLog.contains( '*** end build.log for: project' + FS + 'pom.xml ***' )
+assert buildLog.contains('*** begin build.log for: project' + FS + 'pom.xml ***')
+assert buildLog.contains(buildLogOfProject)
+assert buildLog.contains('*** end build.log for: project' + FS + 'pom.xml ***')
 
-assert buildLog.contains( 'maven-invoker-plugin:' + projectVersion + ':integration-test' )
-assert buildLog.contains( '[ERROR] Failed to execute goal org.apache.maven.plugins:maven-invoker-plugin:' + projectVersion + ':verify' )
+assert buildLog.contains('maven-invoker-plugin:' + projectVersion + ':integration-test')
+assert buildLog.contains('[ERROR] Failed to execute goal org.apache.maven.plugins:maven-invoker-plugin:' + projectVersion + ':verify')
 

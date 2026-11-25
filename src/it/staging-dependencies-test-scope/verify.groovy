@@ -17,28 +17,27 @@
  * under the License.
  */
 
-import org.codehaus.plexus.util.*;
-import org.codehaus.plexus.util.xml.*;
+import org.codehaus.plexus.util.*
+import org.codehaus.plexus.util.xml.*
 
-File itRepoDir = new File( basedir, "target/it-repo" );
-System.out.println( "Checking for existence of: " + itRepoDir );
+File itRepoDir = new File(basedir, "target/it-repo")
+System.out.println("Checking for existence of: " + itRepoDir)
 assert itRepoDir.isDirectory()
 
 String[] files = [
-        "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
-        "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.pom",
-        "org/slf4j/slf4j-api/maven-metadata-local.xml",
-        "org/slf4j/slf4j-parent/1.7.36/slf4j-parent-1.7.36.pom",
-        "org/slf4j/slf4j-parent/maven-metadata-local.xml",
-        "org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar",
-        "org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.pom",
-        "org/slf4j/slf4j-simple/maven-metadata-local.xml",
-        "test/staging-dependencies-test-scope/1.0-SNAPSHOT/staging-dependencies-test-scope-1.0-SNAPSHOT.pom",
-        "test/staging-dependencies-test-scope/1.0-SNAPSHOT/staging-dependencies-test-scope-1.0-SNAPSHOT.jar"
-  ];
-for ( String file : files )
-{
-    File stagedFile = new File( itRepoDir, file );
-    System.out.println( "Checking for existence of: " + stagedFile );
+    "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
+    "org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.pom",
+    "org/slf4j/slf4j-api/maven-metadata-local.xml",
+    "org/slf4j/slf4j-parent/1.7.36/slf4j-parent-1.7.36.pom",
+    "org/slf4j/slf4j-parent/maven-metadata-local.xml",
+    "org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar",
+    "org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.pom",
+    "org/slf4j/slf4j-simple/maven-metadata-local.xml",
+    "test/staging-dependencies-test-scope/1.0-SNAPSHOT/staging-dependencies-test-scope-1.0-SNAPSHOT.pom",
+    "test/staging-dependencies-test-scope/1.0-SNAPSHOT/staging-dependencies-test-scope-1.0-SNAPSHOT.jar"
+]
+for (String file : files) {
+    File stagedFile = new File(itRepoDir, file)
+    System.out.println("Checking for existence of: " + stagedFile)
     assert stagedFile.isFile() : "Missing: " + stagedFile
 }

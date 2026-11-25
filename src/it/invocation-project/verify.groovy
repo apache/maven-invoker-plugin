@@ -18,27 +18,19 @@
  */
 
 String[] unexpectedPaths =
-[
-    "sub-1/target",
-    "sub-3/target",
-];
+        ["sub-1/target", "sub-3/target",]
 
-for ( String path : unexpectedPaths )
-{
-    File file = new File( new File( basedir, "target/it/project" ), path);
-    System.out.println( "Checking for absence of: " + file );
+for (String path : unexpectedPaths) {
+    File file = new File(new File(basedir, "target/it/project"), path)
+    System.out.println("Checking for absence of: " + file)
     assert !file.exists() : "Unexpected path found: " + file
 }
 
 String[] expectedPaths =
-[
-    "target",
-    "sub-2/target",
-];
+        ["target", "sub-2/target",]
 
-for ( String path : expectedPaths )
-{
-    File file = new File( new File( basedir, "target/it/project" ), path);
-    System.out.println( "Checking for existence of: " + file );
+for (String path : expectedPaths) {
+    File file = new File(new File(basedir, "target/it/project"), path)
+    System.out.println("Checking for existence of: " + file)
     assert file.exists() : "Expected path not found: " + file
 }

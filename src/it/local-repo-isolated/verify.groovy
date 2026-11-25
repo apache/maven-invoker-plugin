@@ -17,11 +17,11 @@
  * under the License.
  */
 
-File badRepoDir = new File( basedir, "target/bad-repo" );
+File badRepoDir = new File(basedir, "target/bad-repo")
 assert !badRepoDir.exists() : "IT used wrong local repository: " + badRepoDir
 
-File itRepoDir = new File( basedir, "target/it-repo" );
+File itRepoDir = new File( basedir, "target/it-repo" )
 assert itRepoDir.isDirectory() : "IT local repository missing: " + itRepoDir
 
-File installedFile = new File( itRepoDir, "test/local-repo-isolated/0.1-SNAPSHOT/local-repo-isolated-0.1-SNAPSHOT.pom" );
+File installedFile = new File( itRepoDir, "test/local-repo-isolated/0.1-SNAPSHOT/local-repo-isolated-0.1-SNAPSHOT.pom" )
 assert installedFile.isFile() : "Installed file missing in local repo: " + installedFile

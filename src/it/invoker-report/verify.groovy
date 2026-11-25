@@ -17,20 +17,24 @@
  * under the License.
  */
 
-File reportFile = new File( basedir, "target/site/invoker.html");
+File reportFile = new File(basedir, "target/site/invoker.html")
 
-System.out.println( "Checking for existence of report file: " + reportFile );
+System.out.println("Checking for existence of report file: " + reportFile)
 assert reportFile.exists() : "Report file missing: " + reportFile
 
 allWarningLines = new File( basedir, "build.log" ).readLines().findAll {
     it.contains( "[WARNING] Incomplete job name-description" )
 }
 
-missingNameLinesCount = allWarningLines.count { it.contains( "name is missing" ) };
-missingDescriptionLinesCount = allWarningLines.count { it.contains( "description is missing" ) };
+missingNameLinesCount = allWarningLines.count {
+    it.contains( "name is missing" )
+}
+missingDescriptionLinesCount = allWarningLines.count {
+    it.contains( "description is missing" )
+}
 
-expectedMissingNames = 4;
+expectedMissingNames = 4
 assert expectedMissingNames == missingNameLinesCount : "Current missingNameLinesCount: " + missingNameLinesCount + " but expecting: " + expectedMissingNames
 
-expectedMissingDescriptions = 1;
+expectedMissingDescriptions = 1
 assert expectedMissingDescriptions == missingDescriptionLinesCount : "Current missingDescriptionLinesCount: " + missingDescriptionLinesCount + " but expecting: " + expectedMissingDescriptions

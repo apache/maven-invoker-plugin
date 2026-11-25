@@ -17,17 +17,17 @@
  * under the License.
  */
 
-assert new File( basedir, 'target/it/project/touch.txt' ).exists()
+assert new File(basedir, 'target/it/project/touch.txt').exists()
 
-File buildLog = new File( basedir, 'build.log' )
+File buildLog = new File(basedir, 'build.log')
 
 String executionString = "Executing:"
-int mavenCommandIndex = buildLog.text.indexOf( executionString )
-String commandLine = buildLog.text.substring( mavenCommandIndex, buildLog.text.indexOf( System.lineSeparator(),
-        mavenCommandIndex ) )
-commandLine = commandLine.substring(commandLine.indexOf("mvn"));
+int mavenCommandIndex = buildLog.text.indexOf(executionString)
+String commandLine = buildLog.text.substring(mavenCommandIndex, buildLog.text.indexOf(System.lineSeparator(),
+        mavenCommandIndex))
+commandLine = commandLine.substring(commandLine.indexOf("mvn"))
 
-assert Arrays.stream( commandLine.split( '\\s' ) )
-    .map( f -> f.replaceAll('\'', ''))
-    .filter(f -> f == '-U')
-    .count() > 0
+assert Arrays.stream(commandLine.split('\\s'))
+.map(f -> f.replaceAll('\'', ''))
+.filter(f -> f == '-U')
+.count() > 0

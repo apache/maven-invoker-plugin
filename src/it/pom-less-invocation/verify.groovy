@@ -17,15 +17,11 @@
  * under the License.
  */
 
-File itDir = new File( basedir, "target/it" );
+File itDir = new File(basedir, "target/it")
 assert itDir.isDirectory() : "IT directory not existent: " + itDir
 
-String[] paths = [
-        "no-pom",
-        "no-pom/build.log",
-];
-for ( String path : paths )
-{
-    File file = new File( itDir, path );
+String[] paths = ["no-pom", "no-pom/build.log",]
+for ( String path : paths ) {
+    File file = new File( itDir, path )
     assert file.exists() : "Expected file/directory not existent: " + file
 }

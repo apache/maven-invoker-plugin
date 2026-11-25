@@ -18,12 +18,12 @@
  */
 
 // make sure the Invoker Plugin was indeed run and the build didn't fail somewhere else
-File touchFile;
+File touchFile
 
-touchFile = new File( basedir, "target/its/beanshell/touch.txt" );
-System.out.println( "Checking for existence of touch file: " + touchFile );
+touchFile = new File(basedir, "target/its/beanshell/touch.txt")
+System.out.println("Checking for existence of touch file: " + touchFile)
 assert touchFile.exists() : "Did not find marker file: " + touchFile
 
-touchFile = new File( basedir, "target/its/groovy/touch.txt" );
-System.out.println( "Checking for existence of touch file: " + touchFile );
+touchFile = new File( basedir, "target/its/groovy/touch.txt" )
+System.out.println( "Checking for existence of touch file: " + touchFile )
 assert touchFile.exists() : "Did not find marker file: " + touchFile

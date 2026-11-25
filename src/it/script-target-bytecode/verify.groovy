@@ -19,6 +19,6 @@
 
 // the outer project sets maven.compiler.release=8, so the hook script must not have been compiled to a level with
 // native records, whatever JDK runs this build
-File result = new File( basedir, "target/its/project/record-superclass.txt" )
+File result = new File(basedir, "target/its/project/record-superclass.txt")
 assert result.exists() : "the post-build hook script did not run"
 assert result.text == "java.lang.Object"

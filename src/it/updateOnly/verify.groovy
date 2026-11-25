@@ -17,8 +17,8 @@
  * under the License.
  */
 
-File marker = new File( basedir, "target/it/project/target/marker.txt" );
+File marker = new File(basedir, "target/it/project/target/marker.txt")
 assert marker.exists() : "Marker file should have been created in setup: " + marker
 
-File archive = new File( basedir, "target/it/project/target/project-0.1-SNAPSHOT.jar" );
+File archive = new File( basedir, "target/it/project/target/project-0.1-SNAPSHOT.jar" )
 assert !archive.exists() : "Target file creation should have been skipped: " + archive

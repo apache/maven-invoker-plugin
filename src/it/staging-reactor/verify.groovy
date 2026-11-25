@@ -17,33 +17,32 @@
  * under the License.
  */
 
-File itRepoDir = new File( basedir, "mod1/target/it-repo" );
-System.out.println( "Checking for existence of: " + itRepoDir );
+File itRepoDir = new File(basedir, "mod1/target/it-repo")
+System.out.println("Checking for existence of: " + itRepoDir)
 assert itRepoDir.isDirectory()
 
 // NOTE: Checking the metadata is included to guard against regression of MINVOKER-43
 String[] files = [
-        "test/mod1/maven-metadata-local.xml",
-        "test/mod1/1.0-SNAPSHOT/maven-metadata-local.xml",
-        "test/mod1/1.0-SNAPSHOT/mod1-1.0-SNAPSHOT.pom",
-        "test/mod1/1.0-SNAPSHOT/mod1-1.0-SNAPSHOT.jar",
-        "test/mod1-parent/maven-metadata-local.xml",
-        "test/mod1-parent/1.0-SNAPSHOT/maven-metadata-local.xml",
-        "test/mod1-parent/1.0-SNAPSHOT/mod1-parent-1.0-SNAPSHOT.pom",
-        "test/mod2/maven-metadata-local.xml",
-        "test/mod2/1.0-SNAPSHOT/maven-metadata-local.xml",
-        "test/mod2/1.0-SNAPSHOT/mod2-1.0-SNAPSHOT.pom",
-        "test/mod2/1.0-SNAPSHOT/mod2-1.0-SNAPSHOT.jar",
-        "test/mod3/1.0-SNAPSHOT/maven-metadata-local.xml",
-        "test/mod3/1.0-SNAPSHOT/mod3-1.0-SNAPSHOT.pom",
-        "test/mod3/1.0-SNAPSHOT/mod3-1.0-SNAPSHOT.jar",
-        "test/mod2-parent/maven-metadata-local.xml",
-        "test/mod2-parent/1.0-SNAPSHOT/maven-metadata-local.xml",
-        "test/mod2-parent/1.0-SNAPSHOT/mod2-parent-1.0-SNAPSHOT.pom",
-  ];
-for ( String file : files )
-{
-    File stagedFile = new File( itRepoDir, file );
-    System.out.println( "Checking for existence of: " + stagedFile );
+    "test/mod1/maven-metadata-local.xml",
+    "test/mod1/1.0-SNAPSHOT/maven-metadata-local.xml",
+    "test/mod1/1.0-SNAPSHOT/mod1-1.0-SNAPSHOT.pom",
+    "test/mod1/1.0-SNAPSHOT/mod1-1.0-SNAPSHOT.jar",
+    "test/mod1-parent/maven-metadata-local.xml",
+    "test/mod1-parent/1.0-SNAPSHOT/maven-metadata-local.xml",
+    "test/mod1-parent/1.0-SNAPSHOT/mod1-parent-1.0-SNAPSHOT.pom",
+    "test/mod2/maven-metadata-local.xml",
+    "test/mod2/1.0-SNAPSHOT/maven-metadata-local.xml",
+    "test/mod2/1.0-SNAPSHOT/mod2-1.0-SNAPSHOT.pom",
+    "test/mod2/1.0-SNAPSHOT/mod2-1.0-SNAPSHOT.jar",
+    "test/mod3/1.0-SNAPSHOT/maven-metadata-local.xml",
+    "test/mod3/1.0-SNAPSHOT/mod3-1.0-SNAPSHOT.pom",
+    "test/mod3/1.0-SNAPSHOT/mod3-1.0-SNAPSHOT.jar",
+    "test/mod2-parent/maven-metadata-local.xml",
+    "test/mod2-parent/1.0-SNAPSHOT/maven-metadata-local.xml",
+    "test/mod2-parent/1.0-SNAPSHOT/mod2-parent-1.0-SNAPSHOT.pom",
+]
+for (String file : files) {
+    File stagedFile = new File(itRepoDir, file)
+    System.out.println("Checking for existence of: " + stagedFile)
     assert stagedFile.isFile()
 }

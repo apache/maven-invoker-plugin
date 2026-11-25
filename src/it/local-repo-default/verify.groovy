@@ -17,19 +17,19 @@
  * under the License.
  */
 
-File badRepoDir = new File( basedir, "target/bad-repo" );
+File badRepoDir = new File(basedir, "target/bad-repo")
 assert !badRepoDir.exists() : "Sub build used wrong local repository (from its settings.xml): " + badRepoDir
 
 /*
  * NOTE: This relies heavily on the Invoker Plugin's configuration of our parent build, not nice but until MINVOKER-49
  * is available here, we have no other way of getting the path.
  */
-File localRepoPathOfThisBuild = new File( basedir.getParentFile().getParentFile(), "local-repo" );
-System.out.println("Local repository of this build: " + localRepoPathOfThisBuild);
+File localRepoPathOfThisBuild = new File( basedir.getParentFile().getParentFile(), "local-repo" )
+System.out.println("Local repository of this build: " + localRepoPathOfThisBuild)
 
-File textFile = new File( basedir, "target/its/project/target/local-repo-path.txt" );
-File localRepoPathOfSubBuild = new File( textFile.readLines( 'UTF-8' )[0] );
-System.out.println("Local repository of sub build: " + localRepoPathOfSubBuild);
+File textFile = new File( basedir, "target/its/project/target/local-repo-path.txt" )
+File localRepoPathOfSubBuild = new File( textFile.readLines( 'UTF-8' )[0] )
+System.out.println("Local repository of sub build: " + localRepoPathOfSubBuild)
 
 /*
  * This is partly a sanity check of the Maven core (i.e. its MavenSettingsBuilder) which should ensure
@@ -39,5 +39,5 @@ System.out.println("Local repository of sub build: " + localRepoPathOfSubBuild);
  */
 assert localRepoPathOfThisBuild.getCanonicalPath() == localRepoPathOfSubBuild.getCanonicalPath() : "Sub build used wrong local repository: " + localRepoPathOfSubBuild
 
-File installedFile = new File( localRepoPathOfThisBuild, "test/local-repo-default/0.1-SNAPSHOT/local-repo-default-0.1-SNAPSHOT.pom" );
+File installedFile = new File( localRepoPathOfThisBuild, "test/local-repo-default/0.1-SNAPSHOT/local-repo-default-0.1-SNAPSHOT.pom" )
 assert installedFile.isFile() : "Installed file missing in local repo: " + installedFile

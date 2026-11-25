@@ -18,8 +18,8 @@
  */
 
 // Previous potential target 'content' has impact on IT execution
-// (Some new file should be created by verify.sh) 
-new File( basedir, "target/invoker-reports-test" ).deleteDir()
-new File( basedir, "src/it/script-ret-quiet/target" ).deleteDir()
-new File( basedir, "src/it/script-ret-true/target" ).deleteDir()
-return true;
+// (Some new file should be created by verify.sh)
+new File(basedir, "target/invoker-reports-test").deleteDir()
+new File(basedir, "src/it/script-ret-quiet/target").deleteDir()
+new File(basedir, "src/it/script-ret-true/target").deleteDir()
+return true
