@@ -222,14 +222,44 @@ one of the properties, set the parameter to it explicitly:
 
 # Predefined global variables
 
-To allow the scripts to access some useful data about the test project, the following global variables will be defined by the Invoker Plugin before running the script:
+To allow the scripts to access some useful data about the test project, the Invoker Plugin defines the following global variables before it runs a script. The Scope column shows how often the plugin sets the value:
 
-|Name|Type|Description|Since|
-|:---|:---|:---|:---|
-|`basedir`|`java.io.File`|The absolute path to the base directory of the test project.|1.0|
-|`localRepositoryPath`|`java.io.File`|The absolute path to the local repository used for the Maven invocation on the test project.|1.3|
-|`context`|`java.util.Map`|The storage of key-value pairs used to pass data from the pre-build hook script to the post-build hook script.|1.4|
-|`context.get('userProperties')`|`java.util.Properties`|The user properties for executing project|3.7.0|
-|`mavenVersion`|`java.lang.String`|The version of Maven executing on the test project.|1.9|
+- Per build: once for the whole plugin execution, the same value for every test project.
+- Per job attempt: once each time the plugin runs a test project. The selector script, the pre-build scripts and the post-build scripts of that attempt see the same value. If the plugin reruns the test project, the rerun gets new values.
+- Per script run: for each script that runs.
+
+|Name|Type|Description|Scope|Since|
+|:---|:---|:---|:---|:---|
+|`basedir`|`java.io.File`|The absolute path to the base directory of the test project.|Per script run|1.0|
+|`scriptdir`|`java.io.File`|The directory that contains the script that runs.|Per script run|3.11.0|
+|`localRepositoryPath`|`java.io.File`|The absolute path to the local repository used for the Maven invocation on the test project.|Per build|1.3|
+|`context`|`java.util.Map`|The storage of key-value pairs used to pass data between the selector script and the pre-build and post-build hook scripts of one test project.|Per job attempt|1.4|
+|`context.get('userProperties')`|`java.util.Properties`|The user properties for executing project|Per job attempt|3.7.0|
+|`mavenVersion`|`java.lang.String`|The version of Maven executing on the test project.|Per build|1.9|
+|`buildLog`|`java.io.File`|The `build.log` file of the test project, in the log directory if you set `logDirectory`. The value is `null` if you set `noLog`.|Per job attempt|3.11.0|
+|`job`|`org.apache.maven.plugins.invoker.ScriptJob`|The test project that runs, with the properties in the following table.|Per job attempt|3.11.0|
+
+The `job` variable has the following read-only properties. In Groovy, read them as `job.basedir`; in BeanShell, call `job.getBasedir()`.
+
+|Property|Type|Description|
+|:---|:---|:---|
+|`basedir`|`java.nio.file.Path`|The base directory of the test project, the same directory as the `basedir` variable.|
+|`buildLog`|`java.nio.file.Path`|The `build.log` file of the test project, the same file as the `buildLog` variable. The value is `null` if you set `noLog`.|
+|`localRepository`|`java.nio.file.Path`|The local repository that the test project uses.|
+|`mavenVersion`|`java.lang.String`|The version of Maven that runs the test project.|
+
+The `job` variable gives you the paths as `Path` objects, so you can resolve other paths against them. In BeanShell scripts, most method calls on a `Path` object fail on Java 17 and later; use the `File` variables there, or port the script to Groovy.
+
+The plugin sets `basedir`, `scriptdir`, `context`, `buildLog` and `job` for each script, so a [`scriptVariables`](../run-mojo.html#scriptVariables) entry with one of these names has no effect. The plugin logs a warning for each such entry. A `scriptVariables` entry named `localRepositoryPath` or `mavenVersion` replaces the variable of that name, but not the `job` properties.
 
 Additional variables that can be accessed in the hook scripts can be defined through the [`scriptVariables`](../run-mojo.html#scriptVariables) parameter in the Invoker Plugin's configuration.
+
+## Reading the build log
+
+A post-build script often checks the output of the build. Read the `buildLog` variable with an explicit character set:
+
+```groovy
+assert buildLog.getText('UTF-8').contains('BUILD SUCCESS')
+```
+
+Use `buildLog` instead of building the path yourself: the file isn't in `basedir` when you set `logDirectory`. If you set `noLog`, the plugin writes no build log and `buildLog` is `null`, so don't read the log in that case.

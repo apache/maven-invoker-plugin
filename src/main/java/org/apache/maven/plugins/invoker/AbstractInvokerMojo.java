@@ -131,6 +131,12 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private static final int RESULT_COLUMN = 60;
 
     /**
+     * The script variable names that are set for each script run and win over the {@link #scriptVariables}.
+     */
+    private static final Set<String> PER_RUN_SCRIPT_VARIABLES = Collections.unmodifiableSet(
+            new TreeSet<>(Arrays.asList("basedir", "scriptdir", "context", "buildLog", "job")));
+
+    /**
      * Flag used to suppress certain invocations. This is useful in tailoring the build using profiles.
      *
      * @since 1.1
@@ -598,7 +604,9 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     private Map<String, String> environmentVariables;
 
     /**
-     * Additional variables for use in the hook scripts.
+     * Additional variables for use in the hook scripts. The names <code>basedir</code>, <code>scriptdir</code>,
+     * <code>context</code>, <code>buildLog</code> and <code>job</code> are set for each script run and cannot be
+     * overridden here; the plugin logs a warning and ignores such an entry.
      *
      * @since 1.9
      */
@@ -1018,8 +1026,13 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         scriptRunner.setBeanShellWarning(beanShellWarning);
         scriptRunner.setGlobalVariable("localRepositoryPath", localRepositoryPath);
         scriptRunner.setGlobalVariable("mavenVersion", actualMavenVersion);
+        warnAboutOverriddenScriptVariables();
         if (scriptVariables != null) {
-            scriptVariables.forEach((key, value) -> scriptRunner.setGlobalVariable(key, value));
+            scriptVariables.forEach((key, value) -> {
+                if (!PER_RUN_SCRIPT_VARIABLES.contains(key)) {
+                    scriptRunner.setGlobalVariable(key, value);
+                }
+            });
         }
         scriptRunner.setClassPath(scriptClassPath);
 
@@ -1028,6 +1041,21 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             getLog().debug("Compiling hook scripts to bytecode level " + targetBytecode);
             scriptRunner.setTargetBytecode(targetBytecode);
         }
+    }
+
+    /**
+     * Warns about each entry of {@link #scriptVariables} that the plugin or the script interpreter sets for every
+     * script run, which makes the configured value dead.
+     */
+    void warnAboutOverriddenScriptVariables() {
+        if (scriptVariables == null) {
+            return;
+        }
+        scriptVariables.keySet().stream()
+                .filter(PER_RUN_SCRIPT_VARIABLES::contains)
+                .sorted()
+                .forEach(name -> getLog().warn("The scriptVariables entry '" + name
+                        + "' is ignored, the hook scripts get their own value for this name for every run"));
     }
 
     /**
@@ -1968,20 +1996,21 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         Map<String, Object> context = new LinkedHashMap<>();
         Properties scriptUserProperties = new Properties();
         context.put("userProperties", scriptUserProperties);
+        Map<String, Object> variables = scriptJobVariables(basedir, logger);
 
-        if (!runSelectorHook(basedir, context, logger)) {
+        if (!runSelectorHook(basedir, context, variables, logger)) {
             return false;
         }
 
         try {
-            runPreBuildHook(basedir, context, logger, 0);
+            runPreBuildHook(basedir, context, variables, logger, 0);
 
             for (int invocationIndex = 1; ; invocationIndex++) {
                 if (invocationIndex > 1 && !invokerProperties.isInvocationDefined(invocationIndex)) {
                     break;
                 }
 
-                runPreBuildHook(basedir, context, logger, invocationIndex);
+                runPreBuildHook(basedir, context, variables, logger, invocationIndex);
 
                 final InvocationRequest request = new DefaultInvocationRequest();
 
@@ -2040,12 +2069,12 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                     throw new RunFailureException(
                             "Maven invocation failed. " + e.getMessage(), BuildJob.Result.FAILURE_BUILD);
                 }
-                runPostBuildHook(basedir, context, logger, invocationIndex);
+                runPostBuildHook(basedir, context, variables, logger, invocationIndex);
             }
         } catch (Exception | Error e) {
             // the post-build hook runs after a failure, too, but its failure must not replace the first one
             try {
-                runPostBuildHook(basedir, context, logger, 0);
+                runPostBuildHook(basedir, context, variables, logger, 0);
             } catch (Exception | Error hookFailure) {
                 e.addSuppressed(hookFailure);
                 String message = "Post-build hook failed after an earlier failure, which is kept: " + hookFailure;
@@ -2056,7 +2085,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             }
             throw e;
         }
-        runPostBuildHook(basedir, context, logger, 0);
+        runPostBuildHook(basedir, context, variables, logger, 0);
         return true;
     }
 
@@ -2078,10 +2107,27 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
     }
 
-    private boolean runSelectorHook(File basedir, Map<String, Object> context, FileLogger logger)
+    /**
+     * Creates the variables bound for each script run of one job attempt: the build log and the {@link ScriptJob}.
+     */
+    private Map<String, Object> scriptJobVariables(File basedir, FileLogger logger) {
+        File buildLog = logger != null ? logger.getOutputFile().getAbsoluteFile() : null;
+        ScriptJob job = new ScriptJob(
+                basedir.toPath(),
+                buildLog != null ? buildLog.toPath() : null,
+                localRepositoryPath != null ? localRepositoryPath.toPath() : null,
+                actualMavenVersion);
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("buildLog", buildLog);
+        variables.put("job", job);
+        return Collections.unmodifiableMap(variables);
+    }
+
+    private boolean runSelectorHook(
+            File basedir, Map<String, Object> context, Map<String, Object> variables, FileLogger logger)
             throws MojoExecutionException, RunFailureException {
         try {
-            scriptRunner.run("selector script", basedir, selectorScript, context, logger);
+            scriptRunner.run("selector script", basedir.toPath(), selectorScript, context, variables, logger);
         } catch (ScriptReturnException e) {
             return false;
         } catch (ScriptException e) {
@@ -2095,11 +2141,16 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         return true;
     }
 
-    private void runPreBuildHook(File basedir, Map<String, Object> context, FileLogger logger, int invocationIndex)
+    private void runPreBuildHook(
+            File basedir,
+            Map<String, Object> context,
+            Map<String, Object> variables,
+            FileLogger logger,
+            int invocationIndex)
             throws MojoExecutionException, RunFailureException {
         try {
             String hookName = invocationIndex > 0 ? preBuildHookScript + "." + invocationIndex : preBuildHookScript;
-            scriptRunner.run("pre-build script", basedir, hookName, context, logger);
+            scriptRunner.run("pre-build script", basedir.toPath(), hookName, context, variables, logger);
         } catch (ScriptException e) {
             if (logger != null) {
                 logger.consumeLine("Error executing pre-build hook: " + e.getMessage());
@@ -2110,11 +2161,16 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         }
     }
 
-    private void runPostBuildHook(File basedir, Map<String, Object> context, FileLogger logger, int invocationIndex)
+    private void runPostBuildHook(
+            File basedir,
+            Map<String, Object> context,
+            Map<String, Object> variables,
+            FileLogger logger,
+            int invocationIndex)
             throws MojoExecutionException, RunFailureException {
         try {
             String hookName = invocationIndex > 0 ? postBuildHookScript + "." + invocationIndex : postBuildHookScript;
-            scriptRunner.run("post-build script", basedir, hookName, context, logger);
+            scriptRunner.run("post-build script", basedir.toPath(), hookName, context, variables, logger);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         } catch (ScriptException e) {

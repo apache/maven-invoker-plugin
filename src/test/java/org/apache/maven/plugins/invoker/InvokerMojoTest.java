@@ -22,11 +22,13 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
@@ -37,7 +39,12 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.apache.maven.plugins.invoker.TestUtil.getBasedir;
 import static org.apache.maven.plugins.invoker.TestUtil.setVariableValueToObject;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -371,5 +378,40 @@ class InvokerMojoTest {
         invokerMojo.execute();
 
         assertThat(reportsDirectory).doesNotExist();
+    }
+
+    @Test
+    void warnsOnceForEachScriptVariableTheScriptsGetPerRun() throws Exception {
+        Log log = mock(Log.class);
+        invokerMojo.setLog(log);
+        Map<String, String> scriptVariables = new LinkedHashMap<>();
+        for (String name : new String[] {"basedir", "scriptdir", "context", "buildLog", "job"}) {
+            scriptVariables.put(name, "x");
+        }
+        scriptVariables.put("localRepositoryPath", "x");
+        scriptVariables.put("mavenVersion", "x");
+        scriptVariables.put("myOwn", "x");
+        setVariableValueToObject(invokerMojo, "scriptVariables", scriptVariables);
+
+        invokerMojo.warnAboutOverriddenScriptVariables();
+
+        for (String name : new String[] {"basedir", "scriptdir", "context", "buildLog", "job"}) {
+            verify(log, times(1)).warn(contains("'" + name + "' is ignored"));
+        }
+        verify(log, times(5)).warn(anyString());
+    }
+
+    @Test
+    void doesNotWarnForOtherScriptVariables() throws Exception {
+        Log log = mock(Log.class);
+        invokerMojo.setLog(log);
+        Map<String, String> scriptVariables = new LinkedHashMap<>();
+        scriptVariables.put("localRepositoryPath", "x");
+        scriptVariables.put("myOwn", "x");
+        setVariableValueToObject(invokerMojo, "scriptVariables", scriptVariables);
+
+        invokerMojo.warnAboutOverriddenScriptVariables();
+
+        verify(log, never()).warn(anyString());
     }
 }
