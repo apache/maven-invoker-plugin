@@ -1633,7 +1633,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @param globalInvokerProperties
      * @throws org.apache.maven.plugin.MojoExecutionException If the project could not be launched.
      */
-    private void runBuild(
+    void runBuild(
             File projectsDir,
             BuildJob buildJob,
             File settingsFile,
@@ -1656,18 +1656,21 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             basedir = pomFile.getParentFile();
         }
 
-        File interpolatedPomFile = interpolatePomFile(pomFile, basedir);
         // FIXME: Think about the following code part -- ^^^^^^^ END
 
         getLog().info(buffer().a("Building: ").strong(buildJob.getProject()).build());
 
-        InvokerProperties invokerProperties = getInvokerProperties(basedir, globalInvokerProperties);
-
-        // let's set what details we can
-        buildJob.setName(invokerProperties.getJobName());
-        buildJob.setDescription(invokerProperties.getJobDescription());
-
+        File interpolatedPomFile = null;
         try {
+            // inside the try, so that a job that cannot even be set up is written to the report as an error
+            interpolatedPomFile = interpolatePomFile(pomFile, basedir);
+
+            InvokerProperties invokerProperties = getInvokerProperties(basedir, globalInvokerProperties);
+
+            // let's set what details we can
+            buildJob.setName(invokerProperties.getJobName());
+            buildJob.setDescription(invokerProperties.getJobDescription());
+
             int selection = getSelection(invokerProperties, actualJreVersion);
             if (selection == 0) {
                 long startTime = System.currentTimeMillis();
@@ -1746,6 +1749,14 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                 getLog().info(pad(buildJob).failure("FAILED").a(' ') + "(" + formatElapsedTime(buildJob.getTime())
                         + ")");
             }
+        } catch (Exception | Error e) {
+            // The report is written below while the exception is still propagating, so the result has to be set here.
+            buildJob.setResult(BuildJob.Result.ERROR);
+            buildJob.setFailureMessage(String.valueOf(e));
+
+            getLog().error(pad(buildJob).failure("ERROR").a(' ') + "(" + formatElapsedTime(buildJob.getTime()) + ")");
+            getLog().error("  " + e);
+            throw e;
         } finally {
             deleteInterpolatedPomFile(interpolatedPomFile);
             writeBuildReport(buildJob);
@@ -1988,7 +1999,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
 
                 Properties userProperties =
                         getUserProperties(basedir, invokerProperties.getUserPropertiesFile(invocationIndex));
-                userProperties.putAll(scriptUserProperties);
+                addScriptUserProperties(userProperties, scriptUserProperties);
                 request.setProperties(userProperties);
 
                 // Isolate the forked build from the environment that is invoking this plugin: clear
@@ -2024,6 +2035,14 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             runPostBuildHook(basedir, context, logger, 0);
         }
         return true;
+    }
+
+    /**
+     * Copies the user properties set by the scripts to the properties of the invocation. Scripts can put any object
+     * into the properties, for example a Groovy GString, but the invoker accepts only Strings.
+     */
+    static void addScriptUserProperties(Properties userProperties, Properties scriptUserProperties) {
+        scriptUserProperties.forEach((key, value) -> userProperties.put(String.valueOf(key), String.valueOf(value)));
     }
 
     int getParallelThreadsCount() {

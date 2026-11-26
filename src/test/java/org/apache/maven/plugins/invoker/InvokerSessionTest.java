@@ -24,6 +24,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.invoker.model.BuildJob;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -46,5 +47,21 @@ class InvokerSessionTest {
         verify(logger).warn("The following builds were skipped:");
         verify(logger).warn("*  minvoker-279");
         verify(logger, never()).error(anyString());
+    }
+
+    @Test
+    void jobWithoutResultCountsAsError() {
+        Log logger = mock(Log.class);
+        BuildJob unfinishedBuildJob = new BuildJob("minvoker-no-result");
+        InvokerSession session = new InvokerSession(Collections.singletonList(unfinishedBuildJob));
+
+        assertThat(session.getErrorJobs()).containsExactly(unfinishedBuildJob);
+        assertThat(session.getFailedJobs()).isEmpty();
+        assertThat(session.getSuccessfulJobs()).isEmpty();
+
+        session.logSummary(logger, false);
+
+        verify(logger).info("  Passed: 0, Failed: 0, Errors: 1, Skipped: 0");
+        verify(logger).error("*  minvoker-no-result");
     }
 }
