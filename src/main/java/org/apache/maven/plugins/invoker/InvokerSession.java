@@ -165,9 +165,10 @@ class InvokerSession {
                 successfulJobs.add(buildJob);
             } else if (BuildJob.Result.SKIPPED.equals(buildJob.getResult())) {
                 skippedJobs.add(buildJob);
-            } else if (BuildJob.Result.ERROR.equals(buildJob.getResult())) {
+            } else if (buildJob.getResult() == null || BuildJob.Result.ERROR.equals(buildJob.getResult())) {
+                // a job without a result did not finish, it must not vanish from the summary
                 errorJobs.add(buildJob);
-            } else if (buildJob.getResult() != null) {
+            } else {
                 failedJobs.add(buildJob);
             }
         }
