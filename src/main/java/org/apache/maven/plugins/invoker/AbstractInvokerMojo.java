@@ -1946,6 +1946,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
         Map<String, Object> context = new LinkedHashMap<>();
         Properties scriptUserProperties = new Properties();
         context.put("userProperties", scriptUserProperties);
+        // per job, so it cannot be a global variable of the ScriptRunner shared by parallel jobs; null with noLog
+        context.put("buildLog", logger != null ? logger.getOutputFile() : null);
 
         if (!runSelectorHook(basedir, context, logger)) {
             return false;
