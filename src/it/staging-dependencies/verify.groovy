@@ -17,8 +17,7 @@
  * under the License.
  */
 
-import org.codehaus.plexus.util.*
-import org.codehaus.plexus.util.xml.*
+import groovy.xml.XmlSlurper
 
 File itRepoDir = new File(basedir, "target/it-repo")
 System.out.println("Checking for existence of: " + itRepoDir)
@@ -61,16 +60,9 @@ for (String file : files) {
 File stagedTestScope = new File(itRepoDir, "org/slf4j/slf4j-simple")
 assert !stagedTestScope.exists() : "Test scope dependencies should not exists"
 
-Reader reader = ReaderFactory.newXmlReader( new File( itRepoDir, "org/apache/maven/its/dep/maven-metadata-local.xml" ) )
-Xpp3Dom dom = Xpp3DomBuilder.build( reader )
-IOUtil.close( reader )
+def metadata = new XmlSlurper().parse(new File(itRepoDir, "org/apache/maven/its/dep/maven-metadata-local.xml"))
 
-assert dom.getChild( "versioning" ).getChild( "versions" ).getChildCount() == 2 : "Invalid version number count in metadata"
+assert metadata.versioning.versions.version.size() == 2 : "Invalid version number count in metadata"
 
-List versions = new ArrayList()
-versions.add( dom.getChild( "versioning" ).getChild( "versions" ).getChild( 0 ).getValue() )
-versions.add( dom.getChild( "versioning" ).getChild( "versions" ).getChild( 1 ).getValue() )
-Collections.sort( versions )
-assert versions.equals( Arrays.asList( new String[] {
-    "1.0", "2.0"
-} ) ) : "Invalid version numbers in metadata: " + versions
+List versions = metadata.versioning.versions.version*.text().sort()
+assert versions == ["1.0", "2.0"] : "Invalid version numbers in metadata: " + versions
