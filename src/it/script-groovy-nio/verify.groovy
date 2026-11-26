@@ -18,7 +18,7 @@
  */
 
 // the inner project's hook script exercises the java.nio.file.Path extension methods of groovy-nio
-File result = new File( basedir, "target/its/project/nio-result.txt" )
+File result = new File(basedir, "target/its/project/nio-result.txt")
 assert result.exists() : "the post-build hook script did not run"
 assert result.readLines() == ['text', 'appended']
 

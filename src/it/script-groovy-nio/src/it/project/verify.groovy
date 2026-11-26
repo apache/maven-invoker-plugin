@@ -22,9 +22,9 @@ import java.nio.file.Path
 // the extension methods used here come from groovy-nio
 Path dir = basedir.toPath()
 
-assert dir.resolve( 'pom.xml' ).text.contains( '<artifactId>project</artifactId>' )
+assert dir.resolve('pom.xml').text.contains('<artifactId>project</artifactId>')
 
-Path result = dir.resolve( 'nio-result.txt' )
+Path result = dir.resolve('nio-result.txt')
 result.text = 'text'
 result << '\nappended'
 assert result.readLines() == ['text', 'appended']
