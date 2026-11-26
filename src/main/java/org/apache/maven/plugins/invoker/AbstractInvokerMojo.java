@@ -313,8 +313,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * BeanShell scripts are deprecated and will stop being supported; write new scripts in Groovy and port existing
      * <code>.bsh</code> scripts. If this
      * script exists for a particular project but returns any non-null value different from <code>true</code> or throws
-     * an exception, the corresponding build is flagged as a failure. In this case, neither Maven nor the post-build
-     * hook script will be invoked.
+     * an exception, the corresponding build is flagged as a failure. In this case, Maven will not be invoked, but the
+     * post-build hook script still runs.
      *
      * @since 1.0
      */
@@ -328,6 +328,13 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * BeanShell scripts are deprecated and will stop being supported; write new scripts in Groovy and port existing
      * <code>.bsh</code> scripts. If this script exists for a particular project but returns any non-null value different from <code>true</code> or
      * throws an exception, the corresponding build is flagged as a failure.
+     * <p>
+     * The script runs once the project has been built, also when the build or the pre-build hook script has failed, so
+     * it can clean up. In that case the first failure stays the result of the build and a failure of this script is only
+     * attached to it and written to the <code>build.log</code>, if there is one. If the project is invoked several times
+     * (for example with <code>invoker.goals.2</code>), the script <code>postbuild.N</code> (for example
+     * <code>postbuild.1.groovy</code>) runs only after invocation N succeeded, whereas this script runs at the end
+     * of the job whatever happened before.
      *
      * @since 1.0
      */
@@ -1937,7 +1944,7 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
      * @throws RunFailureException If either a hook script or the build itself
      *             failed.
      */
-    private boolean runBuild(
+    boolean runBuild(
             File basedir,
             File pomFile,
             File settingsFile,
@@ -2031,9 +2038,21 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
                 }
                 runPostBuildHook(basedir, context, logger, invocationIndex);
             }
-        } finally {
-            runPostBuildHook(basedir, context, logger, 0);
+        } catch (Exception | Error e) {
+            // the post-build hook runs after a failure, too, but its failure must not replace the first one
+            try {
+                runPostBuildHook(basedir, context, logger, 0);
+            } catch (Exception | Error hookFailure) {
+                e.addSuppressed(hookFailure);
+                String message = "Post-build hook failed after an earlier failure, which is kept: " + hookFailure;
+                getLog().debug(message);
+                if (logger != null) {
+                    logger.consumeLine(message);
+                }
+            }
+            throw e;
         }
+        runPostBuildHook(basedir, context, logger, 0);
         return true;
     }
 
