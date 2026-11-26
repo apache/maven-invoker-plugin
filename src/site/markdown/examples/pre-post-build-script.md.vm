@@ -125,8 +125,8 @@ Use `assert` with a message instead of a `try` and `catch` block that returns `f
 expression when the assertion fails, so the message in `build.log` shows what the script found:
 
 ```groovy
-def log = new File(basedir, "build.log")
-assert log.text.contains("BUILD SUCCESS") : "build.log does not report a successful build"
+def report = new File(basedir, "target/report.txt").getText('UTF-8')
+assert report.contains("3 modules") : "target/report.txt does not list all modules"
 ```
 
 ## File encoding
