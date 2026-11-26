@@ -17,8 +17,8 @@
  * under the License.
  */
 
-def buildLog = new File( basedir, "build.log" ).text
+def buildLog = new File(basedir, "build.log").text
 
-assert buildLog.contains( "maven 1 execute" )
-assert buildLog.contains( "maven 2 execute" )
-assert buildLog.contains( "[INFO] BUILD SUCCESS" )
+assert buildLog.contains("maven 1 execute")
+assert buildLog.contains("maven 2 execute")
+assert buildLog.contains("[INFO] BUILD SUCCESS")

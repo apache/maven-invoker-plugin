@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-def buildLog = new File( basedir, 'build.log' )
+def buildLog = new File(basedir, 'build.log')
 
 // on this level we try find some substring,
 // if not found it will be logged and cause parent verify script to find required text

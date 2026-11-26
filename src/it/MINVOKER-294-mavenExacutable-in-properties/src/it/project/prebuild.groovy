@@ -18,5 +18,5 @@
  */
 
 // workaround for executable flags, eg during build from source-release.zip
-new File( basedir, "mvn1" ).setExecutable( true )
-new File( basedir, "mvn2" ).setExecutable( true )
+new File(basedir, "mvn1").setExecutable(true)
+new File(basedir, "mvn2").setExecutable(true)

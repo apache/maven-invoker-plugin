@@ -17,24 +17,21 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+import java.io.*
+import java.util.*
+import java.util.regex.*
 
-try
-{
-    File touchFile = new File( basedir, "target/touch.txt" );
-    System.out.println( "Checking for existence of touch file: " + touchFile );
-    if ( !touchFile.exists() )
-    {
-        System.out.println( "touch.txt not exists FAILED!" );
-        return false;
+try {
+    File touchFile = new File(basedir, "target/touch.txt")
+    System.out.println("Checking for existence of touch file: " + touchFile)
+    if (!touchFile.exists()) {
+        System.out.println("touch.txt not exists FAILED!")
+        return false
     }
 }
-catch( Throwable t )
-{
-    t.printStackTrace();
-    return false;
+catch(Throwable t) {
+    t.printStackTrace()
+    return false
 }
 
-return true;
+return true

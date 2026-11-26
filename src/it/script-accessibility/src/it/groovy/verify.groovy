@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import org.MyClass;
+import org.MyClass
 
 println MyClass.PUBLIC
 println MyClass.PROTECTED

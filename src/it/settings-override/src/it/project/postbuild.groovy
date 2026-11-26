@@ -17,5 +17,5 @@
  * under the License.
  */
 
-File interpolatedCustomSettings = new File( basedir, "../interpolated-settings-override.xml" )
+File interpolatedCustomSettings = new File(basedir, "../interpolated-settings-override.xml")
 assert interpolatedCustomSettings.isFile()

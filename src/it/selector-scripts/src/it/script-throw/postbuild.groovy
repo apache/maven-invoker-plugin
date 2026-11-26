@@ -17,10 +17,10 @@
  * under the License.
  */
 
-import java.io.*;
+import java.io.*
 
 // create touch file so that the parent build can verify whether this build was executed
-File touchFile = new File( basedir, "target/touch.txt" );
-System.out.println( "Creating touch file: " + touchFile );
-touchFile.getParentFile().mkdirs();
-touchFile.createNewFile();
+File touchFile = new File(basedir, "target/touch.txt")
+System.out.println("Creating touch file: " + touchFile)
+touchFile.getParentFile().mkdirs()
+touchFile.createNewFile()

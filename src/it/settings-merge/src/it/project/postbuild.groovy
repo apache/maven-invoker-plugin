@@ -19,11 +19,13 @@
 
 import groovy.xml.XmlSlurper
 
-File effectiveSettings = new File( basedir, "effective-settings.xml" )
+File effectiveSettings = new File(basedir, "effective-settings.xml")
 assert effectiveSettings.isFile()
 
-def settings = new XmlSlurper().parse( effectiveSettings )
-def server = settings.servers.server.find{ it.id.equals('dummy-it-settings-merge') }
+def settings = new XmlSlurper().parse(effectiveSettings)
+def server = settings.servers.server.find{
+    it.id.equals('dummy-it-settings-merge')
+}
 
-if( !server.password.equals('overridden') )
-  throw new org.apache.maven.plugin.MojoExecutionException("Incorrect server password - specified settings.xml not merged/dominant " + server.password)
+if(!server.password.equals('overridden'))
+    throw new org.apache.maven.plugin.MojoExecutionException("Incorrect server password - specified settings.xml not merged/dominant " + server.password)

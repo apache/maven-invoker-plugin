@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-File buildLog = new File( basedir, 'build.log' )
+File buildLog = new File(basedir, 'build.log')
 
 // if one of criteria matches
-if( buildLog.exists() )
-{
-  assert buildLog.text.contains( '[INFO] Rule 0: org.apache.maven.enforcer.rules.AlwaysPass passed' )
+if(buildLog.exists()) {
+    assert buildLog.text.contains('[INFO] Rule 0: org.apache.maven.enforcer.rules.AlwaysPass passed')
 }
 

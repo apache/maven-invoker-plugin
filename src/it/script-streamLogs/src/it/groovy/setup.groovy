@@ -17,14 +17,14 @@
  * under the License.
  */
 
-import java.io.*;
+import java.io.*
 
 // marker for parent build that this sub build was indeed run
-File touchFile = new File( basedir, "touch.txt" )
+File touchFile = new File(basedir, "touch.txt")
 touchFile.createNewFile()
 
 println("Output from groovy script")
 
-def pom = new File( basedir, "pom.xml" ).text
+def pom = new File(basedir, "pom.xml").text
 assert pom.contains("<modelVersion>9.9.9</modelVersion>")
 

@@ -23,7 +23,7 @@ import java.util.regex.*
 
 println context
 
-File touchFile = context.get( "touchFile" )
+File touchFile = context.get("touchFile")
 touchFile.createNewFile()
 
 return true

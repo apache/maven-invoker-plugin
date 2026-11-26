@@ -20,20 +20,19 @@
 import groovy.xml.XmlSlurper
 
 // ensure script context contains localRepositoryPath
-assert new File( basedir, "../../../target/it-repo" ).canonicalFile.equals( localRepositoryPath )
+assert new File(basedir, "../../../target/it-repo").canonicalFile.equals(localRepositoryPath)
 
-File interpolatedSettings = new File( basedir, "../interpolated-settings.xml" )
+File interpolatedSettings = new File(basedir, "../interpolated-settings.xml")
 assert interpolatedSettings.isFile()
 
-def filename = new File( basedir, "../../../../../local-repo" ).canonicalPath
+def filename = new File(basedir, "../../../../../local-repo").canonicalPath
 // Convert URL, see org.apache.maven.plugins.invoker.AbstractInvokerMojo.toUrl(String)
-String url = "file://" + new File(  filename  ).toURI().path
-if ( url.endsWith( "/" ) )
-{
-    url = url.substring( 0, url.length() - 1 )
+String url = "file://" + new File(filename).toURI().path
+if (url.endsWith("/")) {
+    url = url.substring(0, url.length() - 1)
 }
 
-def settings = new XmlSlurper().parse( interpolatedSettings )
+def settings = new XmlSlurper().parse(interpolatedSettings)
 
 // ensure right settings and mirror are picked up
 def sandboxMirror = settings.mirrors.mirror[0]

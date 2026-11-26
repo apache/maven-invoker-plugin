@@ -17,6 +17,6 @@
  * under the License.
  */
 
-import java.io.*;
+import java.io.*
 
-return "Some thing";
+return "Some thing"

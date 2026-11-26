@@ -17,5 +17,5 @@
  * under the License.
  */
 
-throw new IllegalStateException( "The pre-build script failed as expected." );
+throw new IllegalStateException("The pre-build script failed as expected.")
 

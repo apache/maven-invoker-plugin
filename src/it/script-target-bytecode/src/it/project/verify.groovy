@@ -21,6 +21,6 @@
 // extending java.lang.Object below that, so the superclass shows the level this script was compiled to
 record Probe(int value) {}
 
-new File( basedir, "record-superclass.txt" ).text = Probe.superclass.name
+new File(basedir, "record-superclass.txt").text = Probe.superclass.name
 
 return true
