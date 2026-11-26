@@ -99,6 +99,58 @@ def file = new File( basedir, "target/my-test-project-1.0-SNAPSHOT.jar" )
 assert file.isFile()
 ```
 
+# Writing hook scripts
+
+The plugin runs the pre-build, post-build and selector scripts through the same script runner, but it treats their
+results differently. Use the following rules to write scripts that fail with a clear message.
+
+## Return values
+
+A script passes when it returns `null` or a value whose string form is `true`. In Groovy, the value of the last
+statement is the return value, so a script that ends with an assignment or a method call can return something you did
+not intend. A script that returns any other value fails with a `ScriptReturnException`. A script that throws an
+exception or fails an assertion also fails, and the plugin writes the stack trace to the `build.log` file of the test
+project.
+
+The effect of a failure depends on the kind of script:
+
+- A failing pre-build script marks the test project as failed in the pre-build hook.
+- A failing post-build script marks the test project as failed in the post-build hook.
+- A selector script that returns a value other than `true` skips the test project. A selector script that throws an
+  exception ends the test project with an error instead of skipping it.
+
+## Assertions
+
+Use `assert` with a message instead of a `try` and `catch` block that returns `false`. Groovy prints the values of the
+expression when the assertion fails, so the message in `build.log` shows what the script found:
+
+```groovy
+def log = new File( basedir, "build.log" )
+assert log.text.contains( "BUILD SUCCESS" ) : "build.log does not report a successful build"
+```
+
+## File encoding
+
+Read files with an explicit character set. The `text` property and the `getText()` and `readLines()` methods without an
+argument use the platform character set, so the same script can read different content on different machines:
+
+```groovy
+def lines = new File( basedir, "target/report.txt" ).readLines( 'UTF-8' )
+def content = new File( basedir, "target/report.txt" ).getText( 'UTF-8' )
+```
+
+## Classpath
+
+Hook scripts run with the Groovy modules that the plugin bundles, plus the dependencies that you add to the plugin
+declaration. For the list of modules and how to add more, see [Groovy version and extensions](../groovy-version.html).
+Don't rely on libraries such as plexus-utils or Commons IO being on the classpath, because the plugin doesn't
+guarantee them. Use the JDK and Groovy APIs, or add the library as a plugin dependency.
+
+## Keep scripts small
+
+Use a script to check behavior that needs a real Maven build, such as the files that a plugin goal creates. Test pure
+logic, such as parsing or string handling, in unit tests, where a failure is faster to find and to reproduce.
+
 # BeanShell scripts
 
 Since plugin version 3.11.0, BeanShell (`.bsh`) scripts are deprecated, and support for them will be removed in a
