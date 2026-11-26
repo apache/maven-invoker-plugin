@@ -22,7 +22,7 @@ import java.nio.file.Paths
 
 def projectPath = new File(basedir, 'src/it/clone-symlinks').toPath()
 
-def testDir = projectPath.resolve('testDir');
+def testDir = projectPath.resolve('testDir')
 def testFile = projectPath.resolve('test.txt')
 
 Files.createDirectory(testDir)

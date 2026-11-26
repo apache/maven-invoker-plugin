@@ -17,7 +17,7 @@
  * under the License.
  */
 
-new File( basedir, 'prebuild.1.txt' ).text = 'prebuild.1'
+new File(basedir, 'prebuild.1.txt').text = 'prebuild.1'
 
 def userProperties = context.get('userProperties')
 userProperties.put('prebuild', '1')

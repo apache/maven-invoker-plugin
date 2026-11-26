@@ -17,6 +17,6 @@
  * under the License.
  */
 
-import java.io.*;
+import java.io.*
 
-throw new NullPointerException( "Bite me" );
+throw new NullPointerException("Bite me")

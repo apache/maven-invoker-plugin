@@ -17,6 +17,6 @@
  * under the License.
  */
 
-new File( basedir, 'postbuild.2.txt' ).text = 'postbuild.2'
+new File(basedir, 'postbuild.2.txt').text = 'postbuild.2'
 
 true

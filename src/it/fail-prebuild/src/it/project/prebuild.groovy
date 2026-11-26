@@ -17,10 +17,10 @@
  * under the License.
  */
 
-import java.io.*;
+import java.io.*
 
 // marker for parent build that this sub build was indeed run
-File touchFile = new File( basedir, "touch.txt" );
-touchFile.createNewFile();
+File touchFile = new File(basedir, "touch.txt")
+touchFile.createNewFile()
 
-return false;
+return false

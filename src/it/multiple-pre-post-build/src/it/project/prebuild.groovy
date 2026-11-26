@@ -17,6 +17,6 @@
  * under the License.
  */
 
-new File( basedir, 'prebuild.txt' ).text = 'prebuild'
+new File(basedir, 'prebuild.txt').text = 'prebuild'
 
 true
