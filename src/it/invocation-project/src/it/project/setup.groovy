@@ -17,15 +17,10 @@
  * under the License.
  */
 
-import java.io.*
-
-String[] paths =
-        ["target", "sub-1/target", "sub-2/target", "sub-3/target",]
+String[] paths = ["target", "sub-1/target", "sub-2/target", "sub-3/target"]
 
 for (String path : paths) {
     File dir = new File(basedir, path)
     System.out.println("Creating directory: " + dir)
-    if (!dir.mkdirs()) {
-        throw new IOException("Failed to create directory: " + dir)
-    }
+    assert dir.mkdirs() : "Failed to create directory: " + dir
 }

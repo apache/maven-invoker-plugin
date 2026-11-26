@@ -27,5 +27,4 @@ def server = settings.servers.server.find{
     it.id.equals('dummy-it-settings-merge')
 }
 
-if(!server.password.equals('overridden'))
-    throw new org.apache.maven.plugin.MojoExecutionException("Incorrect server password - specified settings.xml not merged/dominant " + server.password)
+assert server.password.equals('overridden') : "Incorrect server password - specified settings.xml not merged/dominant " + server.password

@@ -17,21 +17,6 @@
  * under the License.
  */
 
-import java.io.*
-import java.util.*
-import java.util.regex.*
-
-try {
-    File touchFile = new File(basedir, "target/touch.txt")
-    System.out.println("Checking for existence of touch file: " + touchFile)
-    if (!touchFile.exists()) {
-        System.out.println("touch.txt not exists FAILED!")
-        return false
-    }
-}
-catch(Throwable t) {
-    t.printStackTrace()
-    return false
-}
-
-return true
+File touchFile = new File(basedir, "target/touch.txt")
+System.out.println("Checking for existence of touch file: " + touchFile)
+assert touchFile.exists() : "touch.txt not exists FAILED!"

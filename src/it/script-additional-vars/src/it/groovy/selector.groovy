@@ -17,21 +17,8 @@
  * under the License.
  */
 
-import java.io.*
-import java.util.*
+println hello
+assert hello == "world" : "Additional script variable declared in mojo configuration not defined: hello"
 
-try {
-    println hello
-    if (!hello.equals("world")) {
-        throw new Exception("Additional script variable declared in mojo configuration not defined: hello")
-    }
-
-    println version
-    if (!version.equals("1.0-SNAPSHOT")) {
-        throw new Exception("Additional script variable declared in mojo configuration not defined: version")
-    }
-}
-catch(Throwable t) {
-    t.printStackTrace()
-    throw t
-}
+println version
+assert version == "1.0-SNAPSHOT" : "Additional script variable declared in mojo configuration not defined: version"

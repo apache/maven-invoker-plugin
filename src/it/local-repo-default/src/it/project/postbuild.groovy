@@ -17,21 +17,9 @@
  * under the License.
  */
 
-import java.io.*
-import java.util.*
-import java.util.regex.*
-
-try {
-    // just dump our local repo path for verification by the parent build
-    File textFile = new File(basedir, "target/local-repo-path.txt")
-    textFile.getParentFile().mkdirs()
-    Writer writer = new OutputStreamWriter(new FileOutputStream(textFile), "UTF-8")
-    writer.write(localRepositoryPath.getAbsolutePath())
-    writer.close()
-}
-catch(Throwable t) {
-    t.printStackTrace()
-    return false
-}
+// just dump our local repo path for verification by the parent build
+File textFile = new File(basedir, "target/local-repo-path.txt")
+textFile.getParentFile().mkdirs()
+textFile.write(localRepositoryPath.getAbsolutePath(), 'UTF-8')
 
 return true
