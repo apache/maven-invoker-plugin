@@ -125,8 +125,8 @@ Use `assert` with a message instead of a `try` and `catch` block that returns `f
 expression when the assertion fails, so the message in `build.log` shows what the script found:
 
 ```groovy
-def log = new File( basedir, "build.log" )
-assert log.text.contains( "BUILD SUCCESS" ) : "build.log does not report a successful build"
+def log = new File(basedir, "build.log")
+assert log.text.contains("BUILD SUCCESS") : "build.log does not report a successful build"
 ```
 
 ## File encoding
@@ -135,8 +135,8 @@ Read files with an explicit character set. The `text` property and the `getText(
 argument use the platform character set, so the same script can read different content on different machines:
 
 ```groovy
-def lines = new File( basedir, "target/report.txt" ).readLines( 'UTF-8' )
-def content = new File( basedir, "target/report.txt" ).getText( 'UTF-8' )
+def lines = new File(basedir, "target/report.txt").readLines('UTF-8')
+def content = new File(basedir, "target/report.txt").getText('UTF-8')
 ```
 
 ## Classpath
