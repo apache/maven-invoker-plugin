@@ -116,7 +116,7 @@ The effect of a failure depends on the kind of script:
 
 - A failing pre-build script marks the test project as failed in the pre-build hook.
 - A failing post-build script marks the test project as failed in the post-build hook.
-- A selector script that returns a value other than `true` skips the test project. A selector script that throws an
+- A selector script that returns a value other than `null` or `true` skips the test project. A selector script that throws an
   exception ends the test project with an error instead of skipping it.
 
 ## Assertions
