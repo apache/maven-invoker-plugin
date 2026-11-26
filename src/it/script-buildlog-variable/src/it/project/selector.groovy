@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// no build has run yet, so the file may not exist; the entry is still there
+// no build has run yet: the log exists but holds no build output
 assert context.containsKey("buildLog")
 assert context.get("buildLog") instanceof File
+assert context.get("buildLog").isFile()
 
 return true
