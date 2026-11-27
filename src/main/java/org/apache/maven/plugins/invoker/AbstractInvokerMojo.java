@@ -126,9 +126,6 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
     static final String SPLIT_LOCAL_REPOSITORY_PROPERTY = "aether.enhancedLocalRepository.split";
 
     /**
-     * The zero-based column index where to print the invoker result.
-     */
-    /**
      * Flag used to suppress certain invocations. This is useful in tailoring the build using profiles.
      *
      * @since 1.1
