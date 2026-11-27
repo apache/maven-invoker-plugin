@@ -1759,7 +1759,8 @@ public abstract class AbstractInvokerMojo extends AbstractMojo {
             buildJob.setResult(BuildJob.Result.ERROR);
             buildJob.setFailureMessage(String.valueOf(e));
 
-            getLog().error(pad(buildJob).failure("ERROR").a(' ') + "(" + formatElapsedTime(buildJob.getTime()) + ")");
+            getLog().error(buffer().a(logPrefix).failure("ERROR").a(' ') + "(" + formatElapsedTime(buildJob.getTime())
+                    + ")");
             getLog().error("  " + e);
             throw e;
         } finally {
