@@ -185,7 +185,7 @@ Delete the `.bsh` file once the `.groovy` file exists: when you configure a scri
 files exist, the plugin runs the `.bsh` one.
 
 A script configured with an extension other than `.bsh` or `.groovy`, such as `verify.txt`, runs as Groovy since plugin
-version 3.11.0; earlier versions ran it as BeanShell. The plugin logs a warning for each such script.
+version 3.11.0, which uses maven-script-interpreter 1.10; earlier versions ran it as BeanShell.
 
 # Pre and Post Build Script for multiple project executions
 
