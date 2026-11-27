@@ -27,11 +27,11 @@ def buildLog = new File(basedir, 'build.log').text
 
 def fs = File.separator
 
-assert buildLog.count("setup${fs}pom.xml .................................... FAILED") == 1
-assert buildLog.count("setup${fs}pom.xml .................................... SUCCESS") == 1
+assert buildLog.count("[setup${fs}pom.xml] FAILED") == 1
+assert buildLog.count("[setup${fs}pom.xml] SUCCESS") == 1
 
-assert buildLog.count("project${fs}pom.xml .................................. FAILED") == 1
-assert buildLog.count("project${fs}pom.xml .................................. SUCCESS") == 1
+assert buildLog.count("[project${fs}pom.xml] FAILED") == 1
+assert buildLog.count("[project${fs}pom.xml] SUCCESS") == 1
 
 def setupBuildLog1 = new File(basedir, 'target/it/setup/build.log.1').text
 assert setupBuildLog1.count("[INFO] BUILD SUCCESS") == 1
